@@ -1,0 +1,82 @@
+ver: 10
+debug: false
+
+#强制要求加载资源包
+RequireResourcePack: false
+
+#发送资源包的提示
+ResourcePackPrompt: |
+  §b服务器内拥有自定义材质的轻RPG物品，
+  如果不使用服务器资源包的话可能会影响正常游玩。
+
+#吃东西时播放声音
+EatSound:
+  ROTTEN_FLESH: minecraft:moe.burp  #吃腐肉时播放moe.burp
+  SWEET_BERRIES: minecraft:moe.huaq
+
+#自定义物品配置
+CustItemSetting:
+  BambooDragonfly: #竹蜻蜓
+    flySpeed: 0.03
+  SeekerBow:
+    spawnChance: 0.080 #生成到怪物手上的几率
+    itemDropChance: 0.25 #掉落几率
+    turningPower: 0.2 #转向能力
+    duration: 80 #持续导航时间
+    delay: 4 #发射后延迟导航
+    saveTarget: false #发射出去后是否保留目标选择
+
+  EnderBow: #末影弓
+    spawnChance: 0.075
+    itemDropChance: 0.25
+    swapVehicle: true    #交换坐骑
+
+  EnderHat: #末影使者
+    spawnChance: 0.075
+    itemDropChance: 0.25
+
+  SamuraiSword: #武士刀
+    spawnChance: 0.075
+    itemDropChance: 0.25
+    damage: 10    #伤害
+    skillDamage: 18.5   #技能伤害
+
+  ResurrectArmor: #妖精庇护r
+    cooldown: 120    #被动CD
+  Creeper:
+    fuze: 50
+
+#自定义实体配置
+CustEntitySetting:
+  SkeletonWin: #骷髅王
+    spawnChance: #生成几率
+      _def_: 0.02 #缺省值所有世界生成几率
+      world: 0.025 #world主世界生成几率
+    itemDropChance: 0.25
+    dropexp: 600 #掉落经验值
+
+  ZombieWarrior: #僵尸武士配置
+    spawnChance:
+      _def_: 0.025
+      world: 0.03
+    itemDropChance: 0.9
+    dropexp: 600
+
+  SlimeWin: #骷髅王配置
+    spawnChance:
+      _def_: 0.025
+      world: 0.03
+    size: 10
+
+#内建Http资源包服务器
+HttpServer:
+  #是否启用
+  enable: false
+  #速度限制(0为关闭
+  rateLimiting: 2M
+  #最大连接数(0为关闭
+  maxCount: 6
+  #服务器地址和端口(0.0.0.0为监听所有网卡)
+  serverUrl: 'http://0.0.0.0:1888'
+  #http服务根目录
+  serverDir: 'plugins/RPGArmour/http'
