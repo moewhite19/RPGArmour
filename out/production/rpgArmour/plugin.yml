@@ -1,0 +1,53 @@
+name: RPGArmour
+description: RPGArmour
+main: cn.whiteg.rpgArmour.RPGArmour
+version: 1.0.1
+api-version: 1.13
+author: MoeWhite
+depend: [MMOCore, MoeInfo]
+softdepend: []
+commands:
+  rpgarmour:
+   description: MyPlug
+   aliases:
+     - 'ra'
+     - 'rpga'
+  rideo:
+    description: MyPlug
+    aliases:
+    - 'rdo'
+    - 'reo'
+
+  ride:
+    description: MyPlug
+    aliases:
+    - 'rd'
+    - 're'
+
+  rideme:
+    description: MyPlug
+    aliases:
+    - 'rdm'
+    - 'rem'
+
+  hat:
+    description: hat command
+    aliases:
+    - 'heat'
+
+  eject:
+    description: eject command
+
+#permissions:
+#  RPGArmour.*:
+#    description: MyplugPer
+#    default: op
+#    children:
+#      whiteg.reload: true
+#      whiteg.test: true
+#  RPGArmour.reload:
+#    description: Reload
+#    default: [rpga,ra]
+#  RPGArmour.test:
+#    description: Test
+#    default: opw

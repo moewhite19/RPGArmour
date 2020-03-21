@@ -1,0 +1,133 @@
+package cn.whiteg.rpgArmour;
+
+import cn.whiteg.mmocore.common.CommandInterface;
+import cn.whiteg.mmocore.MMOCore;
+import cn.whiteg.mmocore.util.PluginUtil;
+import cn.whiteg.rpgArmour.custItems.ResurrectArmor;
+import cn.whiteg.rpgArmour.listener.*;
+import cn.whiteg.rpgArmour.manager.*;
+import org.bukkit.Bukkit;
+import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.entity.Entity;
+
+import java.lang.ref.SoftReference;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Logger;
+
+
+public class RPGArmour extends PluginBase {
+    public static RPGArmour plugin;
+    public static Debuger debuger;
+    public static SoftReference<List<Entity>> ClearComfirm = new SoftReference<>(null);
+    public static Logger logger;
+    public static ConsoleCommandSender console;
+    public MMOCore mmoCore;
+    public CommandManager commandManager;
+    public SubCommand subCommand;
+    private CustItemManager itemManager;
+    private CustEntityManager entityManager;
+    private RecipeManage recipeManage;
+    private ApiManager apiManager;
+    private GUIManager guiManager;
+
+    public RPGArmour() {
+        plugin = this;
+    }
+
+    public void onLoad() {
+        logger = getLogger();
+        console = Bukkit.getConsoleSender();
+        logger.info("--开始加载");
+        Setting.reload();
+        saveDefaultConfig();
+        if (Setting.DEBUG){
+            logger.info("已开启调试");
+            debuger = new Debuger(getLogger());
+            //EntityTypes<MyZombie> nz = EntityTypes.a("myzombie",EntityTypes.a.a(MyZombie.class,MyZombie::new));
+            //ARMOR_STAND = a("armor_stand",EntityTypes.a.a(EntityArmorStand::new,EnumCreatureType.MISC).a(0.5F,1.975F));
+            //EntityTypes.a("zombie", EntityTypes.a.a(MyMode.class, MyMode::new));
+        } else {
+            debuger = new Debuger(null);
+        }
+    }
+
+    public void onEnable() {
+//        guiManager = new GUIManager(this);
+        recipeManage = new RecipeManage(this);
+        itemManager = new CustItemManager();
+        entityManager = new CustEntityManager();
+        if (Bukkit.getPluginManager().getPlugin("MMOCore") != null)
+            mmoCore = MMOCore.plugin;
+        regListener(new ArmorListener());
+        regListener(new PlayerItemHatListener());
+        regListener(new RideListenetr());
+        regListener(new PlayerAttListener());
+//        try{
+//            regListener(new PaperPlayerJumpListener());
+//            logger.info("使用PaperJump事件");
+//        }catch (Exception e){
+//            regListener(new PlayerMoveToJump());
+//            logger.info("使用MoveToJump事件");
+//        }
+        regListener(new PlayerMoveToJump());
+        regListener(new PlayerDammangeListener());
+        regListener(new undyingListener());
+        regListener(new ResurrectArmor());
+        regListener(new DisplayDamageListener());
+        //修复刷怪笼事件
+//        regListener(new SpawnerReasonFix());
+        if (Setting.forgeResourcePack) regListener(new forgePackListener());
+//        regEven(new Craftting());
+        commandManager = new CommandManager();
+        final PluginCommand pcmd = getCommand("rpgarmour");
+        if (pcmd != null){
+            pcmd.setExecutor(commandManager);
+            pcmd.setTabCompleter(commandManager);
+            subCommand = new SubCommand();
+            for (Map.Entry<String, CommandInterface> e : commandManager.commands.entrySet()) {
+                String cmd = e.getKey();
+                final PluginCommand c = PluginUtil.getPluginCommand(this,cmd);
+                final CommandInterface ci = e.getValue();
+                subCommand.regCommand(cmd,ci);
+                if (c != null){
+                    c.setExecutor(subCommand);
+                    c.setTabCompleter(subCommand);
+                }
+            }
+        }
+        ResourcePackManage.set();
+    }
+
+    public void onDisable() {
+        //animation.unreg();
+        unregListener();
+        getLogger().info("关闭");
+        recipeManage.unload();
+        recipeManage = null;
+        entityManager = null;
+        itemManager = null;
+        apiManager = null;
+    }
+
+    public CustItemManager getItemManager() {
+        return itemManager;
+    }
+
+    public CustEntityManager getEntityManager() {
+        return entityManager;
+    }
+
+    public RecipeManage getRecipeManage() {
+        return recipeManage;
+    }
+
+    public GUIManager getGuiManager() {
+        return guiManager;
+    }
+
+    public ApiManager getApiManager() {
+        return apiManager;
+    }
+}

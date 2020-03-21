@@ -1,0 +1,232 @@
+ver: 8
+debug: false
+
+#强制要求加载资源包
+forgeResourcePack: false
+#吃东西时播放声音
+EatSound:
+  #吃腐肉时播放moe.burp
+  ROTTEN_FLESH: minecraft:moe.burp
+  SWEET_BERRIES: minecraft:moe.huaq
+
+CustItemSetting:
+  #竹蜻蜓
+  BambooDragonfly:
+    flySpeed: 0.03
+  SeekerBow:
+    #生成到怪物手上的几率
+    spawnChance: 0.080
+    #掉落几率
+    itemDropChance: 0.25
+  #末影弓
+  EnderBow:
+    spawnChance: 0.075
+    itemDropChance: 0.25
+    #末影弓
+  QuickFiringCrossbow:
+    spawnChance: 0.075
+    itemDropChance: 0.25
+  #末影使者
+  EnderHat:
+    spawnChance: 0.075
+    itemDropChance: 0.25
+  #武士刀
+  SamuraiSword:
+    spawnChance: 0.075
+    itemDropChance: 0.25
+    #伤害
+    damage: 10
+    #技能伤害
+    skillDamage: 18.5
+  ResurrectArmor:
+    #被动CD
+    cooldown: 120
+  Creeper:
+    fuze: 50
+  GravityStaff:
+    damageRisk: 0.03
+    BlockList:
+      - STONE
+      - GRASS
+      - DIRT
+      - COBBLESTONE
+      - BEDROCK
+      - SAND
+      - GRAVEL
+      - GOLD_ORE
+      - IRON_ORE
+      - COAL_ORE
+      - SPONGE
+      - GLASS
+      - LAPIS_ORE
+      - LAPIS_BLOCK
+      - DISPENSER
+      - SANDSTONE
+      - NOTE_BLOCK
+      - GOLD_BLOCK
+      - IRON_BLOCK
+      - BRICK
+      - TNT
+      - BOOKSHELF
+      - MOSSY_COBBLESTONE
+      - OBSIDIAN
+      - DIAMOND_ORE
+      - DIAMOND_BLOCK
+      - REDSTONE_ORE
+      - ICE
+      - SNOW_BLOCK
+      - CACTUS
+      - CLAY
+      - JUKEBOX
+      - PUMPKIN
+      - NETHERRACK
+      - SOUL_SAND
+      - GLOWSTONE
+      - JACK_O_LANTERN
+      - BRICK_STAIRS
+      - NETHER_BRICK
+      - BREWING_STAND
+      - CAULDRON
+      - END_STONE
+      - DRAGON_EGG
+      - SANDSTONE_STAIRS
+      - EMERALD_ORE
+      - ENDER_CHEST
+      - EMERALD_BLOCK
+      - BEACON
+      - ANVIL
+      - DAYLIGHT_DETECTOR
+      - REDSTONE_BLOCK
+      - HOPPER
+      - QUARTZ_BLOCK
+      - DROPPER
+      - SLIME_BLOCK
+      - BARRIER
+      - IRON_TRAPDOOR
+      - PRISMARINE
+      - SEA_LANTERN
+      - HAY_BLOCK
+      - COAL_BLOCK
+      - PACKED_ICE
+      - RED_SANDSTONE
+      - RED_SANDSTONE_STAIRS
+      - SPRUCE_FENCE_GATE
+      - BIRCH_FENCE_GATE
+      - JUNGLE_FENCE_GATE
+      - DARK_OAK_FENCE_GATE
+      - ACACIA_FENCE_GATE
+      - SPRUCE_FENCE
+      - BIRCH_FENCE
+      - JUNGLE_FENCE
+      - DARK_OAK_FENCE
+      - ACACIA_FENCE
+      - SPRUCE_DOOR
+      - BIRCH_DOOR
+      - JUNGLE_DOOR
+      - ACACIA_DOOR
+      - DARK_OAK_DOOR
+      - PURPUR_BLOCK
+      - PURPUR_PILLAR
+      - PURPUR_STAIRS
+      - PURPUR_SLAB
+      - GRASS_PATH
+      - FROSTED_ICE
+      - NETHER_WART_BLOCK
+      - BONE_BLOCK
+      - OBSERVER
+      - WHITE_GLAZED_TERRACOTTA
+      - ORANGE_GLAZED_TERRACOTTA
+      - MAGENTA_GLAZED_TERRACOTTA
+      - LIGHT_BLUE_GLAZED_TERRACOTTA
+      - YELLOW_GLAZED_TERRACOTTA
+      - LIME_GLAZED_TERRACOTTA
+      - PINK_GLAZED_TERRACOTTA
+      - GRAY_GLAZED_TERRACOTTA
+      - CYAN_GLAZED_TERRACOTTA
+      - PURPLE_GLAZED_TERRACOTTA
+      - BLUE_GLAZED_TERRACOTTA
+      - BROWN_GLAZED_TERRACOTTA
+      - GREEN_GLAZED_TERRACOTTA
+      - RED_GLAZED_TERRACOTTA
+      - BLACK_GLAZED_TERRACOTTA
+    EntityList:
+      - STRAY
+      - HUSK
+      - ZOMBIE_VILLAGER
+      - SKELETON_HORSE
+      - ZOMBIE_HORSE
+      - ARMOR_STAND
+      - DONKEY
+      - MULE
+      - VINDICATOR
+      - ILLUSIONER
+      - SPIDER
+      - SLIME
+      - CAVE_SPIDER
+      - SILVERFISH
+      - BLAZE
+      - MAGMA_CUBE
+      - ENDER_DRAGON
+      - WITHER
+      - BAT
+      - WITCH
+      - ENDERMITE
+      - GUARDIAN
+      - PIG
+      - SHEEP
+      - COW
+      - CHICKEN
+      - SQUID
+      - WOLF
+      - MUSHROOM_COW
+      - SNOWMAN
+      - OCELOT
+      - IRON_GOLEM
+      - HORSE
+      - RABBIT
+      - POLAR_BEAR
+      - LLAMA
+      - PARROT
+      - VILLAGER
+      - TURTLE
+      - PHANTOM
+      - COD
+      - SALMON
+      - PUFFERFISH
+      - TROPICAL_FISH
+      - DROWNED
+      - DOLPHIN
+      - CAT
+      - PANDA
+      - RAVAGER
+      - TRADER_LLAMA
+      - WANDERING_TRADER
+      - FOX
+
+CustEntitySetting:
+  #骷髅王
+  SkeletonWin:
+    #生成几率
+    spawnChance:
+      #缺省值所有世界生成几率
+      _def_: 0.02
+      #world主世界生成几率
+      world: 0.025
+    itemDropChance: 0.25
+    dropexp: 600
+  ZombWarrior:
+    spawnChance:
+      _def_: 0.025
+      world: 0.03
+    itemDropChance: 0.9
+    dropexp: 600
+  ZombWin:
+    spawnChance:
+      _def_: 0.01
+    itemDropChance: 0.9
+    dropexp: 600
+  SlimeWin:
+    spawnChance:
+      _def_: 0.025
+      world: 0.03
+    size: 10
