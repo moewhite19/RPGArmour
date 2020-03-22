@@ -1,31 +1,28 @@
 package cn.whiteg.rpgArmour.commands;
 
 import cn.whiteg.mmocore.common.CommandInterface;
-import cn.whiteg.rpgArmour.utils.ItemToolUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.bukkit.inventory.meta.ItemMeta;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class openinv extends CommandInterface {
 
     @Override
     public boolean onCommand(CommandSender sender,Command cmd,String label,String[] args) {
+        if (!sender.hasPermission("whiteg.test")){
+            sender.sendMessage("阁下没有权限");
+            return false;
+        }
         if (args.length > 1){
             Player player = Bukkit.getPlayer(args[1]);
-            if(player==null){
+            if (player == null){
                 sender.sendMessage("没有找到玩家");
                 return true;
             }
             PlayerInventory inv = player.getInventory();
-            if(sender instanceof Player){
+            if (sender instanceof Player){
                 Player sp = (Player) sender;
                 sp.openInventory(inv);
             }

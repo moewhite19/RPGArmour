@@ -16,16 +16,26 @@ import org.bukkit.entity.Player;
 import java.lang.ref.SoftReference;
 import java.util.*;
 
-import static cn.whiteg.rpgArmour.RPGArmour.ClearComfirm;
-
 public class clear extends CommandInterface {
+    static public SoftReference<List<Entity>> ClearComfirm = new SoftReference<>(null);
 
     @Override
     public boolean onCommand(CommandSender sender,Command cmd,String label,String[] args) {
-        {
-            if (sender.hasPermission("whiteg.test")){
-                try{
-                    if (args.length == 2 && sender instanceof Player){
+        if (sender.hasPermission("whiteg.test")){
+            try{
+                if (args.length == 2){
+                    if (args[1].equals("confirm")){
+                        List<Entity> entitys = ClearComfirm.get();
+                        if (entitys == null){
+                            sender.sendMessage("没有实体可以清理");
+                            return false;
+                        }
+                        for (Entity entity : entitys) {
+                            entity.remove();
+                        }
+                        sender.sendMessage("清理了" + entitys.size() + "个实体");
+                        ClearComfirm.clear();
+                    } else if (sender instanceof Player){
                         double r;
                         String d = args[1];
                         if (d.equals("*")){
@@ -33,7 +43,30 @@ public class clear extends CommandInterface {
                         } else r = Double.valueOf(args[1]);
                         Player player = (Player) sender;
                         onClear(player,r,sender);
-                    } else if (args.length == 3){
+                    }
+                } else if (args.length == 3){
+                    if (args[1].equals("confirm")){
+                        List<Entity> entitys = ClearComfirm.get();
+                        if (entitys == null){
+                            sender.sendMessage("没有实体可以清理");
+                            return false;
+                        }
+                        EntityType et;
+                        try{
+                            et = EntityType.valueOf(args[2]);
+                        }catch (IllegalArgumentException e){
+                            sender.sendMessage("无效ID");
+                            return false;
+                        }
+                        int num = 0;
+                        for (int i = entitys.size() - 1; i >= 0; i--) {
+                            if (entitys.get(i).getType() != et) continue;
+                            entitys.get(i).remove();
+                            entitys.remove(i);
+                            num++;
+                        }
+                        sender.sendMessage("清理了" + num + "个实体");
+                    } else {
                         Player player = Bukkit.getPlayer(args[2]);
                         if (player == null){
                             sender.sendMessage("找不到玩家");
@@ -46,12 +79,13 @@ public class clear extends CommandInterface {
                         } else r = Double.valueOf(args[1]);
                         onClear(player,r,sender);
                     }
-                }catch (NumberFormatException e){
-                    sender.sendMessage("无效参数");
+
                 }
-            } else {
-                sender.sendMessage("阁下没有权限");
+            }catch (NumberFormatException e){
+                sender.sendMessage("无效参数");
             }
+        } else {
+            sender.sendMessage("阁下没有权限");
         }
         return false;
     }
@@ -78,12 +112,12 @@ public class clear extends CommandInterface {
         ClearComfirm = new SoftReference<>(entities);
         for (Map.Entry m : map.entrySet()) {
             TextComponent a1 = new TextComponent(m.getKey() + " * " + m.getValue());
-            a1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/ra clearconfirm " + m.getKey()));
+            a1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/ra clear confirm " + m.getKey()));
             a1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("清除这类").color(ChatColor.BLUE).create()));
             sender.spigot().sendMessage(a1);
         }
         TextComponent a1 = new TextComponent("发现了" + iar + "个实体");
-        a1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/ra clearconfirm"));
+        a1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/ra clear confirm"));
         a1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("清除全部").color(ChatColor.BLUE).create()));
         sender.spigot().sendMessage(a1);
     }

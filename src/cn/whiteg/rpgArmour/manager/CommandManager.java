@@ -7,7 +7,7 @@ import org.bukkit.command.*;
 import java.util.*;
 
 public class CommandManager implements CommandExecutor, TabCompleter {
-    final private String[] cmds = new String[]{"clear","clearconfirm","reload","worldentity","rideo","ride","rideme","test","give","summon","show","openinv","hat","getmode","eject","spawneff","setpack","sendpack","ghost","setsize","setbox","recipe"};
+    final private String[] cmds = new String[]{"clear","reload","rideo","ride","rideme","test","give","summon","show","openinv","hat","getmode","eject","spawneff","setpack","sendpack","ghost","setsize","setbox","recipe"};
     final public Map<String, CommandInterface> commands = new HashMap<>(cmds.length);
 
     public CommandManager() {

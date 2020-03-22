@@ -20,7 +20,6 @@ import java.util.logging.Logger;
 public class RPGArmour extends PluginBase {
     public static RPGArmour plugin;
     public static Debuger debuger;
-    public static SoftReference<List<Entity>> ClearComfirm = new SoftReference<>(null);
     public static Logger logger;
     public static ConsoleCommandSender console;
     public MMOCore mmoCore;
