@@ -25,7 +25,6 @@ public class RPGArmour extends PluginBase {
     public static ConsoleCommandSender console;
     public MMOCore mmoCore;
     public CommandManager commandManager;
-    public SubCommand subCommand;
     private CustItemManager itemManager;
     private CustEntityManager entityManager;
     private RecipeManage recipeManage;
@@ -85,17 +84,6 @@ public class RPGArmour extends PluginBase {
         if (pcmd != null){
             pcmd.setExecutor(commandManager);
             pcmd.setTabCompleter(commandManager);
-            subCommand = new SubCommand();
-            for (Map.Entry<String, CommandInterface> e : commandManager.commands.entrySet()) {
-                String cmd = e.getKey();
-                final PluginCommand c = PluginUtil.getPluginCommand(this,cmd);
-                final CommandInterface ci = e.getValue();
-                subCommand.regCommand(cmd,ci);
-                if (c != null){
-                    c.setExecutor(subCommand);
-                    c.setTabCompleter(subCommand);
-                }
-            }
         }
         ResourcePackManage.set();
     }

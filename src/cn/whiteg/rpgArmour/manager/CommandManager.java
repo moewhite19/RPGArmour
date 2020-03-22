@@ -1,22 +1,25 @@
 package cn.whiteg.rpgArmour.manager;
 
 import cn.whiteg.mmocore.common.CommandInterface;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.TabCompleter;
+import cn.whiteg.rpgArmour.RPGArmour;
+import org.bukkit.command.*;
 
 import java.util.*;
 
 public class CommandManager implements CommandExecutor, TabCompleter {
-    public Map<String, CommandInterface> commands = new HashMap<>();
-    private String[] cmds;
+    final private String[] cmds = new String[]{"clear","clearconfirm","reload","worldentity","rideo","ride","rideme","test","give","summon","show","openinv","hat","getmode","eject","spawneff","setpack","sendpack","ghost","setsize","setbox","recipe"};
+    final public Map<String, CommandInterface> commands = new HashMap<>(cmds.length);
 
     public CommandManager() {
-        cmds = new String[]{"clear","clearconfirm","reload","worldentity","rideo","ride","rideme","test","give","summon","show","openinv","hat","getmode","eject","spawneff","setpack","sendpack","ghost","setsize","setbox" , "recipe"};
-        for (String s : cmds) {
+        SubCommand subCommand = new SubCommand();
+        for (String cmd : cmds) {
             try{
-                commands.put(s,(CommandInterface) Class.forName("cn.whiteg.rpgArmour.commands." + s).newInstance());
+                commands.put(cmd,(CommandInterface) Class.forName("cn.whiteg.rpgArmour.commands." + cmd).newInstance());
+                PluginCommand pc = RPGArmour.plugin.getCommand(cmd);
+                if (pc != null){
+                    pc.setExecutor(subCommand);
+                    pc.setTabCompleter(subCommand);
+                }
             }catch (InstantiationException | IllegalAccessException | ClassNotFoundException e){
                 e.printStackTrace();
             }
@@ -66,5 +69,28 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             return getMatches(args[0],localArrayList);
         }
         return null;
+    }
+
+    public class SubCommand implements CommandExecutor, TabCompleter {
+        @Override
+        public boolean onCommand(CommandSender commandSender,Command command,String s,String[] strings) {
+            final CommandInterface ci = commands.get(command.getName());
+            if (ci == null) return false;
+            String[] args = new String[strings.length + 1];
+            args[0] = command.getName();
+            System.arraycopy(strings,0,args,1,strings.length);
+            ci.onCommand(commandSender,command,s,args);
+            return true;
+        }
+
+        @Override
+        public List<String> onTabComplete(CommandSender commandSender,Command command,String s,String[] strings) {
+            CommandInterface ci = commands.get(command.getName());
+            if (ci == null) return null;
+            String[] args = new String[strings.length + 1];
+            args[0] = command.getName();
+            System.arraycopy(strings,0,args,1,strings.length);
+            return ci.onTabComplete(commandSender,command,s,args);
+        }
     }
 }
