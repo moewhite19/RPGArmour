@@ -4,12 +4,12 @@ import net.minecraft.server.v1_15_R1.NBTTagCompound;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
-public class nmsItem_1_15_R1 implements NMSItem {
+public class NMSItem_1_15_R1 extends NMSItem {
     private final net.minecraft.server.v1_15_R1.ItemStack nmsItem;
     private TagCompound roottag;
     private ItemStack bukkitItem;
 
-    public nmsItem_1_15_R1(ItemStack item) {
+    public NMSItem_1_15_R1(ItemStack item) {
         this.bukkitItem = item;
         nmsItem = CraftItemStack.asNMSCopy(item);
         roottag = new TagCompound_1_15_R1(nmsItem.getTag());

@@ -4,10 +4,9 @@ import cn.whiteg.mmocore.common.CommandInterface;
 import cn.whiteg.rpgArmour.Setting;
 import cn.whiteg.rpgArmour.enitity.MyZombie;
 import cn.whiteg.rpgArmour.entityWrapper.DropItem;
-import cn.whiteg.rpgArmour.nms.ItemNbtBuilder;
+import cn.whiteg.rpgArmour.nms.NMSItem;
 import cn.whiteg.rpgArmour.nms.TagCompound;
 import net.minecraft.server.v1_15_R1.PacketPlayOutExplosion;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -74,7 +73,7 @@ public class test extends CommandInterface {
                 Player player = (Player) sender;
                 PlayerInventory inv = player.getInventory();
                 ItemStack item = inv.getItemInMainHand();
-                ItemNbtBuilder nms = new ItemNbtBuilder(item);
+                NMSItem nms = NMSItem.asNmsItemCopy(item);
                 sender.sendMessage("has" + nms.hasTag());
                 break;
             }
@@ -82,7 +81,7 @@ public class test extends CommandInterface {
                 Player player = (Player) sender;
                 PlayerInventory inv = player.getInventory();
                 ItemStack item = inv.getItemInMainHand();
-                ItemNbtBuilder nms = new ItemNbtBuilder(item);
+                NMSItem nms = NMSItem.asNmsItemCopy(item);
                 TagCompound tgs = nms.hasTag() ? nms.getTag() : nms.craftTag();
                 String key = args.length > 2 ? args[2] : "Test";
                 String str = args.length > 3 ? args[3] : "Test";
@@ -97,7 +96,7 @@ public class test extends CommandInterface {
                 Player player = (Player) sender;
                 PlayerInventory inv = player.getInventory();
                 ItemStack item = inv.getItemInMainHand();
-                ItemNbtBuilder nms = new ItemNbtBuilder(item);
+                NMSItem nms = NMSItem.asNmsItemCopy(item);
                 TagCompound tgs = nms.getTag();
                 String key = args.length > 2 ? args[2] : "Test";
                 if (tgs.hasTag()) sender.sendMessage("目标Tag为 " + tgs.getString(key));

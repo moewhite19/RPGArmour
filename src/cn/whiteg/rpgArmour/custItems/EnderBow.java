@@ -35,35 +35,19 @@ public class EnderBow extends CustItem_CustModle implements Listener {
     }
 
     public static void swapLoc(Entity e,Entity f) {
-        if (e.isDead() || f.isDead() || e == f) return;
+        if (!e.isValid() || !f.isValid() || e == f) return;
         Location el = e.getLocation();
         Entity ev = e.getVehicle();
 
         Location fl = f.getLocation();
         Entity fv = f.getVehicle();
-
-//        if (fv != null){
-//            EntityTpUtils.forgeStopRide(f);
-//            fv.addPassenger(e);
-//        } else {
-//            EntityTpUtils.enderTeleportTo(e,fl);
-//        }
-//
-//        if (ev != null){
-//            EntityTpUtils.forgeStopRide(e);
-//            ev.addPassenger(f);
-//        } else {
-//            EntityTpUtils.enderTeleportTo(f,el);
-//        }
         tpLoc(e,fv,fl);
         tpLoc(f,ev,el);
     }
 
     public static void tpLoc(Entity e,Entity v,Location loc) {
-        if (v != null && v.isValid() && (e.getVehicle() == v || v.addPassenger(e))){
-            return;
-        }
         EntityTpUtils.forgeStopRide(e);
+        if (v != null && v.isValid() && v.addPassenger(e)) return;
         EntityTpUtils.enderTeleportTo(e,loc);
     }
 

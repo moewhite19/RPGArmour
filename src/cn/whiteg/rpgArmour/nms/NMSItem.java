@@ -3,16 +3,39 @@ package cn.whiteg.rpgArmour.nms;
 
 import org.bukkit.inventory.ItemStack;
 
-interface NMSItem {
-    boolean hasTag();
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
-    TagCompound getTag();
+public abstract class NMSItem {
+    private static Constructor con;
 
-    void setTag(TagCompound tag);
+    static {
+        Class<?> nmsClass = NMSItem_1_15_R1.class;
+        try{
+            con = nmsClass.getConstructor(ItemStack.class);
+        }catch (NoSuchMethodException e){
+            e.printStackTrace();
+        }
+    }
 
-    TagCompound craftTag();
+    public static NMSItem asNmsItemCopy(ItemStack item) {
+        try{
+            return (NMSItem) con.newInstance(item);
+        }catch (InstantiationException | IllegalAccessException | InvocationTargetException e){
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-    ItemStack update();
+    public abstract boolean hasTag();
 
-    ItemStack getItem();
+    public abstract TagCompound getTag();
+
+    public abstract void setTag(TagCompound tag);
+
+    public abstract TagCompound craftTag();
+
+    public abstract ItemStack update();
+
+    public abstract ItemStack getItem();
 }
