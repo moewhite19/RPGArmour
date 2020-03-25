@@ -47,7 +47,7 @@ public class EnderBow extends CustItem_CustModle implements Listener {
 
     public static void tpLoc(Entity e,Entity v,Location loc) {
         EntityTpUtils.forgeStopRide(e);
-        if (v != null && v.isValid() && v.addPassenger(e)) return;
+        if (v == e || v != null && v.isValid() && v.addPassenger(e)) return;
         EntityTpUtils.enderTeleportTo(e,loc);
     }
 
