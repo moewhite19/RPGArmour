@@ -1,10 +1,7 @@
 package cn.whiteg.rpgArmour.custEntitys;
 
-import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.Setting;
 import cn.whiteg.rpgArmour.api.CustEntityName;
-import cn.whiteg.rpgArmour.api.CustItem;
-import cn.whiteg.rpgArmour.custItems.XiaoChou;
 import cn.whiteg.rpgArmour.utils.RandomUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -59,17 +56,19 @@ public class SlimeWin extends CustEntityName implements Listener, CommandExecuto
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent event) {
         Entity e = event.getEntity();
-        Entity der = event.getDamager();
-        if (is(e) && der instanceof Projectile){
+        Entity damager = event.getDamager();
+        if (e == damager) return;
+        if (damager instanceof Projectile && is(e)){
             event.setCancelled(true);
-            der.remove();
+            damager.remove();
             final Slime slime = (Slime) event.getEntity();
             slime.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,20,2));
             slime.getWorld().playSound(slime.getLocation(),"minecraft:block.wet_grass.break",SoundCategory.AMBIENT,1f,0.5f);
-        } else if (is(der)){
+        } else if (is(damager)){
             final Slime slime = (Slime) event.getDamager();
             slime.addPotionEffect(new PotionEffect(PotionEffectType.REGENERATION,40,2));
-            e.addPassenger(der);
+            if (e.getVehicle() == damager) return;
+            damager.addPassenger(e);
         }
     }
 
@@ -134,6 +133,7 @@ public class SlimeWin extends CustEntityName implements Listener, CommandExecuto
         }
         return true;
     }
+
     @Override
     public List<String> onTabComplete(CommandSender commandSender,Command command,String s,String[] strings) {
         return null;
