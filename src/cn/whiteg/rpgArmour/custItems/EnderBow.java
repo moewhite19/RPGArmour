@@ -22,6 +22,7 @@ import java.util.Random;
 public class EnderBow extends CustItem_CustModle implements Listener {
     private final String endTag = "end_bow";
     private final Entity[] ents = new Entity[2];
+    private boolean swapVehicle;
     private float itemDropChance = 0.05f;
     private float spawnChance = 0.075f;
 
@@ -31,10 +32,11 @@ public class EnderBow extends CustItem_CustModle implements Listener {
         if (c != null){
             spawnChance = (float) c.getDouble("spawnChance",spawnChance);
             itemDropChance = (float) c.getDouble("itemDropChance",itemDropChance);
+            swapVehicle = c.getBoolean("swapVehicle",true);
         }
     }
 
-    public static void swapLoc(Entity e,Entity f) {
+    public void swapLoc(Entity e,Entity f) {
         if (!e.isValid() || !f.isValid() || e == f) return;
         Location el = e.getLocation();
         Entity ev = e.getVehicle();
@@ -45,9 +47,9 @@ public class EnderBow extends CustItem_CustModle implements Listener {
         tpLoc(f,ev,el);
     }
 
-    public static void tpLoc(Entity e,Entity v,Location loc) {
+    public void tpLoc(Entity e,Entity v,Location loc) {
         EntityTpUtils.forgeStopRide(e);
-        if (v == e || v != null && v.isValid() && v.addPassenger(e)) return;
+        if (swapVehicle && (v == e || v != null && v.isValid() && v.addPassenger(e))) return;
         EntityTpUtils.enderTeleportTo(e,loc);
     }
 
