@@ -22,10 +22,9 @@ public class forgePackListener implements Listener {
     public void resourcePackChan(PlayerResourcePackStatusEvent event) {
         final Player p = event.getPlayer();
         if (event.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD){
-//            kickPlayer(event.getPlayer(),"§b§l阁下的材质包加载错误\\n §r请尝试重新登录服务器或者联系管理员");
             p.sendMessage("§b§l阁下的材质包加载错误\\n §r请尝试重新登录服务器或者联系管理员");
         } else if (event.getStatus() == PlayerResourcePackStatusEvent.Status.DECLINED){
-            if (p.hasPermission("whiteg.test")){
+            if (p.hasPermission("rpgarmour.nopack")){
                 players.remove(p.getUniqueId());
                 return;
             }

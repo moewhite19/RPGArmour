@@ -1,7 +1,7 @@
 ver: 8
 debug: false
 
-#强制要求加载资源包
+#强制要求加载资源包(当拥有rpgarmour.nopack权限时无视)
 forgeResourcePack: false
 #吃东西时播放声音
 EatSound:

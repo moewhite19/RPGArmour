@@ -102,7 +102,7 @@ public class clear extends CommandInterface {
         int iar = 0;
         Map<EntityType, Integer> map = new EnumMap<EntityType, Integer>(EntityType.class);
         for (Entity entity : es) {
-            if (es instanceof Player){
+            if (entity instanceof Player){
                 continue;
             }
             entities.add(entity);

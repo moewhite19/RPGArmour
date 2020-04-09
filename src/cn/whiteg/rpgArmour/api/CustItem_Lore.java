@@ -40,7 +40,6 @@ public class CustItem_Lore extends CustItem {
     public boolean is(ItemStack item) {
         if (item == null || item.getType() != getMaterial()) return false;
         if (!item.hasItemMeta()) return false;
-        ItemMeta im = item.getItemMeta();
         return ItemToolUtil.hasLore(item,getLore());
     }
 

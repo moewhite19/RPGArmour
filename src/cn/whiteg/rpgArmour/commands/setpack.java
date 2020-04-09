@@ -4,6 +4,7 @@ import cn.whiteg.mmocore.common.CommandInterface;
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.Setting;
 import cn.whiteg.rpgArmour.manager.ResourcePackManage;
+import cn.whiteg.rpgArmour.utils.CommonUtils;
 import cn.whiteg.rpgArmour.utils.Downloader;
 import cn.whiteg.rpgArmour.utils.hashFile;
 import org.bukkit.Bukkit;
@@ -17,8 +18,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
-import java.io.IOException;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
 import java.util.List;
 
@@ -31,7 +30,7 @@ public class setpack extends CommandInterface {
             if (args.length == 1){
                 if (d != null){
                     if (!d.isClose()){
-                        sender.sendMessage("下载任务:" + d.getUrl() + " 大小" + d.getSize() + " 进度" + d.getDownloaded());
+                        sender.sendMessage("下载任务:" + d.getUrl() + " 大小" + CommonUtils.tanByte(d.getSize()) + " 进度" + CommonUtils.tanByte(d.getDownloaded()));
                         return true;
                     } else {
                         d = null;
@@ -43,6 +42,7 @@ public class setpack extends CommandInterface {
                 if (url.equals("stop")){
                     if (d != null){
                         d.close();
+                        d.stop();
                         d = null;
                     } else {
                         sender.sendMessage("没有下载任务");
@@ -50,8 +50,8 @@ public class setpack extends CommandInterface {
                     return true;
                 }
                 if (d != null){
-                    d.stop();
                     d.close();
+                    d.stop();
                 }
                 d = new Downloader(url,"cache",RPGArmour.plugin.getDataFolder().toString(),sender) {
                     @Override
@@ -60,9 +60,8 @@ public class setpack extends CommandInterface {
                             final String s = hashFile.getSha1(file);
                             log("资源包下载完成 sha1值为" + s);
                             ResourcePackManage.set(getUrl(),s);
-                        }catch (IOException e){
-                            e.printStackTrace();
-                        }catch (NoSuchAlgorithmException e){
+                            d = null;
+                        }catch (Exception e){
                             e.printStackTrace();
                         }
                     }
@@ -101,7 +100,7 @@ public class setpack extends CommandInterface {
                                 long speed = loaded - flag;
                                 flag = loaded;
                                 float r = (float) ((double) loaded / (double) size);
-                                bar.setTitle("下载进度" + loaded + "/" + size + "速度" + speed);
+                                bar.setTitle("下载进度" + CommonUtils.tanByte(loaded) + "/" + CommonUtils.tanByte(size) + "速度" + CommonUtils.tanByte(speed));
                                 bar.setProgress(r);
                             }
                         }.runTaskTimerAsynchronously(RPGArmour.plugin,20,20);

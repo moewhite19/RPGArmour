@@ -39,11 +39,15 @@ public class VectorUtils {
      * @return 视角单位向量
      */
     public static Vector viewVector(Location loc) {
-        float yaw = loc.getYaw();
-        float pitch = loc.getPitch();
-//        x:-Math.sin(java.lang.Math.toRadians(yaw)) * Math.cos(java.lang.Math.toRadians(pitch)),
-//        y:-Math.sin(java.lang.Math.toRadians(pitch)),
-//        z:Math.cos(java.lang.Math.toRadians(yaw)) * Math.cos(java.lang.Math.toRadians(pitch))
+        return viewVector(loc.getYaw(),loc.getPitch());
+    }
+
+    /**
+     * 利用球面坐标系坐标获得视角单位向量
+     *
+     * @return 视角单位向量
+     */
+    public static Vector viewVector(float yaw,float pitch) {
         return new Vector(-Math.sin(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)),-Math.sin(Math.toRadians(pitch)),Math.cos(Math.toRadians(yaw)) * Math.cos(Math.toRadians(pitch)));
     }
 

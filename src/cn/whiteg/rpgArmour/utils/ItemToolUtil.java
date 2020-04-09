@@ -27,9 +27,9 @@ public class ItemToolUtil {
         return false;
     }
 
-    public static boolean hasLore(ItemStack che,String lor) {
-        if (che != null){
-            final ItemMeta im = che.getItemMeta();
+    public static boolean hasLore(ItemStack item,String lor) {
+        if (item != null && item.hasItemMeta()){
+            final ItemMeta im = item.getItemMeta();
             if (im == null) return false;
             final List<String> ls = im.getLore();
             if (ls == null || ls.isEmpty()) return false;
