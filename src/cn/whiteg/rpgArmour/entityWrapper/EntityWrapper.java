@@ -5,6 +5,7 @@ import cn.whiteg.rpgArmour.utils.Utils;
 import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.ObjectUtils;
+import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_15_R1.util.CraftVector;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
@@ -94,19 +95,20 @@ public abstract class EntityWrapper {
         try{
             Class<?> packetClass = PacketPlayOutSpawnEntity.class;
             Object packet = packetClass.getConstructor().newInstance();
-            Field[] fields = new Field[12];
-            fields[0] = packetClass.getDeclaredField("a"); // ID
-            fields[1] = packetClass.getDeclaredField("b"); // UUID (Only 1.9+)
-            fields[2] = packetClass.getDeclaredField("c"); // Loc X
-            fields[3] = packetClass.getDeclaredField("d"); // Loc Y
-            fields[4] = packetClass.getDeclaredField("e"); // Loc Z
-            fields[5] = packetClass.getDeclaredField("f"); // Mot X
-            fields[6] = packetClass.getDeclaredField("g"); // Mot Y
-            fields[7] = packetClass.getDeclaredField("h"); // Mot Z
-            fields[8] = packetClass.getDeclaredField("i"); // Pitch
-            fields[9] = packetClass.getDeclaredField("j"); // Yaw
-            fields[10] = packetClass.getDeclaredField("k"); // Type
-            fields[11] = packetClass.getDeclaredField("l"); // Data
+            Field[] fields = new Field[]{
+                    packetClass.getDeclaredField("a"), // ID
+                    packetClass.getDeclaredField("b"), // UUID (Only 1.9+)
+                    packetClass.getDeclaredField("c"), // Loc X
+                    packetClass.getDeclaredField("d"),// Loc Y
+                    packetClass.getDeclaredField("e"),// Loc Z
+                    packetClass.getDeclaredField("f"),// Mot X
+                    packetClass.getDeclaredField("g"),// Mot Y
+                    packetClass.getDeclaredField("h"),// Mot Z
+                    packetClass.getDeclaredField("i"),// Pitch
+                    packetClass.getDeclaredField("j"),// Yaw
+                    packetClass.getDeclaredField("k"), // Type
+                    packetClass.getDeclaredField("l") // Data
+            };
             for (Field field : fields) {
                 field.setAccessible(true);
             }
@@ -321,6 +323,12 @@ public abstract class EntityWrapper {
         dataWatcher.register(silent,true); // silent
         dataWatcher.register(noGravity,false);
         dataWatcher.register(displayName,Optional.empty());
+    }
+
+    public void sendPacket(Packet packet,Player player) {
+        EntityPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
+        PlayerConnection playerConnection = nmsPlayer.playerConnection;
+        playerConnection.sendPacket(packet);
     }
 
 }

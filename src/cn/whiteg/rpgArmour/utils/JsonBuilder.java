@@ -52,10 +52,10 @@ public class JsonBuilder {
                     case "k":
                         part.setValue("obuscated",new Part(true));
                         break;
-                    case "l":
+                    case "b":
                         part.setValue("bold",new Part(true));
                         break;
-                    case "b":
+                    case "l":
                         part.setValue("strikethrough",new Part(true));
                         break;
                     case "n":
