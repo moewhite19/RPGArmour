@@ -11,7 +11,7 @@ public class RideReqest extends PlayerReqest {
     }
 
     @Override
-    public void acceptEvent() {
+    public void onAccept() {
         Location loc1 = getPlayer().getLocation();
         Location loc2 = getSender().getLocation();
         if (!loc1.getWorld().equals(loc2.getWorld()) || loc1.distance(loc2) > 64){

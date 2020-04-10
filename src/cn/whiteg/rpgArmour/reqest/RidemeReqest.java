@@ -11,7 +11,7 @@ public class RidemeReqest extends PlayerReqest {
     }
 
     @Override
-    public void acceptEvent() {
+    public void onAccept() {
         Location loc1 = getPlayer().getLocation();
         Location loc2 = getSender().getLocation();
         if (!loc1.getWorld().getName().equals(loc2.getWorld().getName()) || loc1.distance(loc2) > 64){
