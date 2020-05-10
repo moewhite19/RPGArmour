@@ -4,6 +4,7 @@ import cn.whiteg.mmocore.common.CommandInterface;
 import cn.whiteg.rpgArmour.Setting;
 import cn.whiteg.rpgArmour.enitity.MyZombie;
 import cn.whiteg.rpgArmour.entityWrapper.DropItem;
+import cn.whiteg.rpgArmour.entityWrapper.Zombie;
 import cn.whiteg.rpgArmour.nms.NMSItem;
 import cn.whiteg.rpgArmour.nms.TagCompound;
 import net.minecraft.server.v1_15_R1.PacketPlayOutExplosion;
@@ -113,8 +114,8 @@ public class test extends CommandInterface {
                     player.getNearbyEntities(32D,32D,32D).forEach(entity -> {
                         if (entity instanceof Player){
                             Player p = (Player) entity;
+                            dropItem.setVector(p.getVelocity());
                             dropItem.spawn(p);
-                            dropItem.setVector(p);
                         }
                     });
                     dropItem.spawn(player);
@@ -136,6 +137,16 @@ public class test extends CommandInterface {
                 PlayerInventory inv = player.getInventory();
                 String key = args.length > 2 ? args[2] : "Test";
                 inv.setItemInMainHand(Setting.getStorage().getItemStack(key));
+                break;
+            }
+
+            case "t1": {
+                Player player = (Player) sender;
+                Location loc = player.getLocation();
+                Zombie zombie = new Zombie();
+                zombie.setLocation(loc);
+                zombie.setVector(player.getVelocity());
+                zombie.spawn(player);
                 break;
             }
             default:

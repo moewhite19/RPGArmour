@@ -1,24 +1,23 @@
 package cn.whiteg.rpgArmour.entityWrapper;
 
 import net.minecraft.server.v1_15_R1.*;
-import org.bukkit.Location;
 import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.UUID;
 
 public abstract class LivingEntityWrapper extends EntityWrapper {
     float headRotation = 0;
+    EntityTypes<?> types;
 
     public LivingEntityWrapper(EntityTypes<? extends Entity> entityType) {
         super(entityType);
     }
 
     @Override
-    public Packet<?> createPacketSpawnEntity(int id,UUID uuid,Location loc,EntityTypes<? extends Entity> type) {
+    public Packet<?> createPacketSpawnEntity() {
         try{
-            Class<?> packetClass = PacketPlayOutSpawnEntity.class;
+            Class<?> packetClass = PacketPlayOutSpawnEntityLiving.class;
             Object packet = packetClass.getConstructor().newInstance();
             Field[] fields = new Field[]{
                     packetClass.getDeclaredField("a"), // ID
@@ -37,25 +36,28 @@ public abstract class LivingEntityWrapper extends EntityWrapper {
             for (Field field : fields) {
                 field.setAccessible(true);
             }
-            fields[0].set(packet,id);
+            fields[0].set(packet,entityId);
             fields[1].set(packet,uuid);
-            fields[2].set(packet,IRegistry.ENTITY_TYPE.a(type));
-            fields[3].set(packet,loc.getX());
-            fields[4].set(packet,loc.getY());
-            fields[5].set(packet,loc.getZ());
+            fields[2].set(packet,IRegistry.ENTITY_TYPE.a(types));
+            fields[3].set(packet,location.getX());
+            fields[4].set(packet,location.getY());
+            fields[5].set(packet,location.getZ());
             Vector mot = getVector();
-            fields[6].set(packet,MathHelper.a(mot.getX(),-3.9D,3.9D) * 8000);
-            fields[7].set(packet,MathHelper.a(mot.getY(),-3.9D,3.9D) * 8000);
-            fields[8].set(packet,MathHelper.a(mot.getZ(),-3.9D,3.9D) * 8000);
-            fields[8].set(packet,(int) (loc.getYaw() * 256.0F / 360.0F));
-            fields[9].set(packet,(int) (loc.getPitch() * 256.0F / 360.0F));
-            fields[11].set(packet,(int) (headRotation * 256.0F / 360.0F));
-            return (PacketPlayOutSpawnEntity) packet;
+            if (mot != null){
+                fields[6].set(packet,(int) MathHelper.a(mot.getX(),-3.9D,3.9D) * 8000);
+                fields[7].set(packet,(int) MathHelper.a(mot.getY(),-3.9D,3.9D) * 8000);
+                fields[8].set(packet,(int) MathHelper.a(mot.getZ(),-3.9D,3.9D) * 8000);
+            } else {
+                fields[6].set(packet,0);
+                fields[7].set(packet,0);
+                fields[8].set(packet,0);
+            }
+            fields[9].set(packet,((byte) ((int) (location.getYaw() * 256.0F / 360.0F))));
+            fields[10].set(packet,(byte) ((int) (location.getPitch() * 256.0F / 360.0F)));
+            fields[11].set(packet,(byte) ((int) (headRotation * 256.0F / 360.0F)));
+            return (Packet<?>) packet;
         }catch (NoSuchMethodException | NoSuchFieldException | IllegalAccessException | InvocationTargetException | InstantiationException e){
             e.printStackTrace();
-//            plugin.getLogger().severe("Failed to create packet to spawn entity!");
-//            plugin.debug("Failed to create packet to spawn entity!");
-//            plugin.debug(e);
         }
         return null;
     }

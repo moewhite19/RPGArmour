@@ -3,7 +3,6 @@ package cn.whiteg.rpgArmour.entityWrapper;
 import cn.whiteg.rpgArmour.utils.JsonBuilder;
 import net.minecraft.server.v1_15_R1.*;
 import org.bukkit.Location;
-import org.bukkit.entity.EntityType;
 
 import java.util.Optional;
 
@@ -26,11 +25,6 @@ public class HoloText extends EntityWrapper {
         final byte by = (byte) (flag ? 16 : 0);
         dataWatcher.set(marker,by);
         sendUpdate();
-    }
-
-    @Override
-    EntityType getEntityType() {
-        return EntityType.ARMOR_STAND;
     }
 
     /**

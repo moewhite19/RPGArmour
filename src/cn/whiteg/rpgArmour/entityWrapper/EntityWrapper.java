@@ -19,8 +19,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 public abstract class EntityWrapper {
-
-
     static Field g;
     static Method b;
     static DataWatcherObject<Byte> flags;
@@ -73,7 +71,7 @@ public abstract class EntityWrapper {
     final Class<?> packetPlayOutEntityTeleportClass = PacketPlayOutEntityTeleport.class;
     final UUID uuid;
     final int entityId;
-    final EntityTypes<? extends Entity> entityType;
+    EntityTypes<? extends Entity> entityType;
     DataWatcher dataWatcher;
     Collection<Player> canVisble = null;
     Location location;
@@ -91,12 +89,12 @@ public abstract class EntityWrapper {
      * Create a {@code PacketPlayOutSpawnEntity} object.
      * Only {@link EntityType#ARMOR_STAND} and {@link EntityType#DROPPED_ITEM} are supported!
      */
-    public Packet<?> createPacketSpawnEntity(int id,UUID uuid,Location loc,EntityTypes<? extends Entity> type) {
+    public Packet<?> createPacketSpawnEntity() {
         try{
             Class<?> packetClass = PacketPlayOutSpawnEntity.class;
             Object packet = packetClass.getConstructor().newInstance();
             Field[] fields = new Field[]{
-                    packetClass.getDeclaredField("a"), // ID
+                    packetClass.getDeclaredField("a"), // IDr
                     packetClass.getDeclaredField("b"), // UUID (Only 1.9+)
                     packetClass.getDeclaredField("c"), // Loc X
                     packetClass.getDeclaredField("d"),// Loc Y
@@ -112,17 +110,23 @@ public abstract class EntityWrapper {
             for (Field field : fields) {
                 field.setAccessible(true);
             }
-            fields[0].set(packet,id);
+            fields[0].set(packet,entityId);
             fields[1].set(packet,uuid);
-            fields[2].set(packet,loc.getX());
-            fields[3].set(packet,loc.getY());
-            fields[4].set(packet,loc.getZ());
-            fields[5].set(packet,0);
-            fields[6].set(packet,0);
-            fields[7].set(packet,0);
-            fields[8].set(packet,0);
-            fields[9].set(packet,0);
-            fields[10].set(packet,type);
+            fields[2].set(packet,location.getX());
+            fields[3].set(packet,location.getY());
+            fields[4].set(packet,location.getZ());
+            if (vector == null){
+                fields[5].set(packet,0);
+                fields[6].set(packet,0);
+                fields[7].set(packet,0);
+            } else {
+                fields[5].set(packet,(int) MathHelper.a(vector.getX(),-3.9D,3.9D) * 8000);
+                fields[6].set(packet,(int) MathHelper.a(vector.getY(),-3.9D,3.9D) * 8000);
+                fields[7].set(packet,(int) MathHelper.a(vector.getZ(),-3.9D,3.9D) * 8000);
+            }
+            fields[8].set(packet,MathHelper.d(location.getPitch() * 256.0F / 360.0F));
+            fields[9].set(packet,MathHelper.d(location.getYaw() * 256.0F / 360.0F));
+            fields[10].set(packet,getEntityType());
             fields[11].set(packet,0);
             return (PacketPlayOutSpawnEntity) packet;
         }catch (NoSuchMethodException | NoSuchFieldException | IllegalAccessException | InvocationTargetException | InstantiationException e){
@@ -148,7 +152,7 @@ public abstract class EntityWrapper {
 
     public void playerShow(Collection<Player> players) {
         canVisble = players;
-        Packet p1 = createPacketSpawnEntity(entityId,uuid,location,entityType);
+        Packet p1 = createPacketSpawnEntity();
         Packet<PacketListenerPlayOut> p2 = new PacketPlayOutEntityMetadata(entityId,dataWatcher,true);
         playersForEach(p -> {
             if (p.isOnline() && p.getWorld() == location.getWorld()){
@@ -177,11 +181,13 @@ public abstract class EntityWrapper {
         return canVisble.contains(p);
     }
 
-    abstract EntityType getEntityType();
+    public EntityTypes<? extends Entity> getEntityType() {
+        return entityType;
+    }
 
     public void spawn(Player player) {
-        Packet p1 = createPacketSpawnEntity(entityId,uuid,location,entityType);
-        Packet<PacketListenerPlayOut> p2 = new PacketPlayOutEntityMetadata(entityId,dataWatcher,true);
+        Packet p1 = createPacketSpawnEntity();
+        Packet<PacketListenerPlayOut> p2 = new PacketPlayOutEntityMetadata(entityId,getDataWatcher(),true);
         Utils.sendPacket(p1,player);
         Utils.sendPacket(p2,player);
     }
@@ -335,6 +341,4 @@ public abstract class EntityWrapper {
         PlayerConnection playerConnection = nmsPlayer.playerConnection;
         playerConnection.sendPacket(packet);
     }
-
-
 }

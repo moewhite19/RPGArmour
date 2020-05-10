@@ -1,34 +1,33 @@
 package cn.whiteg.rpgArmour.entityWrapper;
 
 import net.minecraft.server.v1_15_R1.DataWatcherObject;
+import net.minecraft.server.v1_15_R1.EntityItem;
 import net.minecraft.server.v1_15_R1.EntityTypes;
 import net.minecraft.server.v1_15_R1.ItemStack;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
-import org.bukkit.entity.EntityType;
+
+import java.lang.reflect.Field;
 
 public class DropItem extends EntityWrapper {
-
-
     static DataWatcherObject<ItemStack> ITEM;
-
-    static {
-
-    }
-
     private ItemStack nmsItem;
 
+    static {
+        try{
+            Field f = EntityItem.class.getDeclaredField("ITEM");
+            f.setAccessible(true);
+            ITEM = (DataWatcherObject<ItemStack>) f.get(null);
+        }catch (NoSuchFieldException | IllegalAccessException e){
+            e.printStackTrace();
+        }
+    }
     public DropItem(Location location,org.bukkit.inventory.ItemStack item) {
         super(EntityTypes.ITEM);
         this.location = location;
-        setItemStack(item);
+        nmsItem = CraftItemStack.asNMSCopy(item);
         initDataWatcher();
-    }
-
-
-    @Override
-    EntityType getEntityType() {
-        return null;
+//        setItemStack(item);
     }
 
     @Override
