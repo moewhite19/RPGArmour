@@ -49,21 +49,21 @@ public class JsonBuilder {
                 switch (f.toLowerCase()) {
                     case "":
                         break;
-                    case "k":
-                        part.setValue("obuscated",new Part(true));
-                        break;
-                    case "b":
-                        part.setValue("bold",new Part(true));
-                        break;
-                    case "l":
-                        part.setValue("strikethrough",new Part(true));
-                        break;
-                    case "n":
-                        part.setValue("underlined",new Part(true));
-                        break;
-                    case "o":
-                        part.setValue("italic",new Part(true));
-                        break;
+//                    case "k":
+//                        part.setValue("obuscated",new Part(true));
+//                        break;
+//                    case "b":
+//                        part.setValue("bold",new Part(true));
+//                        break;
+//                    case "l":
+//                        part.setValue("strikethrough",new Part(true));
+//                        break;
+//                    case "n":
+//                        part.setValue("underlined",new Part(true));
+//                        break;
+//                    case "o":
+//                        part.setValue("italic",new Part(true));
+//                        break;
                     case "r":
                         part.removeValue("obfuscated");
                         part.removeValue("bold");

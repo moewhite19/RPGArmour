@@ -25,7 +25,7 @@ public abstract class EntityWrapper {
     static Method b;
     static DataWatcherObject<Byte> flags;
     static DataWatcherObject<Integer> air_tick;
-    static DataWatcherObject<Boolean> naem_visible;
+    static DataWatcherObject<Boolean> name_visible;
     static DataWatcherObject<Boolean> silent;
     static DataWatcherObject<Boolean> noGravity;
     static DataWatcherObject<Optional<IChatBaseComponent>> displayName;
@@ -52,7 +52,7 @@ public abstract class EntityWrapper {
             aB.setAccessible(true);
             aC.setAccessible(true);
             silent = (DataWatcherObject<Boolean>) aB.get(null);
-            naem_visible = (DataWatcherObject<Boolean>) aA.get(null);
+            name_visible = (DataWatcherObject<Boolean>) aA.get(null);
             flags = (DataWatcherObject<Byte>) W.get(null);
             air_tick = (DataWatcherObject<Integer>) AIR_TICKS.get(null);
             displayName = (DataWatcherObject<Optional<IChatBaseComponent>>) az.get(null);
@@ -91,7 +91,7 @@ public abstract class EntityWrapper {
      * Create a {@code PacketPlayOutSpawnEntity} object.
      * Only {@link EntityType#ARMOR_STAND} and {@link EntityType#DROPPED_ITEM} are supported!
      */
-    public static Packet createPacketSpawnEntity(int id,UUID uuid,Location loc,EntityTypes type) {
+    public Packet<?> createPacketSpawnEntity(int id,UUID uuid,Location loc,EntityTypes<? extends Entity> type) {
         try{
             Class<?> packetClass = PacketPlayOutSpawnEntity.class;
             Object packet = packetClass.getConstructor().newInstance();
@@ -291,6 +291,10 @@ public abstract class EntityWrapper {
         sendUpdate();
     }
 
+    public void setCustomNameVisible(boolean b) {
+        dataWatcher.set(name_visible,b);
+    }
+
 
     /**
      * Create a NMS data watcher object to send via a {@code PacketPlayOutEntityMetadata} packet.
@@ -319,16 +323,18 @@ public abstract class EntityWrapper {
         };
         dataWatcher.register(EntityWrapper.flags,flags);  //flags
         dataWatcher.register(air_tick,300);
-        dataWatcher.register(naem_visible,customName != null); // custname
+        dataWatcher.register(name_visible,customName != null); // custname
         dataWatcher.register(silent,true); // silent
         dataWatcher.register(noGravity,false);
         dataWatcher.register(displayName,Optional.empty());
     }
+
 
     public void sendPacket(Packet packet,Player player) {
         EntityPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
         PlayerConnection playerConnection = nmsPlayer.playerConnection;
         playerConnection.sendPacket(packet);
     }
+
 
 }
