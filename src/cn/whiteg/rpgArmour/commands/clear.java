@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 
 import java.lang.ref.SoftReference;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class clear extends CommandInterface {
     static public SoftReference<List<Entity>> ClearComfirm = new SoftReference<>(null);
@@ -101,7 +102,7 @@ public class clear extends CommandInterface {
         //  debuger.logout("玩家" + player.getName() + " 位置 " + pl.toString());
         List<Entity> entities = new ArrayList<>();
         int iar = 0;
-        Map<EntityType, Integer> map = new EnumMap<EntityType, Integer>(EntityType.class);
+        Map<EntityType, Integer> map = new EnumMap<>(EntityType.class);
         for (Entity entity : es) {
             if (entity instanceof Player){
                 continue;
@@ -111,7 +112,14 @@ public class clear extends CommandInterface {
             iar++;
         }
         ClearComfirm = new SoftReference<>(entities);
-        for (Map.Entry<EntityType, Integer> m : map.entrySet()) {
+
+        //对map进行排序
+        LinkedHashMap<EntityType, Integer> result = map.entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(Map.Entry::getKey,Map.Entry::getValue,(oldValue,newValue) -> oldValue,
+                        LinkedHashMap::new));
+
+        for (Map.Entry<EntityType, Integer> m : result.entrySet()) {
             TextComponent a1 = new TextComponent(m.getKey() + (Bukkit.getPluginManager().isPluginEnabled("ChanLang") ? "(" + LangUtils.getEntityTypeName(m.getKey()) + ")" : "") + " * " + m.getValue());
             a1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/ra clear confirm " + m.getKey()));
             a1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("清除这类").color(ChatColor.BLUE).create()));
