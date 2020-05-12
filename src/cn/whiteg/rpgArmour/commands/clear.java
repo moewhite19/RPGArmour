@@ -1,5 +1,6 @@
 package cn.whiteg.rpgArmour.commands;
 
+import cn.whiteg.chanlang.LangUtils;
 import cn.whiteg.mmocore.common.CommandInterface;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -110,8 +111,8 @@ public class clear extends CommandInterface {
             iar++;
         }
         ClearComfirm = new SoftReference<>(entities);
-        for (Map.Entry m : map.entrySet()) {
-            TextComponent a1 = new TextComponent(m.getKey() + " * " + m.getValue());
+        for (Map.Entry<EntityType, Integer> m : map.entrySet()) {
+            TextComponent a1 = new TextComponent(m.getKey() + (Bukkit.getPluginManager().isPluginEnabled("ChanLang") ? "(" + LangUtils.getEntityTypeName(m.getKey()) + ")" : "") + " * " + m.getValue());
             a1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND,"/ra clear confirm " + m.getKey()));
             a1.setHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,new ComponentBuilder("清除这类").color(ChatColor.BLUE).create()));
             sender.spigot().sendMessage(a1);
