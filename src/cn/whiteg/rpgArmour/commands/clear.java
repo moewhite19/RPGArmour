@@ -42,7 +42,7 @@ public class clear extends CommandInterface {
                         String d = args[1];
                         if (d.equals("*")){
                             r = Double.MAX_VALUE;
-                        } else r = Double.valueOf(args[1]);
+                        } else r = Double.parseDouble(args[1]);
                         Player player = (Player) sender;
                         onClear(player,r,sender);
                     }
@@ -78,7 +78,7 @@ public class clear extends CommandInterface {
                         String d = args[1];
                         if (d.equals("*")){
                             r = Double.MAX_VALUE;
-                        } else r = Double.valueOf(args[1]);
+                        } else r = Double.parseDouble(args[1]);
                         onClear(player,r,sender);
                     }
 

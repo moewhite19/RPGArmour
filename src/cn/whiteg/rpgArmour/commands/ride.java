@@ -23,7 +23,7 @@ public class ride extends CommandInterface {
                     return true;
                 }
                 if (p1 == p2) return true;
-                new RideReqest(p2,p1).send();
+                new RideReqest(p1).sendTo(p2);
             }
         } else {
             sender.sendMessage("§a/ride <玩家id>§b请求骑乘");
