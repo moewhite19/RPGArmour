@@ -74,13 +74,7 @@ public class SamuraiSword extends CustItem_CustModle implements Listener {
     public void onAttMiss(PlayerAttackMissEvent event) {
         final Player player = event.getPlayer();
         final PlayerInventory pi = player.getInventory();
-        ItemStack item = pi.getItemInMainHand();
-        if (isAir(item)){
-            item = pi.getItemInOffHand();
-            if (is(item)){
-                setCd(player,15);
-            }
-        } else if (is(item)){
+        if (is(pi.getItemInMainHand()) || is(pi.getItemInOffHand())){
             setCd(player,15);
         }
     }
@@ -232,31 +226,6 @@ public class SamuraiSword extends CustItem_CustModle implements Listener {
             event.setOffHandItem(scabbard.createItem());
             setCd(event.getPlayer(),10);
         }
-//        if (isAir(off) && is(main)){
-//            if (event.getPlayer().hasCooldown(getMaterial())){
-//                event.setCancelled(true);
-//                return;
-//            }
-//            if (ItemSwitch(main,getId(),id2)){
-//                Location loc = event.getPlayer().getLocation();
-//                loc.getWorld().playSound(loc,sound_unsheathed,1,1);
-//            }
-//        } else if (isAir(main) && is(off)){
-//            if (event.getPlayer().hasCooldown(getMaterial())){
-//                event.setCancelled(true);
-//                return;
-//            }
-//            if (ItemSwitch(off,id2,getId())){
-//                Location loc = event.getPlayer().getLocation();
-//                loc.getWorld().playSound(loc,sound_put,1,1);
-//                PlayerInventory pi = event.getPlayer().getInventory();
-//                pi.setItemInMainHand(off);
-//                setCd(event.getPlayer(),10);
-//                event.setCancelled(true);
-//            } else {
-//                setCd(event.getPlayer(),15);
-//            }
-//        }
     }
 
     private boolean isAir(ItemStack item) {
