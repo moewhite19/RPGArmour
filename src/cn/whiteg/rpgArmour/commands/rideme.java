@@ -23,9 +23,9 @@ public class rideme extends CommandInterface {
                     return true;
                 }
                 if (p1 == p2) return true;
-                new RidemeReqest(p2,p1).send();
+                new RidemeReqest(p1).sendTo(p2);
             }
-        }else {
+        } else {
             sender.sendMessage("§a/ride <玩家id>§b请求骑乘");
         }
         return true;

@@ -1,7 +1,6 @@
 package cn.whiteg.rpgArmour.custItems;
 
 
-import cn.whiteg.moeInfo.nms.ActionBar;
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.Setting;
 import cn.whiteg.rpgArmour.api.CustItem_CustModle;
@@ -12,7 +11,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.boss.BossBar;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -35,9 +33,6 @@ import java.util.*;
 public class
 BambooDragonfly extends CustItem_CustModle implements Listener {
     public static List<World> worldList = new ArrayList<>();
-    //   private short power = 0;
-    //  private BukkitTask tick;
-    // List<String> lores;
     public final Map<UUID, Staus> staMap = new HashMap<>();
     private final int flyid = 2;
     BukkitTask timer = null;
@@ -80,53 +75,16 @@ BambooDragonfly extends CustItem_CustModle implements Listener {
     public void onJump(PlayerJumpEvent event) {
         if (event.isCancelled() || event.getPlayer().isSneaking()) return;
         Staus sta = getUserSta(event.getPlayer());
-        if (sta == null) return;
-        if (event.getPlayer().getAllowFlight()) return;
-        if (!event.getPlayer().hasPermission("rpgarmour.use.bamboodragonfly")) return;
-        final ItemStack he = event.getPlayer().getInventory().getChestplate();
-        if (he != null && he.getType() == Material.ELYTRA){
-            sta.remove();
-            return;
-        }
-        final ItemStack item = sta.getItem();
-        if (item == null) return;
-        final ItemMeta im = item.getItemMeta();
-        if (im instanceof Damageable){
-            final Damageable dm = ((Damageable) im);
-            if (dm.hasDamage() && dm.getDamage() >= getMaterial().getMaxDurability()){
+        if (sta == null){
+            ItemStack hat = event.getPlayer().getInventory().getHelmet();
+            if (is(hat)){
+                sta = new Staus(event.getPlayer(),hat);
+                staMap.put(event.getPlayer().getUniqueId(),sta);
+            } else {
                 return;
             }
         }
-        im.setCustomModelData(flyid);
-        item.setItemMeta(im);
-        sta.player.setAllowFlight(true);
-        sta.player.setFlying(true);
-        sta.player.setFlySpeed(flyspeed);
-        //sta.upinv();
-        Location l = sta.player.getLocation();
-        l.getWorld().playSound(l,"block.beacon.activate",0.4f,1.5f);
-        sta.activate = true;
-        setTimer();
-/*        tick = new BukkitRunnable() {
-            @Override
-            public void run() {
-                power--;
-                if (!player.isFlying()){
-                    cancel();
-                    return;
-                }
-                if (power < 2){
-                    CustItem.setDurability((short) 27);
-                    getPlayer().setFlying(false);
-                    getPlayer().setAllowFlight(false);
-                    ActionBar.sendActionBar(player,"竹蜻蜓电池耗尽");
-                    upLore();
-                    return;
-                }
-                ActionBar.sendActionBar(player,"竹蜻蜓: " + power);
-            }
-        }.runTaskTimerAsynchronously(RPGArmour.plugin,1,20)*/
-        ;
+        sta.onUse();
     }
 
     @SuppressWarnings("all")
@@ -136,8 +94,6 @@ BambooDragonfly extends CustItem_CustModle implements Listener {
         if (sta == null) return;
         if (sta.activate && !event.isFlying()){
             sta.stopfly();
-            //     if (tick != null) tick.cancel();
-            //   upLore();
         }
     }
 
@@ -178,8 +134,7 @@ BambooDragonfly extends CustItem_CustModle implements Listener {
         ItemStack item = event.getItem();
         if (event.isWear()){
             if (is(item)){
-                addPlayer(event.getPlayer());
-                return;
+                addPlayer(event.getPlayer(),item);
             }
         } else {
             Staus sta = staMap.get(event.getPlayer().getUniqueId());
@@ -187,21 +142,6 @@ BambooDragonfly extends CustItem_CustModle implements Listener {
             sta.remove();
         }
     }
-
-//    @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
-//    public void onInvClick(InventoryClickEvent event) {
-//        if (event.getClickedInventory().getType() != InventoryType.PLAYER || event.getSlot() != 39) return;
-//        Staus sta = staMap.get(event.getWhoClicked().getUniqueId());
-//        if (sta == null) check((Player) event.getWhoClicked());
-//        if (event.getHotbarButton() != -1){
-//            if (event.getRawSlot() != 5) return;
-//            sta.remove();
-//            return;
-//        } else if (event.getSlot() == 39 && event.getClick() != ClickType.MIDDLE){
-//            sta.remove();
-//        }
-//        //setItem(event.getCurrentItem());
-//    }
 
     @Override
     public ItemStack createItem() {
@@ -247,14 +187,15 @@ BambooDragonfly extends CustItem_CustModle implements Listener {
                     }
                     final Iterator<Map.Entry<UUID, Staus>> it = staMap.entrySet().iterator();
                     while (it.hasNext()) {
-                        final Staus sta = it.next().getValue();
+                        Staus sta = it.next().getValue();
                         try{
-                            final ItemStack hat = sta.getItem();
-                            if (hat == null){
+                            if (!sta.hasItem()){
                                 sta.stopfly();
                                 it.remove();
                                 return;
                             }
+                            ItemStack hat = sta.getItem();
+
                             if (sta.activate){
                                 if (ItemToolUtil.damage(hat,1)){
                                     sta.stopfly();
@@ -291,37 +232,32 @@ BambooDragonfly extends CustItem_CustModle implements Listener {
         Player player;
         short flag = 10;
         private ItemStack item;
-//        final BossBar bossBar;
 
         Staus(Player player) {
             this.player = player;
             defFlyspeed = player.getFlySpeed();
-//            bossBar = Bukkit.createBossBar()
+            item = player.getInventory().getHelmet();
         }
 
-        Staus(Player player,ItemStack ite) {
-            this(player);
-            item = ite;
+        Staus(Player player,ItemStack item) {
+            this.player = player;
+            defFlyspeed = player.getFlySpeed();
+            this.item = item;
+        }
+
+        public boolean hasItem() {
+            if (is(item)){
+                ItemStack hat = player.getInventory().getHelmet();
+                return hat.hashCode() == item.hashCode();
+            }
+            return false;
         }
 
         public ItemStack getItem() {
-            if (is(item)){
-                return item;
-            }
-            item = player.getInventory().getHelmet();
-            if (is(item)){
-                return item;
-            }
-            return null;
+            return item;
         }
 
-        public void setItem(ItemStack itemStack) {
-            if (itemStack == null) return;
-            this.item = itemStack;
-//            nmsItem = CraftItemStack.asNMSCopy(itemStack);
-//            modifiers = (nmsItem.hasTag()) ? nmsItem.getTag() : new TagCompound();
-        }
-
+        //停止飞行
         public void stopfly() {
             player.setFlying(false);
             player.setAllowFlight(false);
@@ -345,9 +281,37 @@ BambooDragonfly extends CustItem_CustModle implements Listener {
                 player.getWorld().dropItem(l,he);
             }
             l.getWorld().playSound(l,"block.beacon.deactivate",0.4f,1.5f);
-//            ActionBar.sendActionBar(player,"停止飞行");
             activate = false;
             flag = 10;
+        }
+
+        public void onUse() {
+            if (player.getAllowFlight()) return;
+            if (!player.hasPermission("rpgarmour.use.bamboodragonfly")) return;
+
+            ItemStack chestplate = player.getInventory().getChestplate();
+            if (chestplate != null && chestplate.getType() == Material.ELYTRA){
+                return;
+            }
+
+            if (!hasItem()) return;
+            ItemMeta im = item.getItemMeta();
+            if (im instanceof Damageable){
+                final Damageable dm = ((Damageable) im);
+                if (dm.hasDamage() && dm.getDamage() >= getMaterial().getMaxDurability()){
+                    return;
+                }
+            }
+
+            im.setCustomModelData(flyid);
+            item.setItemMeta(im);
+            player.setAllowFlight(true);
+            player.setFlying(true);
+            player.setFlySpeed(flyspeed);
+            Location l = player.getLocation();
+            l.getWorld().playSound(l,"block.beacon.activate",0.4f,1.5f);
+            activate = true;
+            setTimer();
         }
 
         public void remove() {
