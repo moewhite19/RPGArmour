@@ -175,7 +175,6 @@ public abstract class EntityWrapper {
         }
     }
 
-
     public boolean canVisible(Player p) {
         if (canVisble == null) return false;
         return canVisble.contains(p);

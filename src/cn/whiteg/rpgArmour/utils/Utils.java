@@ -8,8 +8,10 @@ import org.bukkit.entity.Player;
 
 public class Utils {
     public static void sendPacket(Packet packet,Player player) {
-        EntityPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
-        PlayerConnection playerConnection = nmsPlayer.playerConnection;
-        playerConnection.sendPacket(packet);
+        if (player.isOnline()){
+            EntityPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
+            PlayerConnection playerConnection = nmsPlayer.playerConnection;
+            playerConnection.sendPacket(packet);
+        }
     }
 }
