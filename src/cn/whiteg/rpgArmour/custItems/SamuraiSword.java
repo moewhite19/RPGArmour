@@ -15,7 +15,6 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
@@ -290,8 +289,7 @@ public class SamuraiSword extends CustItem_CustModle implements Listener {
         if (spawnChance <= 0) return;
         if (!(event.getEntity() instanceof LivingEntity)) return;
         LivingEntity entity = (LivingEntity) event.getEntity();
-        if (entity.fromMobSpawner() || entity.getEntitySpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG)
-            return;
+        //if (entity.fromMobSpawner() || entity.getEntitySpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG)            return;
         EntityEquipment ej = entity.getEquipment();
         Random random = RandomUtil.getRandom();
         if (ej == null) return;
@@ -305,7 +303,7 @@ public class SamuraiSword extends CustItem_CustModle implements Listener {
                 ej.setItemInMainHand(item);
                 ej.setItemInMainHandDropChance(0.03F);
             }
-        } else if (entity instanceof Zombie && entity.getType() != EntityType.PIG_ZOMBIE){
+        } else if (entity instanceof Zombie && entity.getType() != EntityType.ZOMBIFIED_PIGLIN){
             if (random.nextDouble() < spawnChance){
                 ItemStack item = ItemToolUtil.lootDamageItem(createItem(),0.2F);
                 ej.setItemInOffHand(item);

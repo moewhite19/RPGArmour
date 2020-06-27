@@ -2,11 +2,11 @@ package cn.whiteg.rpgArmour.listener;
 
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.event.PlayerDeathPreprocessEvent;
-import net.minecraft.server.v1_15_R1.*;
+import net.minecraft.server.v1_16_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -32,7 +32,7 @@ public class undyingListener implements Listener {
     public static void EntityResurrect(LivingEntity livingEntity,ItemStack item) {
         EntityLiving entity = ((CraftLivingEntity) livingEntity).getHandle();
         if (item != null){
-            net.minecraft.server.v1_15_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
+            net.minecraft.server.v1_16_R1.ItemStack nmsItem = CraftItemStack.asNMSCopy(item);
             if (entity instanceof EntityPlayer){
                 EntityPlayer entityplayer = ((EntityPlayer) entity);
                 entityplayer.b(StatisticList.ITEM_USED.b(nmsItem.getItem()));

@@ -69,8 +69,7 @@ public class ZombWarrior extends CustEntityName implements Listener, CommandExec
         if (sc == 0) return;
         if (!(event.getEntity() instanceof Zombie)) return;
         LivingEntity entity = (LivingEntity) event.getEntity();
-        CreatureSpawnEvent.SpawnReason spr = entity.getEntitySpawnReason();
-        if (spr == CreatureSpawnEvent.SpawnReason.SPAWNER || spr == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG) return;
+        if (EntityUtils.isSpawner(entity)) return;
         if (entity.getType() == EntityType.ZOMBIE){
             if (RandomUtil.getRandom().nextDouble() < sc){
                 int amn = 0;

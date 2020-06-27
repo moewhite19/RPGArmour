@@ -6,6 +6,7 @@ import cn.whiteg.rpgArmour.api.CustEntityName;
 import cn.whiteg.rpgArmour.custItems.EnderHat;
 import cn.whiteg.rpgArmour.custItems.SeekerBow;
 import cn.whiteg.rpgArmour.custItems.WingHat;
+import cn.whiteg.rpgArmour.utils.EntityUtils;
 import cn.whiteg.rpgArmour.utils.RandomUtil;
 import cn.whiteg.rpgArmour.utils.VectorUtils;
 import org.bukkit.Location;
@@ -62,7 +63,8 @@ public class SkeletonWin extends CustEntityName implements Listener, CommandExec
         if (sc == 0) return;
         if (!(event.getEntity() instanceof Skeleton)) return;
         LivingEntity entity = (LivingEntity) event.getEntity();
-        if(entity.fromMobSpawner() || entity.getEntitySpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG) return;
+        if (EntityUtils.isSpawner(entity)) return;
+
         EntityEquipment ej = entity.getEquipment();
         if (ej == null) return;
         if (entity instanceof Skeleton){

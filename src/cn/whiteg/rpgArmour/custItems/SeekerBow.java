@@ -3,6 +3,7 @@ package cn.whiteg.rpgArmour.custItems;
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.Setting;
 import cn.whiteg.rpgArmour.api.CustItem_CustModle;
+import cn.whiteg.rpgArmour.utils.EntityUtils;
 import cn.whiteg.rpgArmour.utils.ItemToolUtil;
 import cn.whiteg.rpgArmour.utils.RandomUtil;
 import org.bukkit.Bukkit;
@@ -113,7 +114,7 @@ public class SeekerBow extends CustItem_CustModle implements Listener {
         if (!(event.getEntity() instanceof Skeleton)) return;
         Entity entity = event.getEntity();
         Random random = RandomUtil.getRandom();
-        if(entity.fromMobSpawner() || entity.getEntitySpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG) return;
+        if (EntityUtils.isSpawner(entity)) return;
         if (random.nextDouble() < spawnChance){
             EntityEquipment ej = ((Skeleton) entity).getEquipment();
             if (ej != null){

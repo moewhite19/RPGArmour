@@ -1,7 +1,8 @@
 package cn.whiteg.rpgArmour.utils;
 
-import net.minecraft.server.v1_15_R1.IChatBaseComponent;
-import net.minecraft.server.v1_15_R1.PacketPlayOutChat;
+import net.minecraft.server.v1_16_R1.ChatMessageType;
+import net.minecraft.server.v1_16_R1.IChatBaseComponent;
+import net.minecraft.server.v1_16_R1.PacketPlayOutChat;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
@@ -98,7 +99,7 @@ public class JsonBuilder {
     }
 
     public void sendJson(Player p) {
-        final PacketPlayOutChat pc = new PacketPlayOutChat(IChatBaseComponent.ChatSerializer.a(toString()));
+        final PacketPlayOutChat pc = new PacketPlayOutChat(IChatBaseComponent.ChatSerializer.a(toString()),ChatMessageType.SYSTEM,UUID.randomUUID());
         Utils.sendPacket(pc,p);
 //            plugin.debug("Sent JSON: " + toString());
     }

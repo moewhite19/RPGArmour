@@ -3,6 +3,7 @@ package cn.whiteg.rpgArmour.custItems;
 import cn.whiteg.moetp.utils.EntityTpUtils;
 import cn.whiteg.rpgArmour.Setting;
 import cn.whiteg.rpgArmour.api.CustItem_CustModle;
+import cn.whiteg.rpgArmour.utils.EntityUtils;
 import cn.whiteg.rpgArmour.utils.ItemToolUtil;
 import cn.whiteg.rpgArmour.utils.RandomUtil;
 import org.bukkit.Location;
@@ -91,8 +92,7 @@ public class EnderBow extends CustItem_CustModle implements Listener {
         if (spawnChance <= 0) return;
         if (!(event.getEntity() instanceof Skeleton)) return;
         final Entity entity = event.getEntity();
-        if (entity.fromMobSpawner() || entity.getEntitySpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG)
-            return;
+        if (EntityUtils.isSpawner(entity)) return;
         final Random random = RandomUtil.getRandom();
         if (random.nextDouble() < spawnChance){
             final EntityEquipment ej = ((Skeleton) entity).getEquipment();

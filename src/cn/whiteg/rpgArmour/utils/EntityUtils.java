@@ -1,11 +1,9 @@
 package cn.whiteg.rpgArmour.utils;
 
-import net.minecraft.server.v1_15_R1.*;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftEntity;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftMob;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftSnowball;
-import org.bukkit.craftbukkit.v1_15_R1.inventory.CraftItemStack;
+import net.minecraft.server.v1_16_R1.*;
+import org.bukkit.craftbukkit.v1_16_R1.entity.*;
+import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
+import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.entity.Snowball;
@@ -116,12 +114,12 @@ public class EntityUtils {
 
     public static float getAD(LivingEntity entity) {
         EntityLiving e = ((CraftLivingEntity) entity).getHandle();
-        return e.aZ;
+        return e.aY;
     }
 
     public static float getWS(LivingEntity entity) {
         EntityLiving e = ((CraftLivingEntity) entity).getHandle();
-        return e.bb;
+        return e.ba;
     }
 
     public static boolean setGoalTarget(Mob entity,LivingEntity goalTarget) {
@@ -150,10 +148,44 @@ public class EntityUtils {
     public static ItemStack getSnowballItem(Snowball snowball) {
         EntitySnowball nms = ((CraftSnowball) snowball).getHandle();
         try{
-            return CraftItemStack.asBukkitCopy((net.minecraft.server.v1_15_R1.ItemStack) getItemMethod.invoke(nms));
+            return CraftItemStack.asBukkitCopy((net.minecraft.server.v1_16_R1.ItemStack) getItemMethod.invoke(nms));
         }catch (IllegalAccessException | InvocationTargetException e){
             e.printStackTrace();
         }
         return null;
     }
+
+    //实体是否为刷怪笼刷出
+    public static boolean isSpawner(org.bukkit.entity.Entity entity) {
+        //return entity.fromMobSpawner() || entity.getEntitySpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG;  //Paper方法
+        return false;
+    }
+
+    //盔甲架是否锁住
+    private static int getDisabledSlots(ArmorStand as) {
+        EntityArmorStand armorStand = ((CraftArmorStand) as).getHandle();
+        Field f = null;
+        try{
+            f = EntityArmorStand.class.getDeclaredField("bA");
+            f.setAccessible(true);
+            return (int) f.get(armorStand);
+        }catch (NoSuchFieldException | IllegalAccessException e){
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    //锁住盔甲架
+    public static void setSlotsDisabled(ArmorStand as,boolean slotsDisabled) {
+        EntityArmorStand armorStand = ((CraftArmorStand) as).getHandle();
+        Field f = null;
+        try{
+            f = EntityArmorStand.class.getDeclaredField("bA");
+            f.setAccessible(true);
+            f.set(armorStand,slotsDisabled ? 0xFFFFFF : 0);
+        }catch (NoSuchFieldException | IllegalAccessException e){
+            e.printStackTrace();
+        }
+    }
+
 }

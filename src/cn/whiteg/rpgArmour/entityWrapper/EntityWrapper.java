@@ -2,11 +2,11 @@ package cn.whiteg.rpgArmour.entityWrapper;
 
 import cn.whiteg.rpgArmour.utils.JsonBuilder;
 import cn.whiteg.rpgArmour.utils.Utils;
-import net.minecraft.server.v1_15_R1.*;
+import net.minecraft.server.v1_16_R1.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.ObjectUtils;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_15_R1.util.CraftVector;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R1.util.CraftVector;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -32,29 +32,38 @@ public abstract class EntityWrapper {
 
     static {
         try{
-            g = DataWatcher.class.getDeclaredField("g"); //???
-            b = DataWatcher.class.getDeclaredMethod("b",DataWatcherObject.class); //???
             final Class<Entity> entityClass = Entity.class;
-            Field W = entityClass.getDeclaredField("T"); // flags
-            Field AIR_TICKS = entityClass.getDeclaredField("AIR_TICKS"); //Air Ticks???
-            Field aA = entityClass.getDeclaredField("aA"); // custom name visible
-            Field az = entityClass.getDeclaredField("az"); // custom name
-            Field aB = entityClass.getDeclaredField("aB"); // silent
-            Field aC = entityClass.getDeclaredField("aC");// no gravity
+            g = DataWatcher.class.getDeclaredField("g"); //???
             g.setAccessible(true);
+
+            b = DataWatcher.class.getDeclaredMethod("b",DataWatcherObject.class); //???
             b.setAccessible(true);
-            W.setAccessible(true);
-            AIR_TICKS.setAccessible(true);
-            aA.setAccessible(true);
-            az.setAccessible(true);
-            aB.setAccessible(true);
-            aC.setAccessible(true);
-            silent = (DataWatcherObject<Boolean>) aB.get(null);
-            name_visible = (DataWatcherObject<Boolean>) aA.get(null);
-            flags = (DataWatcherObject<Byte>) W.get(null);
-            air_tick = (DataWatcherObject<Integer>) AIR_TICKS.get(null);
-            displayName = (DataWatcherObject<Optional<IChatBaseComponent>>) az.get(null);
-            noGravity = (DataWatcherObject<Boolean>) aC.get(null);
+
+            Field f;
+            f = entityClass.getDeclaredField("T"); // flags
+            f.setAccessible(true);
+            flags = (DataWatcherObject<Byte>) f.get(null);
+
+            f = entityClass.getDeclaredField("AIR_TICKS"); //Air Ticks???
+            f.setAccessible(true);
+            air_tick = (DataWatcherObject<Integer>) f.get(null);
+
+            f = entityClass.getDeclaredField("ax"); // custom name
+            f.setAccessible(true);
+            displayName = (DataWatcherObject<Optional<IChatBaseComponent>>) f.get(null);
+
+            f = entityClass.getDeclaredField("ay"); // custom name visible
+            f.setAccessible(true);
+            name_visible = (DataWatcherObject<Boolean>) f.get(null);
+
+            f = entityClass.getDeclaredField("az"); // silent
+            f.setAccessible(true);
+            silent = (DataWatcherObject<Boolean>) f.get(null);
+
+            f = entityClass.getDeclaredField("aA");// no gravitysilent
+            f.setAccessible(true);
+            noGravity = (DataWatcherObject<Boolean>) f.get(null);
+
             Field count_f = Entity.class.getDeclaredField("entityCount");
             count_f.setAccessible(true);
             entityCount = (AtomicInteger) count_f.get(null);

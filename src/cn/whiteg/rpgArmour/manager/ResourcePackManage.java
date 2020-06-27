@@ -1,7 +1,7 @@
 package cn.whiteg.rpgArmour.manager;
 
 import cn.whiteg.rpgArmour.Setting;
-import net.minecraft.server.v1_15_R1.DedicatedServer;
+import net.minecraft.server.v1_16_R1.DedicatedServer;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.configuration.ConfigurationSection;

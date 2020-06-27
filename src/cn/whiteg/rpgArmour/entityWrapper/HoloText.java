@@ -1,7 +1,7 @@
 package cn.whiteg.rpgArmour.entityWrapper;
 
 import cn.whiteg.rpgArmour.utils.JsonBuilder;
-import net.minecraft.server.v1_15_R1.*;
+import net.minecraft.server.v1_16_R1.*;
 import org.bukkit.Location;
 
 import java.util.Optional;

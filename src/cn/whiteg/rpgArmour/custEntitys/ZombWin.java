@@ -8,8 +8,9 @@ import cn.whiteg.rpgArmour.api.CustItem;
 import cn.whiteg.rpgArmour.custItems.Muramasa;
 import cn.whiteg.rpgArmour.custItems.SamuraiSword;
 import cn.whiteg.rpgArmour.custItems.XiaoChou;
+import cn.whiteg.rpgArmour.utils.EntityUtils;
 import cn.whiteg.rpgArmour.utils.RandomUtil;
-import net.minecraft.server.v1_15_R1.EntityGiantZombie;
+import net.minecraft.server.v1_16_R1.EntityGiantZombie;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -19,7 +20,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftGiant;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftGiant;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -71,8 +72,7 @@ public class ZombWin extends CustEntityName implements Listener, CommandExecutor
         if (sc == 0) return;
         if (!(event.getEntity() instanceof Zombie)) return;
         LivingEntity entity = (LivingEntity) event.getEntity();
-        if (entity.fromMobSpawner() || entity.getEntitySpawnReason() == CreatureSpawnEvent.SpawnReason.SPAWNER_EGG)
-            return;
+        if(EntityUtils.isSpawner(entity)) return;
         if (entity.getType() == EntityType.ZOMBIE){
             if (RandomUtil.getRandom().nextDouble() < sc){
                 for (Entity e : entity.getLocation().getChunk().getEntities()) {

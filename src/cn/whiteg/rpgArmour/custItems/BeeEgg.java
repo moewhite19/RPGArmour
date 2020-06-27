@@ -4,7 +4,7 @@ import cn.whiteg.rpgArmour.api.CustItem_CustModle;
 import cn.whiteg.rpgArmour.utils.EntityUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftSnowball;
+import org.bukkit.craftbukkit.v1_16_R1.entity.CraftSnowball;
 import org.bukkit.entity.Bee;
 import org.bukkit.entity.Snowball;
 import org.bukkit.event.EventHandler;

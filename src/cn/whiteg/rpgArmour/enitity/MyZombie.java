@@ -1,10 +1,10 @@
 package cn.whiteg.rpgArmour.enitity;
 
-import net.minecraft.server.v1_15_R1.*;
+import net.minecraft.server.v1_16_R1.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.craftbukkit.v1_15_R1.CraftWorld;
+import org.bukkit.craftbukkit.v1_16_R1.CraftWorld;
 
 public class MyZombie extends EntityZombie {
     private static MinecraftKey minecraftKey;
@@ -23,7 +23,7 @@ public class MyZombie extends EntityZombie {
         modspawn();
     }
 
-    public MyZombie(net.minecraft.server.v1_15_R1.World world) {
+    public MyZombie(net.minecraft.server.v1_16_R1.World world) {
         super(world);
     }
 
