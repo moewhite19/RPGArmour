@@ -70,7 +70,8 @@ public class Fan extends CustItem_CustModle implements Listener {
         Entity uv = user.getVehicle();
         EntityType vt = uv == null ? null : uv.getType();
         for (Entity e : user.getNearbyEntities(range,range,range)) {
-            if (!e.isValid() || e.isInsideVehicle() || e.getType() == vt) continue;
+            if (!e.isValid() || e.isInsideVehicle() || e.getType() == vt || e.getType() == EntityType.ITEM_FRAME)
+                continue;
             final Location loc2 = e.getLocation();
             float yaw = VectorUtils.getLocYaw(loc,loc2);
             float ag = VectorUtils.checkViewCone(loc,loc2,35F);

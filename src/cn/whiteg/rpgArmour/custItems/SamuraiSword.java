@@ -118,6 +118,7 @@ public class SamuraiSword extends CustItem_CustModle implements Listener {
                 Item dropItem = loc.getWorld().dropItem(loc,main);
                 if (dropItem.isDead()) return;
                 dropItem.setVelocity(VectorUtils.viewVector(loc));
+                main.setData(null);
             }
             event.setDamage(event.getDamage() + skillDamage);
             if (ItemToolUtil.damage(off,3)){
@@ -172,7 +173,9 @@ public class SamuraiSword extends CustItem_CustModle implements Listener {
                 event.setCurrentItem(cursor);
 
             }
-        } else if (isAir(cursor) && isItem(current) == getId()){//拔刀
+        }
+        //拔刀
+        else if (isAir(cursor) && isItem(current) == getId()){
             if (event.getWhoClicked() instanceof Player){
                 ItemMeta im = current.getItemMeta();
                 if (im == null) return;
