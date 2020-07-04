@@ -101,7 +101,7 @@ public class test extends CommandInterface {
                 TagCompound tgs = nms.getTag();
                 String key = args.length > 2 ? args[2] : "Test";
                 if (tgs.hasTag()) sender.sendMessage("目标Tag为 " + tgs.getString(key));
-                else sender.sendMessage("对象没用Tag");
+                else sender.sendMessage("对象没有Tag");
                 break;
             }
 

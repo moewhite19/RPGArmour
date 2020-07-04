@@ -38,7 +38,6 @@ public class CustItemManager {
             regItem(new Fan());
             regItem(new PulseGrenade());
             regItem(new BindingKiller());
-            regItem(new BeeEgg());
 //        addRecipe(new QuickFiringCrossbow());
         });
     }
@@ -112,5 +111,9 @@ public class CustItemManager {
             list.add(ChatColor.stripColor(entry.getValue().getDisplayName()));
         }
         return list;
+    }
+
+    public Map<String, CustItem> getItems() {
+        return items;
     }
 }
