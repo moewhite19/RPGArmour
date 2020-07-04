@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class give extends CommandInterface {
@@ -31,7 +32,7 @@ public class give extends CommandInterface {
             } else {
                 sender.sendMessage("没有找到ID " + id);
             }
-        } else if (args.length == 3 || args.length == 4){
+        } else if (args.length >= 3){
             final Player player = Bukkit.getPlayer(args[2]);
 
             if (player == null){
@@ -39,23 +40,31 @@ public class give extends CommandInterface {
                 return false;
             }
             final String id = args[1];
-            final ItemStack item = RPGArmour.plugin.getItemManager().createItem(id);
-            if (item != null){
-                if (args.length == 4){
-                    try{
-                        final int i = Integer.valueOf(args[3]);
-                        item.setAmount(i);
-                    }catch (NumberFormatException e){
-                        sender.sendMessage("无效数量参数");
-                    }
-                }
-                final String im = item.getItemMeta().getDisplayName();
-                sender.sendMessage("§b给与" + player.getName() + " §r " + im);
-                player.sendMessage("§b收到来自§r" + sender.getName() + "给与的" + im);
-                player.getInventory().addItem(item);
+            ItemStack item;
+            if (args.length > 3){
+                List<String> arg = new ArrayList<>(args.length - 3);
+                arg.addAll(Arrays.asList(args).subList(3,args.length));
+                item = RPGArmour.plugin.getItemManager().createItem(id,arg);
             } else {
-                sender.sendMessage("没有找到ID " + id);
+                item = RPGArmour.plugin.getItemManager().createItem(id);
             }
+            if (item == null){
+                sender.sendMessage("没有找到ID " + id);
+                return false;
+            }
+            if (args.length == 4){
+                try{
+                    final int i = Integer.parseInt(args[3]);
+                    item.setAmount(i);
+                }catch (NumberFormatException e){
+                    sender.sendMessage("无效数量参数");
+                }
+            }
+            final String im = item.getItemMeta().getDisplayName();
+            sender.sendMessage("§b给与" + player.getName() + " §r " + im);
+            if (sender != player) player.sendMessage("§b收到来自§r" + sender.getName() + "给与的" + im);
+            player.getInventory().addItem(item);
+            return true;
         }
         return false;
     }

@@ -3,11 +3,11 @@ package cn.whiteg.rpgArmour.manager;
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.api.CustItem;
 import cn.whiteg.rpgArmour.custItems.*;
-import com.sun.istack.internal.NotNull;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -84,6 +84,11 @@ public class CustItemManager {
         return null;
     }
 
+    public ItemStack createItem(@NotNull String name,List<String> args) {
+        CustItem ca = getCustItem(name);
+        if (ca != null) return ca.createItem(args);
+        return null;
+    }
 
     public CustItem getCustItem(@NotNull String name) {
         CustItem custItem = items.get(name);

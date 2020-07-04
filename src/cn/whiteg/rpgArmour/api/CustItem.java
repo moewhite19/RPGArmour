@@ -74,6 +74,18 @@ public abstract class CustItem {
 
     public abstract ItemStack createItem();
 
+    public ItemStack createItem(List<String> arg) {
+        ItemStack item = createItem();
+        if (arg != null && !arg.isEmpty()){
+            try{
+                item.setAmount(Integer.parseInt(arg.get(0)));
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+        return item;
+    }
+
     public abstract boolean is(ItemStack item);
 
 }
