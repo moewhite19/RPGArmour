@@ -125,8 +125,6 @@ public class SkeletonWin extends CustEntityName implements Listener, CommandExec
                 event.setDamage(event.getDamage() / 2);
             }
         }
-
-
     }
 
     @EventHandler(priority = EventPriority.LOW, ignoreCancelled = true)

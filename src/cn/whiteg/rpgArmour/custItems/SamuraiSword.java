@@ -10,6 +10,7 @@ import cn.whiteg.rpgArmour.utils.VectorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.Particle;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
@@ -34,7 +35,7 @@ public class SamuraiSword extends CustItem_CustModle implements Listener {
     final Scabbard scabbard = new Scabbard();
     private final String sound_unsheathed = "rpgarmour:samuraisword.unsheathed";
     private final String sound_unsheathed2 = "rpgarmour:samuraisword.unsheathed2";
-    private final String sound_put = "rpgarmour:samuraisword.put";
+    private final String sound_put = "rpgarmour:samuraisword.put"; //收刀音效
     private final String sound_att = "minecraft:entity.player.attack.sweep";
     private final String sound_damagebad = "minecraft:entity.player.attack.crit";
     private float damage = 10f;
@@ -87,28 +88,32 @@ public class SamuraiSword extends CustItem_CustModle implements Listener {
         final EntityEquipment equipment = damager.getEquipment();
 //        if (pi == null) return;
         ItemStack main = equipment.getItemInMainHand();
+        //如果主手是拔出状态的武士刀
         if (isItem(main) == id2){
             if (hasCd(damager)) return;
-            Location loc = event.getEntity().getLocation();
+            //普通攻击
+            Location loc = damager.getEyeLocation();
             loc.getWorld().playSound(loc,sound_att,1,1);
+            loc.getWorld().spawnParticle(Particle.SWEEP_ATTACK,loc.clone().add(VectorUtils.viewVector(loc).multiply(0.8F)),2);
             setCd(damager,15);
             double damage = event.getDamage() + this.damage;
             if (damager instanceof Mob) damage += 5;
             event.setDamage(damage);
             if (ItemToolUtil.damage(main,1)){
-                loc = damager.getLocation();
+                //武器用坏了
                 loc.getWorld().playSound(loc,sound_damagebad,1,1);
                 equipment.setItemInMainHand(null);
             }
             return;
         }
 
+        //如果副手是未拔出状态的武士刀
         ItemStack off = equipment.getItemInOffHand();
         if (isItem(off) == getId()){
             if (hasCd(damager)){
                 return;
             }
-            Location loc = damager.getLocation();
+            Location loc = damager.getEyeLocation();
 
             //使用技能时如果主手有物品则掉落
             if (!isAir(main)){
@@ -120,9 +125,12 @@ public class SamuraiSword extends CustItem_CustModle implements Listener {
                 dropItem.setVelocity(VectorUtils.viewVector(loc));
                 main.setData(null);
             }
+
             event.setDamage(event.getDamage() + skillDamage);
+            ;
+            loc.getWorld().playSound(loc,sound_unsheathed2,1,1);
+            loc.getWorld().spawnParticle(Particle.SWEEP_ATTACK,loc.clone().add(VectorUtils.viewVector(loc).multiply(0.8F)),3);
             if (ItemToolUtil.damage(off,3)){
-                loc = damager.getLocation();
                 loc.getWorld().playSound(loc,sound_damagebad,1,1);
                 equipment.setItemInOffHand(null);
                 return;
@@ -131,7 +139,6 @@ public class SamuraiSword extends CustItem_CustModle implements Listener {
             im.setCustomModelData(id2);
             off.setItemMeta(im);
             equipment.setItemInMainHand(off);
-            loc.getWorld().playSound(loc,sound_unsheathed2,1,1);
             equipment.setItemInOffHand(scabbard.createItem());
             setCd(damager,25);
             Bukkit.getScheduler().runTaskLater(RPGArmour.plugin,() -> {
@@ -144,8 +151,6 @@ public class SamuraiSword extends CustItem_CustModle implements Listener {
                     equipment.setItemInMainHand(null);
                     Location l = equipment.getHolder().getLocation();
                     l.getWorld().playSound(l,sound_put,1,1);
-                }
-                if (is(i)){
                 }
             },15);
             return;
