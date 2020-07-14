@@ -1,19 +1,13 @@
 package cn.whiteg.rpgArmour;
 
-import cn.whiteg.mmocore.common.CommandInterface;
 import cn.whiteg.mmocore.MMOCore;
-import cn.whiteg.mmocore.util.PluginUtil;
 import cn.whiteg.rpgArmour.custItems.ResurrectArmor;
 import cn.whiteg.rpgArmour.listener.*;
 import cn.whiteg.rpgArmour.manager.*;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.entity.Entity;
 
-import java.lang.ref.SoftReference;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 
@@ -59,17 +53,8 @@ public class RPGArmour extends PluginBase {
         if (Bukkit.getPluginManager().getPlugin("MMOCore") != null)
             mmoCore = MMOCore.plugin;
         regListener(new ArmorListener());
-        regListener(new PlayerItemHatListener());
+        regListener(new PlayerItemEatListener());
         regListener(new RideListenetr());
-        regListener(new PlayerAttListener());
-//        try{
-//            regListener(new PaperPlayerJumpListener());
-//            logger.info("使用PaperJump事件");
-//        }catch (Exception e){
-//            regListener(new PlayerMoveToJump());
-//            logger.info("使用MoveToJump事件");
-//        }
-        regListener(new PlayerMoveToJump());
         regListener(new PlayerDammangeListener());
         regListener(new undyingListener());
         regListener(new ResurrectArmor());

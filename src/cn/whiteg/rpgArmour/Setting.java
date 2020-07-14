@@ -1,17 +1,20 @@
 package cn.whiteg.rpgArmour;
 
+import cn.whiteg.mmocore.sound.Sound;
 import cn.whiteg.rpgArmour.api.CustEntity;
 import cn.whiteg.rpgArmour.api.CustItem;
 import cn.whiteg.rpgArmour.custItems.BambooDragonfly;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Set;
 
 public class Setting {
@@ -22,6 +25,7 @@ public class Setting {
     private static ConfigurationSection custEntitySetting;
     private static FileConfiguration storage;
     private static FileConfiguration config;
+    private static Map<Material, Sound> eatSoundMap = new EnumMap<>(Material.class);
 
     public static void reload() {
         File file = new File(RPGArmour.plugin.getDataFolder(),"config.yml");
@@ -49,6 +53,20 @@ public class Setting {
         custItemConfit = config.getConfigurationSection("CustItemSetting");
         custEntitySetting = config.getConfigurationSection("CustEntitySetting");
         forgeResourcePack = config.getBoolean("forgeResourcePack",forgeResourcePack);
+
+        //加载声音
+        @Nullable ConfigurationSection cs = config.getConfigurationSection("EatSound");
+        if (cs != null){
+            for (String key : cs.getKeys(false)) {
+                try{
+                    Material mat = Material.valueOf(key.toUpperCase());
+                    eatSoundMap.put(mat,Sound.parseSound(cs.get(key)));
+                }catch (IllegalArgumentException e){
+                    RPGArmour.logger.warning("无效配置ID: " + key);
+                }
+            }
+        }
+
         file = new File(file.getParentFile(),"storage.yml");
         if (file.exists()){
             storage = YamlConfiguration.loadConfiguration(file);
@@ -64,6 +82,10 @@ public class Setting {
         }catch (IOException e){
             e.printStackTrace();
         }
+    }
+
+    public static Map<Material, Sound> getEatSoundMap() {
+        return eatSoundMap;
     }
 
     public static ConfigurationSection getCustEntitySetting(String name) {
