@@ -22,51 +22,51 @@ import java.util.Collections;
 import java.util.List;
 
 public class setpack extends CommandInterface {
-    Downloader d = null;
+    Downloader downloader = null;
 
     @Override
     public boolean onCommand(CommandSender sender,Command cmd,String label,String[] args) {
         if (sender.hasPermission("mmo.setresourcepack")){
             if (args.length == 1){
-                if (d != null){
-                    if (!d.isClose()){
-                        sender.sendMessage("下载任务:" + d.getUrl() + " 大小" + CommonUtils.tanByte(d.getSize()) + " 进度" + CommonUtils.tanByte(d.getDownloaded()));
+                if (downloader != null){
+                    if (!downloader.isClose()){
+                        sender.sendMessage("下载任务:" + downloader.getUrl() + " 大小" + CommonUtils.tanByte(downloader.getSize()) + " 进度" + CommonUtils.tanByte(downloader.getDownloaded()));
                         return true;
                     } else {
-                        d = null;
+                        downloader = null;
                     }
                 }
                 sender.sendMessage("没有下载任务");
             } else if (args.length == 2){
                 final String url = args[1];
                 if (url.equals("stop")){
-                    if (d != null){
-                        d.close();
-                        d.stop();
-                        d = null;
+                    if (downloader != null){
+                        downloader.close();
+                        downloader.stop();
+                        downloader = null;
                     } else {
                         sender.sendMessage("没有下载任务");
                     }
                     return true;
                 }
-                if (d != null){
-                    d.close();
-                    d.stop();
+                if (downloader != null){
+                    downloader.close();
+                    downloader.stop();
                 }
-                d = new Downloader(url,"cache",RPGArmour.plugin.getDataFolder().toString(),sender) {
+                downloader = new Downloader(url,RPGArmour.plugin.getDataFolder(),"resourcepack.zip",sender) {
                     @Override
                     public void onDone(File file) {
                         try{
                             final String s = hashFile.getSha1(file);
                             log("资源包下载完成 sha1值为" + s);
                             ResourcePackManage.set(getUrl(),s);
-                            d = null;
+                            downloader = null;
                         }catch (Exception e){
                             e.printStackTrace();
                         }
                     }
                 };
-                d.start();
+                downloader.start();
                 if (sender instanceof Player){
                     try{
                         final Player p = (Player) sender;
@@ -89,14 +89,14 @@ public class setpack extends CommandInterface {
 
                             @Override
                             public void run() {
-                                if (!p.isOnline() || d == null || d.isClose()){
+                                if (!p.isOnline() || downloader == null || downloader.isClose()){
                                     bar.removeAll();
                                     cancel();
                                     return;
                                 }
 
-                                long size = d.getSize();
-                                long loaded = d.getDownloaded();
+                                long size = downloader.getSize();
+                                long loaded = downloader.getDownloaded();
                                 long speed = loaded - flag;
                                 flag = loaded;
                                 float r = (float) ((double) loaded / (double) size);

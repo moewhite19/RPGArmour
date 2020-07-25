@@ -9,7 +9,7 @@ import java.net.URL;
 public abstract class Downloader extends Thread {
     private final String url;
     private final String fileName;
-    private final String savePath;
+    private final File saveDir;
     private final CommandSender sender;
     private InputStream inputStream = null;
     private FileOutputStream fos = null;
@@ -18,15 +18,15 @@ public abstract class Downloader extends Thread {
     private volatile long downloaded = 0;
     private volatile boolean close = false;
 
-    public Downloader(String url,String fileName,String savePath,CommandSender sender) {
+    public Downloader(String url,File savePath,String fileName,CommandSender sender) {
         this.url = url;
         this.fileName = fileName;
-        this.savePath = savePath;
+        this.saveDir = savePath;
         this.sender = sender;
     }
 
-    public Downloader(String url,String fileName,String savePath) {
-        this(url,fileName,savePath,null);
+    public Downloader(String url,File savePath,String fileName) {
+        this(url,savePath,fileName,null);
     }
 
 
@@ -70,7 +70,6 @@ public abstract class Downloader extends Thread {
             byte[] getData = readInputStream(inputStream);
             bos = null;
             //文件保存位置
-            File saveDir = new File(savePath);
             if (!saveDir.exists()){
                 saveDir.mkdirs();
             }

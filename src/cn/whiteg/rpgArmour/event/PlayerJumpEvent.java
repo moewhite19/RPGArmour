@@ -14,7 +14,7 @@ public class PlayerJumpEvent extends PlayerEvent implements Cancellable {
     private static HandlerList handlerList = new HandlerList();
 
     static {
-        Bukkit.getPluginManager().registerEvents(new Listener() {
+        RPGArmour.plugin.regListener(new Listener() {
             @EventHandler(ignoreCancelled = true)
             public void onMove(PlayerMoveEvent event) {
                 final double y = event.getTo().getY() - event.getFrom().getY();
@@ -23,7 +23,7 @@ public class PlayerJumpEvent extends PlayerEvent implements Cancellable {
                 PlayerJumpEvent pj = new PlayerJumpEvent(event.getPlayer());
                 pj.call();
             }
-        },RPGArmour.plugin);
+        });
     }
 
     private boolean c = false;

@@ -70,6 +70,9 @@ public class RPGArmour extends PluginBase {
             pcmd.setTabCompleter(commandManager);
         }
         ResourcePackManage.set();
+        Bukkit.getScheduler().runTask(this,() -> {
+            recipeManage.onSync();
+        });
     }
 
     public void onDisable() {

@@ -45,7 +45,7 @@ public class Fan extends CustItem_CustModle implements Listener {
     }
 
     @EventHandler()
-    public void onani(PlayerInteractEvent event) {
+    public void onUse(PlayerInteractEvent event) {
         if (event.getAction() != Action.LEFT_CLICK_AIR && event.getAction() != Action.LEFT_CLICK_BLOCK) return;
         final Player player = event.getPlayer();
         final ItemStack item = player.getEquipment().getItemInMainHand();
@@ -64,9 +64,11 @@ public class Fan extends CustItem_CustModle implements Listener {
             player.setCooldown(getMaterial(),20);
         }
         damager = user;
-        Location loc = user.getLocation();
-        loc.setY(loc.getY() - (user instanceof Player ? (((Player) user).isSneaking() ? 0.4D : 0.2D) : 0.3D));
+        Location loc = user.getEyeLocation();
+        if (user instanceof Player) loc.setY(loc.getY() - (((Player) user).isSneaking() ? 0.4D : 0.2D));
         loc.getWorld().playSound(loc,"minecraft:entity.player.attack.knockback",SoundCategory.AMBIENT,1F,0.1F);
+
+        //获取使用者载具
         Entity uv = user.getVehicle();
         EntityType vt = uv == null ? null : uv.getType();
         for (Entity e : user.getNearbyEntities(range,range,range)) {

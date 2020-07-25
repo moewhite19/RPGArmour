@@ -15,6 +15,7 @@ import java.util.Map;
 public class RecipeManage {
     final RPGArmour pligin;
     final Map<NamespacedKey, Recipe> map = new HashMap<>();
+    boolean flag = false;
 
     public RecipeManage(RPGArmour pligin) {
         this.pligin = pligin;
@@ -27,7 +28,7 @@ public class RecipeManage {
     public void addRecipe(NamespacedKey name,Recipe recipe) {
         try{
             map.put(name,recipe);
-            Bukkit.getServer().addRecipe(recipe);
+            if (flag) Bukkit.getServer().addRecipe(recipe);
         }catch (Exception e){
             if (Setting.DEBUG){
                 RPGArmour.logger.info("合成表添加失败: " + name.getKey());
@@ -90,6 +91,14 @@ public class RecipeManage {
             }
         }
         return null;
+    }
+
+    //同步更新配方
+    public void onSync() {
+        map.forEach((namespacedKey,recipe) -> {
+            Bukkit.getServer().addRecipe(recipe);
+        });
+        flag = true;
     }
 
     public void unload() {

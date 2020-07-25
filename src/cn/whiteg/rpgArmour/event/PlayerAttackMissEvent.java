@@ -16,7 +16,7 @@ public class PlayerAttackMissEvent extends PlayerEvent implements Cancellable {
     private static HandlerList handers = new HandlerList();
 
     static {
-        Bukkit.getPluginManager().registerEvents(new Listener() {
+        RPGArmour.plugin.regListener(new Listener() {
             private Player player;
             @EventHandler
             public void onLeft_Click(PlayerInteractEvent event) {
@@ -33,7 +33,7 @@ public class PlayerAttackMissEvent extends PlayerEvent implements Cancellable {
                     player = null;
                 }
             }
-        },RPGArmour.plugin);
+        });
     }
 
     private boolean cancelled = false;
