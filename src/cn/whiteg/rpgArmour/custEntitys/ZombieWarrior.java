@@ -58,11 +58,9 @@ public class ZombieWarrior extends CustEntityName implements Listener, CommandEx
                 Float f = spawnChance.remove("_def_");
                 if (f != null) def_spawnChance = f;
             }
-//            spawnChance = (float) config.getDouble("spawnChance");
             itemDropChance = (float) config.getDouble("itemDropChance",itemDropChance);
             dropexp = config.getInt("dropexp",dropexp);
         }
-//        RPGArmour.plugin.commandManager.addComd(this.getClass() , "win");
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

@@ -5,68 +5,54 @@ debug: false
 forgeResourcePack: false
 #吃东西时播放声音
 EatSound:
-  #吃腐肉时播放moe.burp
-  ROTTEN_FLESH: minecraft:moe.burp
+  ROTTEN_FLESH: minecraft:moe.burp  #吃腐肉时播放moe.burp
   SWEET_BERRIES: minecraft:moe.huaq
 
+#自定义物品配置
 CustItemSetting:
-  #竹蜻蜓
-  BambooDragonfly:
+  BambooDragonfly:  #竹蜻蜓
     flySpeed: 0.03
   SeekerBow:
-    #生成到怪物手上的几率
-    spawnChance: 0.080
-    #掉落几率
-    itemDropChance: 0.25
-  #末影弓
-  EnderBow:
+    spawnChance: 0.080 #生成到怪物手上的几率
+    itemDropChance: 0.25 #掉落几率
+
+  EnderBow:  #末影弓
     spawnChance: 0.075
     itemDropChance: 0.25
-    #交换坐骑
-    swapVehicle: true
-  QuickFiringCrossbow:
+    swapVehicle: true    #交换坐骑
+
+  EnderHat:  #末影使者
     spawnChance: 0.075
     itemDropChance: 0.25
-  #末影使者
-  EnderHat:
+
+  SamuraiSword:  #武士刀
     spawnChance: 0.075
     itemDropChance: 0.25
-  #武士刀
-  SamuraiSword:
-    spawnChance: 0.075
-    itemDropChance: 0.25
-    #伤害
-    damage: 10
-    #技能伤害
-    skillDamage: 18.5
-  ResurrectArmor:
-    #被动CD
-    cooldown: 120
+    damage: 10    #伤害
+    skillDamage: 18.5   #技能伤害
+
+  ResurrectArmor: #妖精庇护r
+    cooldown: 120    #被动CD
   Creeper:
     fuze: 50
 
+#自定义实体配置
 CustEntitySetting:
-  #骷髅王
-  SkeletonWin:
-    #生成几率
-    spawnChance:
-      #缺省值所有世界生成几率
-      _def_: 0.02
-      #world主世界生成几率
-      world: 0.025
+  SkeletonWin:  #骷髅王
+    spawnChance: #生成几率
+      _def_: 0.02 #缺省值所有世界生成几率
+      world: 0.025 #world主世界生成几率
     itemDropChance: 0.25
-    dropexp: 600
+    dropexp: 600 #掉落经验值
 
-  #僵尸武士配置
-  ZombieWarrior:
+  ZombieWarrior:  #僵尸武士配置
     spawnChance:
       _def_: 0.025
       world: 0.03
     itemDropChance: 0.9
     dropexp: 600
 
-  #骷髅王配置
-  SlimeWin:
+  SlimeWin:  #骷髅王配置
     spawnChance:
       _def_: 0.025
       world: 0.03
