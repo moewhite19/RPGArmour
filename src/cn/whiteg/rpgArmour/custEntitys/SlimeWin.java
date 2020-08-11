@@ -33,7 +33,6 @@ public class SlimeWin extends CustEntityName implements Listener, CommandExecuto
     private Map<String, Float> spawnChance = new HashMap<>();
     private float def_spawnChance = 0F;
     private int size = 10;
-//    private float spawnChance = 0.03f;
 
     public SlimeWin() {
         super("§a史莱姆王",Slime.class);
@@ -41,13 +40,12 @@ public class SlimeWin extends CustEntityName implements Listener, CommandExecuto
         if (config != null){
             ConfigurationSection s = config.getConfigurationSection("spawnChance");
             if (s != null){
-                def_spawnChance = (float) s.getDouble("_def_",def_spawnChance);
                 for (String st : s.getKeys(false)) {
                     spawnChance.put(st,(float) s.getDouble(st,def_spawnChance));
                 }
-                spawnChance.remove("_def_");
+                Float f = spawnChance.remove("_def_");
+                if (f != null) def_spawnChance = f;
             }
-//            spawnChance = (float) config.getDouble("spawnChance");
             size = config.getInt("size",size);
         }
 

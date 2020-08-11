@@ -24,7 +24,10 @@ import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.*;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 
@@ -44,17 +47,17 @@ public class SkeletonWin extends CustEntityName implements Listener, CommandExec
         if (config != null){
             ConfigurationSection s = config.getConfigurationSection("spawnChance");
             if (s != null){
-                def_spawnChance = (float) s.getDouble("_def_",def_spawnChance);
                 for (String st : s.getKeys(false)) {
                     spawnChance.put(st,(float) s.getDouble(st,def_spawnChance));
                 }
-                spawnChance.remove("_def_");
+
+                //默认r
+                Float f = spawnChance.remove("_def_");
+                if (f != null) def_spawnChance = f;
             }
-//            spawnChance = (float) config.getDouble("spawnChance");
             itemDropChance = (float) config.getDouble("itemDropChance",itemDropChance);
             dropexp = config.getInt("dropexp",dropexp);
         }
-//        RPGArmour.plugin.commandManager.addComd(this.getClass() , "win");
     }
 
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)

@@ -114,22 +114,22 @@ public class SamuraiSword extends CustItem_CustModle implements Listener {
                 return;
             }
             Location loc = damager.getEyeLocation();
-
             event.setDamage(event.getDamage() + skillDamage);
             loc.getWorld().playSound(loc,sound_unsheathed2,1,1);
             loc.getWorld().spawnParticle(Particle.SWEEP_ATTACK,loc.clone().add(VectorUtils.viewVector(loc).multiply(0.8F)),3);
             //检查耐久度
-            if (ItemToolUtil.damage(off,3)){
-                loc.getWorld().playSound(loc,sound_damagebad,1,1);
-                equipment.setItemInOffHand(null);
-                return;
-            }
             //使用技能时如果主手有物品则掉落
             if (!isAir(main)){
                 Item dropItem = loc.getWorld().dropItem(loc,main);
                 if (dropItem.isDead()) return;
                 dropItem.setVelocity(VectorUtils.viewVector(loc));
                 main.setData(null);
+            }
+            if (ItemToolUtil.damage(off,3)){
+                loc.getWorld().playSound(loc,sound_damagebad,1,1);
+                equipment.setItemInOffHand(null);
+                equipment.setItemInMainHand(null);
+                return;
             }
             ItemMeta im = off.getItemMeta();
             im.setCustomModelData(id2);

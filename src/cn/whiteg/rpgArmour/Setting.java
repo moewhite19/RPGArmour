@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class Setting {
-    private final static int CONFIGVER = 8;
+    private final static int CONFIGVER = 9;
     public static boolean DEBUG;
     public static boolean forgeResourcePack = false;
     private static ConfigurationSection custItemConfit;

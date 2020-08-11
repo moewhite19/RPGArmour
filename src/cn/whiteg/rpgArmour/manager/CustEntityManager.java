@@ -8,7 +8,7 @@ import cn.whiteg.rpgArmour.api.CustEntityName;
 import cn.whiteg.rpgArmour.custEntitys.Seat;
 import cn.whiteg.rpgArmour.custEntitys.SkeletonWin;
 import cn.whiteg.rpgArmour.custEntitys.SlimeWin;
-import cn.whiteg.rpgArmour.custEntitys.ZombWarrior;
+import cn.whiteg.rpgArmour.custEntitys.ZombieWarrior;
 import com.sun.istack.internal.NotNull;
 import com.sun.istack.internal.Nullable;
 import org.bukkit.Bukkit;
@@ -29,7 +29,7 @@ public class CustEntityManager implements Listener {
 
     public CustEntityManager() {
         Bukkit.getScheduler().runTask(RPGArmour.plugin,() -> {
-            regEntity(new ZombWarrior());
+            regEntity(new ZombieWarrior());
             regEntity(new SkeletonWin());
             regEntity(new SlimeWin());
             regEntity(Seat.get());
@@ -49,7 +49,6 @@ public class CustEntityManager implements Listener {
                 }
                 RPGArmour.plugin.regListener(this);
             });
-//        regEntity(new ZombWin());
         });
 
 

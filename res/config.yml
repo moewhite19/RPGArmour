@@ -1,4 +1,4 @@
-ver: 8
+ver: 9
 debug: false
 
 #强制要求加载资源包(当拥有rpgarmour.nopack权限时无视)
@@ -56,17 +56,16 @@ CustEntitySetting:
       world: 0.025
     itemDropChance: 0.25
     dropexp: 600
-  ZombWarrior:
+
+  #僵尸武士配置
+  ZombieWarrior:
     spawnChance:
       _def_: 0.025
       world: 0.03
     itemDropChance: 0.9
     dropexp: 600
-  ZombWin:
-    spawnChance:
-      _def_: 0.01
-    itemDropChance: 0.9
-    dropexp: 600
+
+  #骷髅王配置
   SlimeWin:
     spawnChance:
       _def_: 0.025

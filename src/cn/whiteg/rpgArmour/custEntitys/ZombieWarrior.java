@@ -1,8 +1,8 @@
 package cn.whiteg.rpgArmour.custEntitys;
 
+import cn.whiteg.moetp.utils.EntityTpUtils;
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.Setting;
-import cn.whiteg.rpgArmour.api.CustEntityChunkEvent;
 import cn.whiteg.rpgArmour.api.CustEntityName;
 import cn.whiteg.rpgArmour.api.CustItem;
 import cn.whiteg.rpgArmour.custItems.Muramasa;
@@ -10,54 +10,53 @@ import cn.whiteg.rpgArmour.custItems.SamuraiSword;
 import cn.whiteg.rpgArmour.custItems.XiaoChou;
 import cn.whiteg.rpgArmour.utils.EntityUtils;
 import cn.whiteg.rpgArmour.utils.RandomUtil;
-import net.minecraft.server.v1_16_R1.EntityGiantZombie;
+import cn.whiteg.rpgArmour.utils.VectorUtils;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
+import org.bukkit.block.BlockState;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftGiant;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.projectiles.ProjectileSource;
+import org.bukkit.util.Vector;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class ZombWin extends CustEntityName implements Listener, CommandExecutor, TabCompleter, CustEntityChunkEvent {
+public class ZombieWarrior extends CustEntityName implements Listener, CommandExecutor, TabCompleter {
     private Map<String, Float> spawnChance = new HashMap<>();
     private int dropexp = 600;
-    private float def_spawnChance = 0.01f;
+    private float def_spawnChance = 0.03f;
     private float itemDropChance = 0.8f;
-//    private float spawnChance = 0.03f;
+    private WeakHashMap<UUID, Location> locMap = new WeakHashMap<>();
 
-    public ZombWin() {
-        //super(Material.SHEARS,10,"§b僵尸王");
-        super("§b僵尸王",Giant.class);
-//        RPGArmour.plugin.regListener(this);
+    public ZombieWarrior() {
+        super("§b僵尸武士",Zombie.class);
         ConfigurationSection config = Setting.getCustEntitySetting(this);
         if (config != null){
             ConfigurationSection s = config.getConfigurationSection("spawnChance");
             if (s != null){
-                def_spawnChance = (float) s.getDouble("_def_",def_spawnChance);
                 for (String st : s.getKeys(false)) {
                     spawnChance.put(st,(float) s.getDouble(st,def_spawnChance));
                 }
-                spawnChance.remove("_def_");
+                //默认配置
+                Float f = spawnChance.remove("_def_");
+                if (f != null) def_spawnChance = f;
             }
 //            spawnChance = (float) config.getDouble("spawnChance");
             itemDropChance = (float) config.getDouble("itemDropChance",itemDropChance);
@@ -72,21 +71,32 @@ public class ZombWin extends CustEntityName implements Listener, CommandExecutor
         if (sc == 0) return;
         if (!(event.getEntity() instanceof Zombie)) return;
         LivingEntity entity = (LivingEntity) event.getEntity();
-        if(EntityUtils.isSpawner(entity)) return;
+        if (EntityUtils.isSpawner(entity)) return;
         if (entity.getType() == EntityType.ZOMBIE){
             if (RandomUtil.getRandom().nextDouble() < sc){
-                for (Entity e : entity.getLocation().getChunk().getEntities()) {
+                int amn = 0;
+                for (Entity e : entity.getNearbyEntities(8,8,8)) {
                     if (is(e)){
                         return;
                     }
+                    if (e instanceof Zombie){
+                        amn++;
+                        if (amn >= 4) return;
+                    }
                 }
-                Location loc = entity.getLocation();
-                for (int i = 0; i < 20; i++) {
-                    loc.setY(loc.getY() + 1);
-                    if (loc.getBlock().getType() != Material.AIR) return;
+                for (BlockState bs : entity.getLocation().getChunk().getTileEntities()) {
+                    if (bs instanceof CreatureSpawner){
+                        CreatureSpawner bs1 = (CreatureSpawner) bs;
+                        if (bs1.getSpawnedType() == EntityType.ZOMBIE){
+                            return;
+                        }
+                    }
                 }
                 this.init(entity);
             }
+        } else if (entity.getType() == EntityType.DROWNED && is(entity)){
+//            RPGArmour.logger.info("僵尸武士变溺尸");
+            init(entity);
         }
     }
 
@@ -112,14 +122,14 @@ public class ZombWin extends CustEntityName implements Listener, CommandExecutor
         ej.setHelmet(hat);
         ej.setHelmetDropChance(0);
         AttributeInstance ab = livent.getAttribute(Attribute.GENERIC_MAX_HEALTH);
-        ab.setBaseValue(600);
+        ab.setBaseValue(160);
         ab = livent.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
         ab.setBaseValue(0.3);
         ab = livent.getAttribute(Attribute.GENERIC_ARMOR);
         ab.setBaseValue(10);
         ab = livent.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
-        ab.setBaseValue(1);
-        livent.setHealth(600);
+        ab.setBaseValue(0.5D);
+        livent.setHealth(160);
         if (RandomUtil.getRandom().nextDouble() < 0.25){
             final ItemStack item = RPGArmour.plugin.getItemManager().createItem(Muramasa.class.getName());
             ej.setItemInMainHand(item);
@@ -136,8 +146,28 @@ public class ZombWin extends CustEntityName implements Listener, CommandExecutor
 
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
-        if (is(event.getEntity())){
-
+        Entity entity = event.getEntity();
+        if (is(entity)){
+            if (RandomUtil.getRandom().nextDouble() > 0.5) return;
+            final Location orgl = locMap.get(event.getEntity().getUniqueId());
+            final Location newl = event.getEntity().getLocation();
+            if (orgl != null && orgl.getWorld() == newl.getWorld() && orgl.distanceSquared(newl) < 0.5){
+                Entity damager = event.getDamager();
+                if (damager instanceof Projectile){
+                    ProjectileSource shooter = ((Projectile) damager).getShooter();
+                    if (shooter instanceof Entity){
+                        damager = (Entity) shooter;
+                    } else {
+                        return;
+                    }
+                }
+                if (damager instanceof LivingEntity && entity instanceof Mob){
+                    EntityUtils.setGoalTarget(((Mob) entity),((LivingEntity) damager));
+                }
+                onTpTo(entity,damager);
+            } else {
+                locMap.put(event.getEntity().getUniqueId(),newl);
+            }
         }
     }
 //
@@ -145,13 +175,32 @@ public class ZombWin extends CustEntityName implements Listener, CommandExecutor
 //        return l.getBlock().getType() != Material.AIR;
 //    }
 
-    void ontp(Entity livent) {
-        Entity[] es = livent.getLocation().getChunk().getEntities();
-        for (Entity e : es) {
-            if (e instanceof Player){
-                livent.teleport(e);
+    @EventHandler
+    public void onEntityDamage(EntityDamageEvent event) {
+        if (event.getCause() == EntityDamageEvent.DamageCause.ENTITY_ATTACK || event.getCause() == EntityDamageEvent.DamageCause.ENTITY_SWEEP_ATTACK)
+            return;
+        Entity entity = event.getEntity();
+        if (is(entity)){
+            LivingEntity damager = ((Zombie) entity).getTarget();
+            if (damager == null) return;
+            if (RandomUtil.getRandom().nextDouble() > 0.5) return;
+            final Location orgl = locMap.get(event.getEntity().getUniqueId());
+            final Location newl = event.getEntity().getLocation();
+            if (orgl != null && orgl.getWorld() == newl.getWorld() && orgl.distanceSquared(newl) < 0.5){
+                onTpTo(entity,damager);
+            } else {
+                locMap.put(event.getEntity().getUniqueId(),newl);
             }
         }
+    }
+
+    void onTpTo(Entity entity,Entity damager) {
+        Location loc = damager.getLocation();
+        Vector v = VectorUtils.viewVector(loc);
+        v.multiply(-0.5F);
+        loc.add(v);
+        EntityTpUtils.forgeStopRide(entity);
+        EntityTpUtils.enderTeleportTo(entity,loc);
     }
 
     public boolean onCommand(CommandSender sender,Command cmd,String label,String[] args) {
@@ -171,17 +220,8 @@ public class ZombWin extends CustEntityName implements Listener, CommandExecutor
     }
 
     @Override
-    public void load(Entity entity) {
-        if (entity instanceof Giant){
-            CraftGiant giant = (CraftGiant) entity;
-            EntityGiantZombie nmsE = giant.getHandle();
-            giant.setAI(true);
-        }
-    }
-
-    @Override
-    public void unload(Entity entity) {
-
+    public boolean is(Entity entity) {
+        return entity instanceof Zombie && super.is(entity);
     }
 }
 
