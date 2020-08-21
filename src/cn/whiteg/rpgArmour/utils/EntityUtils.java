@@ -1,8 +1,8 @@
 package cn.whiteg.rpgArmour.utils;
 
-import net.minecraft.server.v1_16_R1.*;
-import org.bukkit.craftbukkit.v1_16_R1.entity.*;
-import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
+import net.minecraft.server.v1_16_R2.*;
+import org.bukkit.craftbukkit.v1_16_R2.entity.*;
+import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -19,6 +19,7 @@ public class EntityUtils {
     public final static Field boundingBoxField;
     public final static Field sizeField;
     public final static Field goalTargetField;
+    public final static Field fieldArmorStandDisabledSlots;
     public final static Method getItemMethod;
 
 
@@ -59,6 +60,23 @@ public class EntityUtils {
             f = null;
         }
         goalTargetField = f;
+
+        //盔甲架是否锁住
+        try{
+            /*
+            * Location line 43
+            private boolean armorStandInvisible;
+            public long bi;
+            private int bv; //here
+            public Vector3f headPose;
+            */
+            f = EntityArmorStand.class.getDeclaredField("bv");//line 43 type int
+            f.setAccessible(true);
+        }catch (NoSuchFieldException e){
+            e.printStackTrace();
+            f = null;
+        }
+        fieldArmorStandDisabledSlots = f;
 
         Method m;
         try{
@@ -114,12 +132,12 @@ public class EntityUtils {
 
     public static float getAD(LivingEntity entity) {
         EntityLiving e = ((CraftLivingEntity) entity).getHandle();
-        return e.aY;
+        return e.aR;
     }
 
     public static float getWS(LivingEntity entity) {
         EntityLiving e = ((CraftLivingEntity) entity).getHandle();
-        return e.ba;
+        return e.aT;
     }
 
     public static boolean setGoalTarget(Mob entity,LivingEntity goalTarget) {
@@ -148,7 +166,7 @@ public class EntityUtils {
     public static ItemStack getSnowballItem(Snowball snowball) {
         EntitySnowball nms = ((CraftSnowball) snowball).getHandle();
         try{
-            return CraftItemStack.asBukkitCopy((net.minecraft.server.v1_16_R1.ItemStack) getItemMethod.invoke(nms));
+            return CraftItemStack.asBukkitCopy((net.minecraft.server.v1_16_R2.ItemStack) getItemMethod.invoke(nms));
         }catch (IllegalAccessException | InvocationTargetException e){
             e.printStackTrace();
         }
@@ -164,12 +182,9 @@ public class EntityUtils {
     //盔甲架是否锁住
     private static int getDisabledSlots(ArmorStand as) {
         EntityArmorStand armorStand = ((CraftArmorStand) as).getHandle();
-        Field f = null;
         try{
-            f = EntityArmorStand.class.getDeclaredField("bA");
-            f.setAccessible(true);
-            return (int) f.get(armorStand);
-        }catch (NoSuchFieldException | IllegalAccessException e){
+            return (int) fieldArmorStandDisabledSlots.get(armorStand);
+        }catch (IllegalAccessException e){
             e.printStackTrace();
         }
         return 0;
@@ -178,12 +193,9 @@ public class EntityUtils {
     //锁住盔甲架
     public static void setSlotsDisabled(ArmorStand as,boolean slotsDisabled) {
         EntityArmorStand armorStand = ((CraftArmorStand) as).getHandle();
-        Field f = null;
         try{
-            f = EntityArmorStand.class.getDeclaredField("bA");
-            f.setAccessible(true);
-            f.set(armorStand,slotsDisabled ? 0xFFFFFF : 0);
-        }catch (NoSuchFieldException | IllegalAccessException e){
+            fieldArmorStandDisabledSlots.set(armorStand,slotsDisabled ? 0xFFFFFF : 0);
+        }catch (IllegalAccessException e){
             e.printStackTrace();
         }
     }

@@ -1,11 +1,11 @@
 package cn.whiteg.rpgArmour.nms;
 
-import net.minecraft.server.v1_16_R1.NBTTagCompound;
-import org.bukkit.craftbukkit.v1_16_R1.inventory.CraftItemStack;
+import net.minecraft.server.v1_16_R2.NBTTagCompound;
+import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
 import org.bukkit.inventory.ItemStack;
 
 public class NMSItem_1_16_R1 extends NMSItem {
-    private final net.minecraft.server.v1_16_R1.ItemStack nmsItem;
+    private final net.minecraft.server.v1_16_R2.ItemStack nmsItem;
     private TagCompound roottag;
     private ItemStack bukkitItem;
 

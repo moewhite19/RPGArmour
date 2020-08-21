@@ -2,11 +2,11 @@ package cn.whiteg.rpgArmour.entityWrapper;
 
 import cn.whiteg.rpgArmour.utils.JsonBuilder;
 import cn.whiteg.rpgArmour.utils.Utils;
-import net.minecraft.server.v1_16_R1.*;
+import net.minecraft.server.v1_16_R2.*;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.libs.org.apache.commons.lang3.ObjectUtils;
-import org.bukkit.craftbukkit.v1_16_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_16_R1.util.CraftVector;
+import org.bukkit.craftbukkit.v1_16_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R2.util.CraftVector;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -38,9 +38,18 @@ public abstract class EntityWrapper {
 
             b = DataWatcher.class.getDeclaredMethod("b",DataWatcherObject.class); //???
             b.setAccessible(true);
-
+    /*
+    * Location line 134
+    protected static final DataWatcherObject<Byte> S;
+    private static final DataWatcherObject<Integer> AIR_TICKS;
+    private static final DataWatcherObject<Optional<IChatBaseComponent>> aq;
+    private static final DataWatcherObject<Boolean> ar;
+    private static final DataWatcherObject<Boolean> as;
+    private static final DataWatcherObject<Boolean> at;
+    protected static final DataWatcherObject<EntityPose> POSE;
+     */
             Field f;
-            f = entityClass.getDeclaredField("T"); // flags
+            f = entityClass.getDeclaredField("S"); // flags
             f.setAccessible(true);
             flags = (DataWatcherObject<Byte>) f.get(null);
 
@@ -48,30 +57,26 @@ public abstract class EntityWrapper {
             f.setAccessible(true);
             air_tick = (DataWatcherObject<Integer>) f.get(null);
 
-            f = entityClass.getDeclaredField("ax"); // custom name
+            f = entityClass.getDeclaredField("aq"); // custom name
             f.setAccessible(true);
             displayName = (DataWatcherObject<Optional<IChatBaseComponent>>) f.get(null);
 
-            f = entityClass.getDeclaredField("ay"); // custom name visible
+            f = entityClass.getDeclaredField("ar"); // custom name visible
             f.setAccessible(true);
             name_visible = (DataWatcherObject<Boolean>) f.get(null);
 
-            f = entityClass.getDeclaredField("az"); // silent
+            f = entityClass.getDeclaredField("as"); // silent
             f.setAccessible(true);
             silent = (DataWatcherObject<Boolean>) f.get(null);
 
-            f = entityClass.getDeclaredField("aA");// no gravitysilent
+            f = entityClass.getDeclaredField("at");// no gravitysilent
             f.setAccessible(true);
             noGravity = (DataWatcherObject<Boolean>) f.get(null);
 
             Field count_f = Entity.class.getDeclaredField("entityCount");
             count_f.setAccessible(true);
             entityCount = (AtomicInteger) count_f.get(null);
-        }catch (NoSuchFieldException e){
-            e.printStackTrace();
-        }catch (NoSuchMethodException e){
-            e.printStackTrace();
-        }catch (IllegalAccessException e){
+        }catch (NoSuchFieldException | NoSuchMethodException | IllegalAccessException e){
             e.printStackTrace();
         }
     }
@@ -100,10 +105,10 @@ public abstract class EntityWrapper {
      */
     public Packet<?> createPacketSpawnEntity() {
         try{
-            Class<?> packetClass = PacketPlayOutSpawnEntity.class;
+            Class packetClass = PacketPlayOutSpawnEntity.class;
             Object packet = packetClass.getConstructor().newInstance();
             Field[] fields = new Field[]{
-                    packetClass.getDeclaredField("a"), // IDr
+                    packetClass.getDeclaredField("a"), // ID
                     packetClass.getDeclaredField("b"), // UUID (Only 1.9+)
                     packetClass.getDeclaredField("c"), // Loc X
                     packetClass.getDeclaredField("d"),// Loc Y

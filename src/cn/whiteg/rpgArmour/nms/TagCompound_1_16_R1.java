@@ -1,6 +1,6 @@
 package cn.whiteg.rpgArmour.nms;
 
-import net.minecraft.server.v1_16_R1.NBTTagCompound;
+import net.minecraft.server.v1_16_R2.NBTTagCompound;
 
 import java.util.Set;
 

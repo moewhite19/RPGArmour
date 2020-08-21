@@ -4,7 +4,7 @@ import cn.whiteg.moepacketapi.MoePacketAPI;
 import cn.whiteg.moepacketapi.api.event.PacketReceiveEvent;
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.manager.ResourcePackManage;
-import net.minecraft.server.v1_16_R1.PacketPlayOutResourcePackSend;
+import net.minecraft.server.v1_16_R2.PacketPlayOutResourcePackSend;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
