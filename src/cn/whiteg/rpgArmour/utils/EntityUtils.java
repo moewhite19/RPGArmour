@@ -1,8 +1,8 @@
 package cn.whiteg.rpgArmour.utils;
 
-import net.minecraft.server.v1_16_R2.*;
-import org.bukkit.craftbukkit.v1_16_R2.entity.*;
-import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
+import net.minecraft.server.v1_16_R3.*;
+import org.bukkit.craftbukkit.v1_16_R3.entity.*;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
@@ -64,17 +64,21 @@ public class EntityUtils {
         //盔甲架是否锁住
         try{
             /*
-            * Location line 43
-            private boolean armorStandInvisible;
-            public long bi;
-            private int bv; //here
-            public Vector3f headPose;
+            * Location line 39
+    private final NonNullList<ItemStack> handItems;
+    private final NonNullList<ItemStack> armorItems;
+    private boolean armorStandInvisible;
+    public long bi;
+    public int disabledSlots;
+    public Vector3f headPose;
+    public Vector3f bodyPose;
             */
-            f = EntityArmorStand.class.getDeclaredField("bv");//line 43 type int
+            f = EntityArmorStand.class.getDeclaredField("disabledSlots");//line 43 type int
             f.setAccessible(true);
         }catch (NoSuchFieldException e){
             e.printStackTrace();
             f = null;
+
         }
         fieldArmorStandDisabledSlots = f;
 
@@ -166,7 +170,7 @@ public class EntityUtils {
     public static ItemStack getSnowballItem(Snowball snowball) {
         EntitySnowball nms = ((CraftSnowball) snowball).getHandle();
         try{
-            return CraftItemStack.asBukkitCopy((net.minecraft.server.v1_16_R2.ItemStack) getItemMethod.invoke(nms));
+            return CraftItemStack.asBukkitCopy((net.minecraft.server.v1_16_R3.ItemStack) getItemMethod.invoke(nms));
         }catch (IllegalAccessException | InvocationTargetException e){
             e.printStackTrace();
         }

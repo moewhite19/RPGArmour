@@ -1,11 +1,11 @@
 package cn.whiteg.rpgArmour.entityWrapper;
 
-import net.minecraft.server.v1_16_R2.DataWatcherObject;
-import net.minecraft.server.v1_16_R2.EntityItem;
-import net.minecraft.server.v1_16_R2.EntityTypes;
-import net.minecraft.server.v1_16_R2.ItemStack;
+import net.minecraft.server.v1_16_R3.DataWatcherObject;
+import net.minecraft.server.v1_16_R3.EntityItem;
+import net.minecraft.server.v1_16_R3.EntityTypes;
+import net.minecraft.server.v1_16_R3.ItemStack;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_16_R3.inventory.CraftItemStack;
 
 import java.lang.reflect.Field;
 

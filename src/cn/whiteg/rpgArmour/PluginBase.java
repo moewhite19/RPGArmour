@@ -7,6 +7,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class PluginBase extends JavaPlugin {
@@ -46,29 +47,24 @@ public class PluginBase extends JavaPlugin {
         return true;
     }
 
+    /**
+     * 卸载事件
+     *
+     * @param listener 事件对象
+     */
     public void unregListener(Listener listener) {
         //注销事件
         HandlerList.unregisterAll(listener);
-        //旧的事件
-//        try{
-//            for (Method method : listenerClass.getMethods()) {
-//                if (method.isAnnotationPresent(EventHandler.class)){
-//                    try{
-//                        Type[] tpyes = method.getGenericParameterTypes();
-//                        if (tpyes.length == 1){
-//                            Class<?> tc = Class.forName(tpyes[0].getTypeName());
-//                            Method tm = tc.getMethod("getHandlerList");
-//                            HandlerList handlerList = (HandlerList) tm.invoke(null);
-//                            handlerList.unregister(listener);
-//                        }
-//                    }catch (ClassNotFoundException | NoClassDefFoundError e){
-//                    }
-//                }
-//            }
-//        }catch (Exception e){
-//            e.printStackTrace();
-//        }
-
+        if (listenerMap.remove(listener.getClass().getName()) == null){
+            //如果按照类名没搜索到对象则遍历
+            Iterator<Map.Entry<String, Listener>> it = listenerMap.entrySet().iterator();
+            while (it.hasNext()) {
+                if (it.next() == listener){
+                    it.remove();
+                    break;
+                }
+            }
+        }
         //调用类中的unreg()方法
         try{
             Class listenerClass = listener.getClass();

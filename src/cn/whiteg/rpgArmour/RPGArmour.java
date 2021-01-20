@@ -22,7 +22,7 @@ public class RPGArmour extends PluginBase {
     private CustEntityManager entityManager;
     private RecipeManage recipeManage;
     private ApiManager apiManager;
-    private GUIManager guiManager;
+    private GUIManager guiManager; //待开发
 
     public RPGArmour() {
         plugin = this;
@@ -46,7 +46,7 @@ public class RPGArmour extends PluginBase {
     }
 
     public void onEnable() {
-//        guiManager = new GUIManager(this);
+//        guiManager = new GUIManager(this); 待开发
         recipeManage = new RecipeManage(this);
         itemManager = new CustItemManager();
         entityManager = new CustEntityManager();

@@ -5,12 +5,13 @@ import org.bukkit.command.CommandSender;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Map;
 
 public abstract class Downloader extends Thread {
     private final String url;
-    private final String fileName;
-    private final File saveDir;
+    private final File file;
     private final CommandSender sender;
+    Map<String, String> property;
     private InputStream inputStream = null;
     private FileOutputStream fos = null;
     private ByteArrayOutputStream bos = null;
@@ -18,15 +19,19 @@ public abstract class Downloader extends Thread {
     private volatile long downloaded = 0;
     private volatile boolean close = false;
 
-    public Downloader(String url,File savePath,String fileName,CommandSender sender) {
+    public Downloader(String url,File saveFile,CommandSender sender,Map<String, String> property) {
         this.url = url;
-        this.fileName = fileName;
-        this.saveDir = savePath;
+        this.file = saveFile;
         this.sender = sender;
+        this.property = property;
     }
 
-    public Downloader(String url,File savePath,String fileName) {
-        this(url,savePath,fileName,null);
+    public Downloader(String url,File savePath,CommandSender sender) {
+        this(url,savePath,sender,null);
+    }
+
+    public Downloader(String url,File savePath) {
+        this(url,savePath,null,null);
     }
 
 
@@ -58,22 +63,28 @@ public abstract class Downloader extends Thread {
         try{
             URL url = new URL(this.url);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            //设置超时间为3秒
-            conn.setConnectTimeout(3 * 1000);
+            conn.setRequestMethod("GET");
+            // 设置连接主机服务器的超时时间：15000毫秒
+            conn.setConnectTimeout(15000);
+            // 设置读取远程返回的数据时间：30000毫秒
+            conn.setReadTimeout(30000);
             //防止屏蔽程序抓取而返回403错误
-            conn.setRequestProperty("User-Agent","Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
+//            conn.setRequestProperty("User-Agent","Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; DigExt)");
+            if (property != null && !property.isEmpty()){
+                property.forEach(conn::setRequestProperty);
+            }
             size = conn.getContentLengthLong();
             //得到输入流
-            log("开始下载" + url + "大小" + size);
+            log("开始下载" + url + "大小" + CommonUtils.tanSize(size));
             inputStream = conn.getInputStream();
             //获取自己数组
             byte[] getData = readInputStream(inputStream);
             bos = null;
             //文件保存位置
-            if (!saveDir.exists()){
-                saveDir.mkdirs();
+            if (!file.getParentFile().exists()){
+                file.getParentFile().mkdirs();
             }
-            File file = new File(saveDir,fileName);
+            if (!file.exists()) file.createNewFile();
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(getData);
             close();

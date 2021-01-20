@@ -4,17 +4,17 @@ import cn.whiteg.mmocore.MMOCore;
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.Setting;
 
-import net.minecraft.server.v1_16_R2.EntityArmorStand;
-import net.minecraft.server.v1_16_R2.EntityTypes;
-import net.minecraft.server.v1_16_R2.EnumCreatureType;
-import net.minecraft.server.v1_16_R2.World;
+import net.minecraft.server.v1_16_R3.EntityArmorStand;
+import net.minecraft.server.v1_16_R3.EntityTypes;
+import net.minecraft.server.v1_16_R3.EnumCreatureType;
+import net.minecraft.server.v1_16_R3.World;
 import org.bukkit.Location;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class MyMode extends EntityArmorStand {
-    public static EntityTypes<net.minecraft.server.v1_16_R2.Entity> md;
+    public static EntityTypes<net.minecraft.server.v1_16_R3.Entity> md;
 
     static {
         if (Setting.DEBUG){
@@ -22,7 +22,7 @@ public class MyMode extends EntityArmorStand {
 //            try{
 //                Method ma = EntityTypes.class.getDeclaredMethod("a",String.class,EntityTypes.a.class);
 //                ma.setAccessible(true);
-//                md = (EntityTypes<net.minecraft.server.v1_16_R2.Entity>) ma.invoke(null,"armor_stand",EntityTypes.a.a(MyMode::new,EnumCreatureType.MISC).a(0.5F,1.975F));
+//                md = (EntityTypes<net.minecraft.server.v1_16_R3.Entity>) ma.invoke(null,"armor_stand",EntityTypes.a.a(MyMode::new,EnumCreatureType.MISC).a(0.5F,1.975F));
 //            }catch (NoSuchMethodException e){
 //                e.printStackTrace();
 //            }catch (IllegalAccessException e){

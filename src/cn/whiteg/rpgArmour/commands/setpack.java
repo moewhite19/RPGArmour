@@ -30,7 +30,7 @@ public class setpack extends CommandInterface {
             if (args.length == 1){
                 if (downloader != null){
                     if (!downloader.isClose()){
-                        sender.sendMessage("下载任务:" + downloader.getUrl() + " 大小" + CommonUtils.tanByte(downloader.getSize()) + " 进度" + CommonUtils.tanByte(downloader.getDownloaded()));
+                        sender.sendMessage("下载任务:" + downloader.getUrl() + " 大小" + CommonUtils.tanSize(downloader.getSize()) + " 进度" + CommonUtils.tanSize(downloader.getDownloaded()));
                         return true;
                     } else {
                         downloader = null;
@@ -53,7 +53,7 @@ public class setpack extends CommandInterface {
                     downloader.close();
                     downloader.stop();
                 }
-                downloader = new Downloader(url,RPGArmour.plugin.getDataFolder(),"resourcepack.zip",sender) {
+                downloader = new Downloader(url,new File(RPGArmour.plugin.getDataFolder(),"resourcepack.zip"),sender) {
                     @Override
                     public void onDone(File file) {
                         try{
@@ -100,7 +100,7 @@ public class setpack extends CommandInterface {
                                 long speed = loaded - flag;
                                 flag = loaded;
                                 float r = (float) ((double) loaded / (double) size);
-                                bar.setTitle("下载进度" + CommonUtils.tanByte(loaded) + "/" + CommonUtils.tanByte(size) + "速度" + CommonUtils.tanByte(speed));
+                                bar.setTitle("下载进度" + CommonUtils.tanSize(loaded) + "/" + CommonUtils.tanSize(size) + "速度" + CommonUtils.tanSize(speed));
                                 bar.setProgress(r);
                             }
                         }.runTaskTimerAsynchronously(RPGArmour.plugin,20,20);
@@ -109,6 +109,9 @@ public class setpack extends CommandInterface {
                     }
                 }
 
+            } else if (args.length == 3){
+                ResourcePackManage.set(args[1],args[2]);
+                sender.sendMessage("已设置资源包");
             } else {
                 sender.sendMessage("参数有误");
             }

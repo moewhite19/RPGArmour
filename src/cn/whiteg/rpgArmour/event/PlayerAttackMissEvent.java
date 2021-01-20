@@ -12,27 +12,31 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.player.PlayerEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
+import static cn.whiteg.rpgArmour.RPGArmour.plugin;
+
 public class PlayerAttackMissEvent extends PlayerEvent implements Cancellable {
     private static HandlerList handers = new HandlerList();
 
     static {
-        RPGArmour.plugin.regListener(new Listener() {
-            private Player player;
-            @EventHandler
-            public void onLeft_Click(PlayerInteractEvent event) {
-                if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK){
-                    PlayerAttackMissEvent e = new PlayerAttackMissEvent(event.getPlayer());
-                    Bukkit.getPluginManager().callEvent(e);
+        Bukkit.getScheduler().runTask(plugin, ()->{
+            plugin.regListener(new Listener() {
+                private Player player;
+                @EventHandler
+                public void onLeft_Click(PlayerInteractEvent event) {
+                    if (event.getAction() == Action.LEFT_CLICK_AIR || event.getAction() == Action.LEFT_CLICK_BLOCK){
+                        PlayerAttackMissEvent e = new PlayerAttackMissEvent(event.getPlayer());
+                        Bukkit.getPluginManager().callEvent(e);
+                    }
                 }
-            }
 
-            @EventHandler
-            public void onEntityDamage(EntityDamageByEntityEvent event) {
-                if (player == null) return;
-                if (event.getDamager() instanceof Player){
-                    player = null;
+                @EventHandler
+                public void onEntityDamage(EntityDamageByEntityEvent event) {
+                    if (player == null) return;
+                    if (event.getDamager() instanceof Player){
+                        player = null;
+                    }
                 }
-            }
+            });
         });
     }
 

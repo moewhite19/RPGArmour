@@ -9,8 +9,6 @@ import cn.whiteg.rpgArmour.custEntitys.Seat;
 import cn.whiteg.rpgArmour.custEntitys.SkeletonWin;
 import cn.whiteg.rpgArmour.custEntitys.SlimeWin;
 import cn.whiteg.rpgArmour.custEntitys.ZombieWarrior;
-import com.sun.istack.internal.NotNull;
-import com.sun.istack.internal.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -19,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -76,7 +75,6 @@ public class CustEntityManager implements Listener {
         entitys.put(name,ca);
     }
 
-    @Nullable
     public boolean spawnEntity(@NotNull String name,Entity entity) {
         CustEntity ce = entitys.get(name);
         if (ce != null) return ce.init(entity);

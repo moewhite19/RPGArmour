@@ -1,13 +1,13 @@
 package cn.whiteg.rpgArmour.nms;
 
-import net.minecraft.server.v1_16_R2.NBTTagCompound;
+import net.minecraft.server.v1_16_R3.NBTTagCompound;
 
 import java.util.Set;
 
-public class TagCompound_1_16_R1 implements TagCompound {
+public class TagCompound_1_16_R2 implements TagCompound {
     private NBTTagCompound tag;
 
-    public TagCompound_1_16_R1(NBTTagCompound tagCompound) {
+    public TagCompound_1_16_R2(NBTTagCompound tagCompound) {
         tag = tagCompound;
     }
 
@@ -48,7 +48,7 @@ public class TagCompound_1_16_R1 implements TagCompound {
 
     @Override
     public TagCompound getCompound(String key){
-        return new TagCompound_1_16_R1(tag.getCompound(key));
+        return new TagCompound_1_16_R2(tag.getCompound(key));
     }
     @Override
     public void setString(String key , String str) {
@@ -72,7 +72,7 @@ public class TagCompound_1_16_R1 implements TagCompound {
 
     @Override
     public TagCompound clone(String key){
-        return new TagCompound_1_16_R1(tag.clone());
+        return new TagCompound_1_16_R2(tag.clone());
     }
 
     @Override

@@ -7,6 +7,7 @@ public class CommonUtils {
     private final static long hour = 3600000L;
     private final static long minute = 60000L;
     private final static long second = 1000L;
+
     public static long getTimeMintoh(String str) {
         if (str.isEmpty()) return 0;
         try{
@@ -107,7 +108,7 @@ public class CommonUtils {
         return sb.toString();
     }
 
-    public static String tanByte(long l) {
+    public static String tanSize(long l) {
         if (l < 0) return "NaN";
         final double k = 1024D;
         final DecimalFormat df = new DecimalFormat("#.00");
@@ -124,8 +125,6 @@ public class CommonUtils {
         }
         return df.format(l / g) + "GB";
     }
-
-
 
 
 }

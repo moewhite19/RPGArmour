@@ -1,11 +1,11 @@
 package cn.whiteg.rpgArmour.commands;
 
 import cn.whiteg.mmocore.common.CommandInterface;
-import net.minecraft.server.v1_16_R2.EntityLiving;
+import net.minecraft.server.v1_16_R3.EntityLiving;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
-import org.bukkit.craftbukkit.v1_16_R2.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 

@@ -10,7 +10,7 @@ public abstract class NMSItem {
     private static Constructor con;
 
     static {
-        Class<?> nmsClass = NMSItem_1_16_R1.class;
+        Class<?> nmsClass = NMSItem_1_16_R2.class;
         try{
             con = nmsClass.getConstructor(ItemStack.class);
         }catch (NoSuchMethodException e){

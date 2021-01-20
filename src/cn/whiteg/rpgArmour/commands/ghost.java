@@ -18,9 +18,13 @@ import org.bukkit.util.EulerAngle;
 import java.util.List;
 
 public class ghost extends CommandInterface {
+    moveListener listener;
 
     @Override
     public boolean onCommand(CommandSender sender,Command cmd,String label,String[] args) {
+        if (listener != null){
+            listener.unreg();
+        }
         if (sender instanceof Player){
             if (sender.hasPermission("whiteg.test")){
                 ((Player) sender).setGameMode(GameMode.SPECTATOR);
@@ -28,7 +32,8 @@ public class ghost extends CommandInterface {
                 as.setHelmet(((Player) sender).getEquipment().getHelmet());
                 as.setVisible(false);
                 as.setMarker(true);
-                RPGArmour.plugin.regListener("other@" + sender.getName(),new moveListener((Player) sender,as));
+                listener = new moveListener((Player) sender,as);
+                RPGArmour.plugin.regListener(listener);
             } else {
                 sender.sendMessage("阁下没有权限");
             }
@@ -41,7 +46,7 @@ public class ghost extends CommandInterface {
         return null;
     }
 
-    class moveListener implements Listener {
+    static class moveListener implements Listener {
         final Player player;
         final ArmorStand ghost;
 
@@ -53,6 +58,7 @@ public class ghost extends CommandInterface {
         @EventHandler
         public void onMove(PlayerMoveEvent event) {
             if (event.getPlayer().getUniqueId().equals(player.getUniqueId())){
+                if (player.getGameMode() != GameMode.SPECTATOR) unreg();
                 final Location loc = player.getLocation();
                 ghost.teleport(loc);
                 ghost.setHeadPose(new EulerAngle(loc.getPitch() / 45,0,0));
@@ -62,21 +68,19 @@ public class ghost extends CommandInterface {
         @EventHandler
         public void onExit(PlayerQuitEvent event) {
             if (event.getPlayer().getUniqueId().equals(player.getUniqueId())){
-                RPGArmour.plugin.unregListener("other@Q" + player.getName());
+                unreg();
             }
         }
 
         @EventHandler
         public void onMoeleChan(PlayerGameModeChangeEvent event) {
             if (event.getPlayer().getUniqueId().equals(player.getUniqueId())){
-                RPGArmour.plugin.unregListener("other@Q" + player.getName());
+                unreg();
             }
         }
 
         public void unreg() {
-            PlayerQuitEvent.getHandlerList().unregister(this);
-            PlayerMoveEvent.getHandlerList().unregister(this);
-            PlayerGameModeChangeEvent.getHandlerList().unregister(this);
+            RPGArmour.plugin.unregListener(this);
             ghost.remove();
         }
 

@@ -1,6 +1,6 @@
 package cn.whiteg.rpgArmour.entityWrapper;
 
-import net.minecraft.server.v1_16_R2.*;
+import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.util.Vector;
 
 import java.lang.reflect.Field;
