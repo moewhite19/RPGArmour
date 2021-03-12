@@ -1,6 +1,7 @@
 package cn.whiteg.rpgArmour;
 
 import cn.whiteg.mmocore.MMOCore;
+import cn.whiteg.mmocore.common.CommandManage;
 import cn.whiteg.rpgArmour.custItems.ResurrectArmor;
 import cn.whiteg.rpgArmour.listener.*;
 import cn.whiteg.rpgArmour.manager.*;
@@ -16,7 +17,7 @@ public class RPGArmour extends PluginBase {
     public static Logger logger;
     public static ConsoleCommandSender console;
     public MMOCore mmoCore;
-    public CommandManager commandManager;
+    public CommandManage commandManager;
     private CustItemManager itemManager;
     private CustEntityManager entityManager;
     private RecipeManage recipeManage;
@@ -62,7 +63,7 @@ public class RPGArmour extends PluginBase {
 //        regListener(new SpawnerReasonFix());
         if (Setting.forgeResourcePack) regListener(new forgePackListener());
 //        regEven(new Craftting());
-        commandManager = new CommandManager(this);
+        commandManager = new CommandManage(this);
         commandManager.setExecutor();
         ResourcePackManage.set();
         Bukkit.getScheduler().runTask(this,() -> {
