@@ -65,8 +65,8 @@ public class Fan extends CustItem_CustModle implements Listener {
             player.setCooldown(getMaterial(),20);
         }
         damager = user;
-        Location loc = user.getEyeLocation();
-        if (user instanceof Player) loc.setY(loc.getY() - (((Player) user).isSneaking() ? 0.4D : 0.2D));
+        Location loc = user.getLocation();
+        loc.setY(loc.getY() + user.getHeight() / 2);
         sound.playTo(loc);
 
         //获取使用者载具
