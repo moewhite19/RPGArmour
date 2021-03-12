@@ -1,6 +1,6 @@
 package cn.whiteg.rpgArmour.commands;
 
-import cn.whiteg.mmocore.common.CommandInterface;
+import cn.whiteg.mmocore.common.HasCommandInterface;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -12,19 +12,16 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
-public class getmode extends CommandInterface {
+public class getmode extends HasCommandInterface {
     static WeakReference<List<String>> ls = new WeakReference<>(null);
 
     @Override
-    public boolean onCommand(CommandSender sender,Command cmd,String label,String[] args) {
-        if (!sender.hasPermission("whiteg.test")){
-            return false;
-        }
-        if (args.length == 3 && sender instanceof Player){
+    public boolean executo(CommandSender sender,Command cmd,String label,String[] args) {
+        if (args.length == 2 && sender instanceof Player){
             Player player = (Player) sender;
             try{
-                Material mat = Material.valueOf(args[1]);
-                int id = Integer.valueOf(args[2]);
+                Material mat = Material.valueOf(args[0]);
+                int id = Integer.parseInt(args[1]);
                 ItemStack item = new ItemStack(mat);
                 ItemMeta im = item.getItemMeta();
                 im.setCustomModelData(id);
@@ -39,8 +36,8 @@ public class getmode extends CommandInterface {
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender,Command cmd,String label,String[] args) {
-        if (args.length == 2){
+    public List<String> complete(CommandSender sender,Command cmd,String label,String[] args) {
+        if (args.length == 1){
             List<String> l = ls.get();
             if (l == null){
                 l = new ArrayList<>();
@@ -53,4 +50,10 @@ public class getmode extends CommandInterface {
         }
         return null;
     }
+
+    @Override
+    public boolean canUseCommand(CommandSender sender) {
+        return sender.hasPermission("whiteg.test");
+    }
+
 }

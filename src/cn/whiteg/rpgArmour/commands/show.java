@@ -68,7 +68,7 @@ public class show extends CommandInterface {
 
     @Override
     public List<String> onTabComplete(CommandSender sender,Command cmd,String label,String[] args) {
-        if (args.length == 2){
+        if (args.length == 1){
             List<String> l = ls.get();
             if (l == null){
                 l = new ArrayList<>();

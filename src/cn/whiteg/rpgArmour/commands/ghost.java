@@ -1,6 +1,6 @@
 package cn.whiteg.rpgArmour.commands;
 
-import cn.whiteg.mmocore.common.CommandInterface;
+import cn.whiteg.mmocore.common.HasCommandInterface;
 import cn.whiteg.rpgArmour.RPGArmour;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -17,26 +17,22 @@ import org.bukkit.util.EulerAngle;
 
 import java.util.List;
 
-public class ghost extends CommandInterface {
+public class ghost extends HasCommandInterface {
     moveListener listener;
 
     @Override
-    public boolean onCommand(CommandSender sender,Command cmd,String label,String[] args) {
+    public boolean executo(CommandSender sender,Command cmd,String label,String[] args) {
         if (listener != null){
             listener.unreg();
         }
         if (sender instanceof Player){
-            if (sender.hasPermission("whiteg.test")){
-                ((Player) sender).setGameMode(GameMode.SPECTATOR);
-                ArmorStand as = ((Player) sender).getWorld().spawn(((Player) sender).getLocation(),ArmorStand.class);
-                as.setHelmet(((Player) sender).getEquipment().getHelmet());
-                as.setVisible(false);
-                as.setMarker(true);
-                listener = new moveListener((Player) sender,as);
-                RPGArmour.plugin.regListener(listener);
-            } else {
-                sender.sendMessage("阁下没有权限");
-            }
+            ((Player) sender).setGameMode(GameMode.SPECTATOR);
+            ArmorStand as = ((Player) sender).getWorld().spawn(((Player) sender).getLocation(),ArmorStand.class);
+            as.setHelmet(((Player) sender).getEquipment().getHelmet());
+            as.setVisible(false);
+            as.setMarker(true);
+            listener = new moveListener((Player) sender,as);
+            RPGArmour.plugin.regListener(listener);
         }
         return false;
     }
@@ -45,6 +41,12 @@ public class ghost extends CommandInterface {
     public List<String> onTabComplete(CommandSender sender,Command cmd,String label,String[] args) {
         return null;
     }
+
+    @Override
+    public boolean canUseCommand(CommandSender sender) {
+        return sender.hasPermission("whiteg.test");
+    }
+
 
     static class moveListener implements Listener {
         final Player player;

@@ -7,14 +7,13 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.LinkedList;
 import java.util.List;
 
 public class sendpack extends CommandInterface {
 
     @Override
     public boolean onCommand(CommandSender sender,Command cmd,String label,String[] args) {
-        if (args.length == 1 && sender instanceof Player){
+        if (args.length == 0 && sender instanceof Player){
             if (!sender.hasPermission("rpgarmour.sendpack.self")){
                 sender.sendMessage("§b阁下没有权限");
                 return false;
@@ -28,7 +27,7 @@ public class sendpack extends CommandInterface {
             sender.sendMessage("已发送资源包");
             return true;
         }
-        if (args.length == 2){
+        if (args.length == 1){
             if (!sender.hasPermission("rpgarmour.sendpack.other")){
                 sender.sendMessage("§b阁下没有权限");
                 return false;
@@ -39,14 +38,14 @@ public class sendpack extends CommandInterface {
                 sender.sendMessage("无资源包");
                 return false;
             }
-            if (args[1].equals("@a")){
+            if (args[0].equals("@a")){
                 Bukkit.getOnlinePlayers().forEach(p -> {
                     ResourcePackManage.sendPack(p,s[0],s[1]);
                 });
                 sender.sendMessage("给所有玩家发送资源包");
                 return true;
             }
-            Player p = Bukkit.getPlayer(args[1]);
+            Player p = Bukkit.getPlayer(args[0]);
             if (p == null){
                 sender.sendMessage("找不到玩家");
                 return false;
@@ -63,14 +62,8 @@ public class sendpack extends CommandInterface {
 
     @Override
     public List<String> onTabComplete(CommandSender sender,Command cmd,String label,String[] args) {
-        if (args.length == 2){
-            List<String> ls = new LinkedList<>();
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                ls.add(p.getName());
-            }
-            ls.remove(sender.getName());
-            ls.add("@a");
-            return getMatches(args[1],ls);
+        if (args.length == 1){
+            return PlayersList(args);
         }
         return null;
     }

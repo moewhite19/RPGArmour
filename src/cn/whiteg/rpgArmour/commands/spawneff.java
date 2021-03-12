@@ -1,6 +1,6 @@
 package cn.whiteg.rpgArmour.commands;
 
-import cn.whiteg.mmocore.common.CommandInterface;
+import cn.whiteg.mmocore.common.HasCommandInterface;
 import net.minecraft.server.v1_16_R3.EntityLiving;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -9,32 +9,31 @@ import org.bukkit.craftbukkit.v1_16_R3.entity.CraftLivingEntity;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class spawneff extends CommandInterface {
+public class spawneff extends HasCommandInterface {
 
     @Override
-    public boolean onCommand(CommandSender sender,Command cmd,String label,String[] args) {
+    public boolean executo(CommandSender sender,Command cmd,String label,String[] args) {
         if (!sender.hasPermission("whiteg.test")){
             return true;
         }
-        if (args.length == 2 && sender instanceof Player){
+        if (args.length == 1 && sender instanceof Player){
             Player player = (Player) sender;
             try{
-                byte b = Byte.valueOf(args[1]);
+                byte b = Byte.parseByte(args[0]);
                 boruadeff(player,b);
             }catch (NumberFormatException e){
                 sender.sendMessage("无效参数");
             }
-        } else if (args.length == 3){
-            Player player = Bukkit.getPlayer(args[1]);
+        } else if (args.length == 2){
+            Player player = Bukkit.getPlayer(args[0]);
             if (player == null){
                 sender.sendMessage("找不到玩家");
                 return true;
             }
             try{
-                byte b = Byte.valueOf(args[2]);
+                byte b = Byte.parseByte(args[1]);
                 boruadeff(player,b);
             }catch (NumberFormatException e){
                 sender.sendMessage("无效参数");
@@ -49,15 +48,16 @@ public class spawneff extends CommandInterface {
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender,Command cmd,String label,String[] args) {
-        if (args.length == 2){
-            List<String> ls = new ArrayList<>();
-            for (Player p : Bukkit.getOnlinePlayers()) {
-                ls.add(p.getName());
-            }
-            ls.remove(sender.getName());
-            return getMatches(args[1],ls);
+    public List<String> complete(CommandSender sender,Command cmd,String label,String[] args) {
+        if (args.length == 1){
+            return PlayersList(args);
         }
         return null;
     }
+
+    @Override
+    public boolean canUseCommand(CommandSender sender) {
+        return sender.hasPermission("whiteg.test");
+    }
+
 }

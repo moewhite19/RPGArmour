@@ -15,18 +15,18 @@ public class rideo extends CommandInterface {
     public boolean onCommand(CommandSender sender,Command cmd,String label,String[] args) {
         if (sender instanceof Player){
             if (sender.hasPermission("whiteg.test")){
-                if (args.length == 2){
+                if (args.length == 1){
                     Player p = (Player) sender;
-                    Player o = Bukkit.getPlayer(args[1]);
+                    Player o = Bukkit.getPlayer(args[0]);
                     if (RideManage.Ride(p,o)){
                         sender.sendMessage("已骑上去");
                     } else {
                         sender.sendMessage("未知原因没有骑上去");
                     }
                 }
-                if (args.length == 3){
-                    Player p1 = Bukkit.getPlayer(args[1]);
-                    Player p2 = Bukkit.getPlayer(args[2]);
+                if (args.length == 2){
+                    Player p1 = Bukkit.getPlayer(args[0]);
+                    Player p2 = Bukkit.getPlayer(args[1]);
                     if (p1 == null || p2 == null){
                         sender.sendMessage("§b玩家不存在");
                     }

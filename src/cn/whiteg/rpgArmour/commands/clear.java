@@ -1,7 +1,7 @@
 package cn.whiteg.rpgArmour.commands;
 
 import cn.whiteg.chanlang.LangUtils;
-import cn.whiteg.mmocore.common.CommandInterface;
+import cn.whiteg.mmocore.common.HasCommandInterface;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -18,15 +18,15 @@ import java.lang.ref.SoftReference;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class clear extends CommandInterface {
+public class clear extends HasCommandInterface {
     static public SoftReference<List<Entity>> ClearComfirm = new SoftReference<>(null);
 
     @Override
-    public boolean onCommand(CommandSender sender,Command cmd,String label,String[] args) {
+    public boolean executo(CommandSender sender,Command cmd,String label,String[] args) {
         if (sender.hasPermission("whiteg.test")){
             try{
-                if (args.length == 2){
-                    if (args[1].equals("confirm")){
+                if (args.length == 1){
+                    if (args[0].equals("confirm")){
                         List<Entity> entitys = ClearComfirm.get();
                         if (entitys == null){
                             sender.sendMessage("没有实体可以清理");
@@ -39,15 +39,15 @@ public class clear extends CommandInterface {
                         ClearComfirm.clear();
                     } else if (sender instanceof Player){
                         double r;
-                        String d = args[1];
+                        String d = args[0];
                         if (d.equals("*")){
                             r = Double.MAX_VALUE;
-                        } else r = Double.parseDouble(args[1]);
+                        } else r = Double.parseDouble(args[0]);
                         Player player = (Player) sender;
                         onClear(player,r,sender);
                     }
-                } else if (args.length == 3){
-                    if (args[1].equals("confirm")){
+                } else if (args.length == 2){
+                    if (args[0].equals("confirm")){
                         List<Entity> entitys = ClearComfirm.get();
                         if (entitys == null){
                             sender.sendMessage("没有实体可以清理");
@@ -55,7 +55,7 @@ public class clear extends CommandInterface {
                         }
                         EntityType et;
                         try{
-                            et = EntityType.valueOf(args[2]);
+                            et = EntityType.valueOf(args[1]);
                         }catch (IllegalArgumentException e){
                             sender.sendMessage("无效ID");
                             return false;
@@ -69,16 +69,16 @@ public class clear extends CommandInterface {
                         }
                         sender.sendMessage("清理了" + num + "个实体");
                     } else {
-                        Player player = Bukkit.getPlayer(args[2]);
+                        Player player = Bukkit.getPlayer(args[1]);
                         if (player == null){
                             sender.sendMessage("找不到玩家");
                             return false;
                         }
                         double r;
-                        String d = args[1];
+                        String d = args[0];
                         if (d.equals("*")){
                             r = Double.MAX_VALUE;
-                        } else r = Double.parseDouble(args[1]);
+                        } else r = Double.parseDouble(args[0]);
                         onClear(player,r,sender);
                     }
 
@@ -134,5 +134,10 @@ public class clear extends CommandInterface {
     @Override
     public List<String> onTabComplete(CommandSender sender,Command cmd,String label,String[] args) {
         return null;
+    }
+
+    @Override
+    public boolean canUseCommand(CommandSender sender) {
+        return sender.hasPermission("whiteg.test");
     }
 }

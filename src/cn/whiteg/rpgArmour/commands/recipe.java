@@ -6,7 +6,6 @@ import cn.whiteg.rpgArmour.manager.GUIManager;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.InventoryView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +18,9 @@ public class recipe extends CommandInterface {
         if (!sender.hasPermission(pex)){
             return false;
         }
-        if (args.length == 2 && sender instanceof Player){
+        if (args.length == 1 && sender instanceof Player){
             final Player player = (Player) sender;
-            final String id = args[1];
+            final String id = args[0];
             GUIManager.GUIAbs inv = RPGArmour.plugin.getRecipeManage().getRecipeInv(player,id);
             if (inv == null){
                 sender.sendMessage("无效ID");
@@ -59,10 +58,10 @@ public class recipe extends CommandInterface {
     @Override
     public List<String> onTabComplete(CommandSender sender,Command cmd,String label,String[] args) {
         if (!sender.hasPermission(pex)) return null;
-        if (args.length == 2){
+        if (args.length == 1){
             final List<String> ls = new ArrayList<>(RPGArmour.plugin.getItemManager().getItemNames());
             return getMatches(ls,args);
-        } else if (args.length == 3){
+        } else if (args.length == 2){
             return PlayersList(args);
         }
         return null;

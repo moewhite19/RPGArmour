@@ -14,10 +14,10 @@ public class rideme extends CommandInterface {
 
     @Override
     public boolean onCommand(CommandSender sender,Command cmd,String label,String[] args) {
-        if (args.length == 2 && sender instanceof Player){
+        if (args.length == 1 && sender instanceof Player){
             if (sender.hasPermission("rpgarmour.rideme")){
                 Player p1 = (Player) sender;
-                Player p2 = Bukkit.getPlayer(args[1]);
+                Player p2 = Bukkit.getPlayer(args[0]);
                 if (p2 == null){
                     sender.sendMessage("§b找不到玩家");
                     return true;
@@ -33,13 +33,13 @@ public class rideme extends CommandInterface {
 
     @Override
     public List<String> onTabComplete(CommandSender sender,Command cmd,String label,String[] args) {
-        if (args.length == 2){
+        if (args.length == 1){
             List<String> ls = new ArrayList<>();
             for (Player p : Bukkit.getOnlinePlayers()) {
                 ls.add(p.getName());
             }
             ls.remove(sender.getName());
-            return getMatches(args[1],ls);
+            return getMatches(args,ls);
         }
         return null;
     }

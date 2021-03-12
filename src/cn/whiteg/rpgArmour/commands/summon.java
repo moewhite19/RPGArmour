@@ -1,6 +1,6 @@
 package cn.whiteg.rpgArmour.commands;
 
-import cn.whiteg.mmocore.common.CommandInterface;
+import cn.whiteg.mmocore.common.HasCommandInterface;
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.api.CustEntity;
 import org.bukkit.command.Command;
@@ -10,21 +10,17 @@ import org.bukkit.entity.Player;
 import java.util.ArrayList;
 import java.util.List;
 
-public class summon extends CommandInterface {
+public class summon extends HasCommandInterface {
 
     @Override
-    public boolean onCommand(CommandSender sender,Command cmd,String label,String[] args) {
-        if (!sender.hasPermission("rpgarmour.summon")){
-            sender.sendMessage("阁下没有权限");
-            return false;
-        }
-        if (args.length == 2){
+    public boolean executo(CommandSender sender,Command cmd,String label,String[] args) {
+        if (args.length == 1){
             if (!(sender instanceof Player)){
                 sender.sendMessage("这个指令只有玩家能用");
                 return true;
             }
             final Player player = (Player) sender;
-            final String id = args[1];
+            final String id = args[0];
             CustEntity ce = RPGArmour.plugin.getEntityManager().getCustEntity(id);
             if (ce != null){
                 ce.summon(player.getLocation());
@@ -40,8 +36,14 @@ public class summon extends CommandInterface {
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender,Command cmd,String label,String[] args) {
+    public List<String> complete(CommandSender sender,Command cmd,String label,String[] args) {
         List<String> ls = new ArrayList<>(RPGArmour.plugin.getEntityManager().getEntityNames());
         return getMatches(ls,args);
     }
+
+    @Override
+    public boolean canUseCommand(CommandSender sender) {
+        return sender.hasPermission("whiteg.test");
+    }
+
 }

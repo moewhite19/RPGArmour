@@ -1,6 +1,6 @@
 package cn.whiteg.rpgArmour.commands;
 
-import cn.whiteg.mmocore.common.CommandInterface;
+import cn.whiteg.mmocore.common.HasCommandInterface;
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.Setting;
 import cn.whiteg.rpgArmour.manager.ResourcePackManage;
@@ -21,13 +21,13 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
-public class setpack extends CommandInterface {
+public class setpack extends HasCommandInterface {
     Downloader downloader = null;
 
     @Override
-    public boolean onCommand(CommandSender sender,Command cmd,String label,String[] args) {
+    public boolean executo(CommandSender sender,Command cmd,String label,String[] args) {
         if (sender.hasPermission("mmo.setresourcepack")){
-            if (args.length == 1){
+            if (args.length == 0){
                 if (downloader != null){
                     if (!downloader.isClose()){
                         sender.sendMessage("下载任务:" + downloader.getUrl() + " 大小" + CommonUtils.tanSize(downloader.getSize()) + " 进度" + CommonUtils.tanSize(downloader.getDownloaded()));
@@ -37,8 +37,8 @@ public class setpack extends CommandInterface {
                     }
                 }
                 sender.sendMessage("没有下载任务");
-            } else if (args.length == 2){
-                final String url = args[1];
+            } else if (args.length == 1){
+                final String url = args[0];
                 if (url.equals("stop")){
                     if (downloader != null){
                         downloader.close();
@@ -109,8 +109,8 @@ public class setpack extends CommandInterface {
                     }
                 }
 
-            } else if (args.length == 3){
-                ResourcePackManage.set(args[1],args[2]);
+            } else if (args.length == 2){
+                ResourcePackManage.set(args[0],args[1]);
                 sender.sendMessage("已设置资源包");
             } else {
                 sender.sendMessage("参数有误");
@@ -121,11 +121,17 @@ public class setpack extends CommandInterface {
     }
 
     @Override
-    public List<String> onTabComplete(CommandSender sender,Command cmd,String label,String[] args) {
-        if (args.length == 2){
+    public List<String> complete(CommandSender sender,Command cmd,String label,String[] args) {
+        if (args.length == 1){
             final ConfigurationSection sc = Setting.getStorage().getConfigurationSection("resourcepack");
             if (sc != null) return Collections.singletonList(sc.getString("url"));
         }
         return null;
     }
+
+    @Override
+    public boolean canUseCommand(CommandSender sender) {
+        return sender.hasPermission("whiteg.test");
+    }
+
 }

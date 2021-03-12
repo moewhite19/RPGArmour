@@ -1,6 +1,6 @@
 package cn.whiteg.rpgArmour.commands;
 
-import cn.whiteg.mmocore.common.CommandInterface;
+import cn.whiteg.mmocore.common.HasCommandInterface;
 import cn.whiteg.rpgArmour.Setting;
 import cn.whiteg.rpgArmour.enitity.MyZombie;
 import cn.whiteg.rpgArmour.entityWrapper.DropItem;
@@ -23,16 +23,12 @@ import org.bukkit.util.Vector;
 
 import java.util.*;
 
-public class test extends CommandInterface {
+public class test extends HasCommandInterface {
     Map<UUID, String> cache = new WeakHashMap<>();
 
     @Override
-    public boolean onCommand(CommandSender sender,Command cmd,String label,String[] args) {
-        if (!sender.hasPermission("whiteg.test")){
-            sender.sendMessage("§b权限不足");
-            return true;
-        }
-        if (args.length < 2) return false;
+    public boolean executo(CommandSender sender,Command cmd,String label,String[] args) {
+        if (args.length < 1) return false;
         test(sender,args);
         return true;
     }
@@ -158,6 +154,12 @@ public class test extends CommandInterface {
         sender.sendMessage("System "+oldEntity.getAttributeMap().a(args[2]).toString());
    */
     }
+
+    @Override
+    public boolean canUseCommand(CommandSender sender) {
+        return sender.hasPermission("whiteg.test");
+    }
+
 
     //生成盔甲架
     public ArmorStand spawnEntity(Location loc) {

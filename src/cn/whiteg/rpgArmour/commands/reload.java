@@ -1,19 +1,15 @@
 package cn.whiteg.rpgArmour.commands;
 
-import cn.whiteg.mmocore.common.CommandInterface;
+import cn.whiteg.mmocore.common.HasCommandInterface;
 import cn.whiteg.rpgArmour.RPGArmour;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 
 import java.util.List;
 
-public class reload extends CommandInterface {
+public class reload extends HasCommandInterface {
     @Override
-    public boolean onCommand(CommandSender sender,Command cmd,String label,String[] args) {
-        if ((!sender.hasPermission("rpgarmour.reload"))){
-            sender.sendMessage("阁下没有权限使用这个指令");
-            return true;
-        }
+    public boolean executo(CommandSender sender,Command cmd,String label,String[] args) {
         RPGArmour.plugin.onDisable();
         RPGArmour.plugin.onLoad();
         RPGArmour.plugin.onEnable();
@@ -25,4 +21,10 @@ public class reload extends CommandInterface {
     public List<String> onTabComplete(CommandSender sender,Command cmd,String label,String[] args) {
         return null;
     }
+
+    @Override
+    public boolean canUseCommand(CommandSender sender) {
+        return sender.hasPermission("whiteg.test");
+    }
+
 }
