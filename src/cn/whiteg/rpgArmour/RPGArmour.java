@@ -6,7 +6,6 @@ import cn.whiteg.rpgArmour.listener.*;
 import cn.whiteg.rpgArmour.manager.*;
 import org.bukkit.Bukkit;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.command.PluginCommand;
 
 import java.util.logging.Logger;
 
@@ -63,12 +62,8 @@ public class RPGArmour extends PluginBase {
 //        regListener(new SpawnerReasonFix());
         if (Setting.forgeResourcePack) regListener(new forgePackListener());
 //        regEven(new Craftting());
-        commandManager = new CommandManager();
-        final PluginCommand pcmd = getCommand("rpgarmour");
-        if (pcmd != null){
-            pcmd.setExecutor(commandManager);
-            pcmd.setTabCompleter(commandManager);
-        }
+        commandManager = new CommandManager(this);
+        commandManager.setExecutor();
         ResourcePackManage.set();
         Bukkit.getScheduler().runTask(this,() -> {
             recipeManage.onSync();

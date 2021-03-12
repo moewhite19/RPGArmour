@@ -1,7 +1,7 @@
 package cn.whiteg.rpgArmour.commands;
 
 import cn.whiteg.chanlang.LangUtils;
-import cn.whiteg.mmocore.common.CommandInterface;
+import cn.whiteg.rpgArmour.manager.CommandInterface;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.ComponentBuilder;

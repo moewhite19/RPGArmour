@@ -15,7 +15,7 @@ public class VectorUtils {
         double x = loc2.getX() - loc1.getX();
         double z = loc2.getZ() - loc1.getZ();
         double rad = Math.atan2(-x,z);
-        return (float) Math.toDegrees(rad);
+        return (float) Math.toDegrees(rad); //转角度
     }
 
     /**
@@ -73,7 +73,6 @@ public class VectorUtils {
         if (t > 180) t -= 360;
         else if (t < -180) t += 360;
         return t;
-
     }
 
     /**

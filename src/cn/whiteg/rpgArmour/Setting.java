@@ -49,7 +49,7 @@ public class Setting {
             }
         }
         DEBUG = config.getBoolean("debug");
-        BambooDragonfly.worldList.add(Bukkit.getWorld("world_the_end"));
+        BambooDragonfly.disableWorld.add(Bukkit.getWorld("world_the_end"));
         custItemConfit = config.getConfigurationSection("CustItemSetting");
         custEntitySetting = config.getConfigurationSection("CustEntitySetting");
         forgeResourcePack = config.getBoolean("forgeResourcePack",forgeResourcePack);
@@ -60,7 +60,7 @@ public class Setting {
             for (String key : cs.getKeys(false)) {
                 try{
                     Material mat = Material.valueOf(key.toUpperCase());
-                    eatSoundMap.put(mat,Sound.parseSound(cs.get(key)));
+                    eatSoundMap.put(mat,Sound.parseYml(cs.get(key)));
                 }catch (IllegalArgumentException e){
                     RPGArmour.logger.warning("无效配置ID: " + key);
                 }

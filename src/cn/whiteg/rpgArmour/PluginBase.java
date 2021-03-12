@@ -6,6 +6,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.lang.reflect.Method;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -26,10 +27,15 @@ public class PluginBase extends JavaPlugin {
     }
 
     public void unregListener() {
-        for (Map.Entry<String, Listener> entry : listenerMap.entrySet()) {
-            unregListener(entry.getValue());
+        try{
+            for (Map.Entry<String, Listener> entry : listenerMap.entrySet()) {
+                unregListener(entry.getValue());
+            }
+            listenerMap.clear();
+        }catch (ConcurrentModificationException ignored){
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        listenerMap.clear();
     }
 
 

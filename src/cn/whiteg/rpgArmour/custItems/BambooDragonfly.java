@@ -1,6 +1,7 @@
 package cn.whiteg.rpgArmour.custItems;
 
 
+import cn.whiteg.mmocore.sound.SingleSound;
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.Setting;
 import cn.whiteg.rpgArmour.api.CustItem_CustModle;
@@ -32,10 +33,13 @@ import java.util.*;
 
 public class
 BambooDragonfly extends CustItem_CustModle implements Listener {
-    public static List<World> worldList = new ArrayList<>();
+    public static List<World> disableWorld = new ArrayList<>();
     public final Map<UUID, Staus> staMap = new HashMap<>();
     private final int flyid = 2;
     BukkitTask timer = null;
+    SingleSound stopSound = new SingleSound("block.beacon.deactivate",0.4f,1.5f);
+    SingleSound startSound = new SingleSound("block.beacon.activate",0.4f,1.5f);
+
     private float flyspeed = 0.04f;
 
     public BambooDragonfly() {
@@ -57,7 +61,7 @@ BambooDragonfly extends CustItem_CustModle implements Listener {
     public boolean is(ItemStack item) {
         if (item == null || item.getType() != getMaterial() || !item.hasItemMeta()) return false;
         final ItemMeta im = item.getItemMeta();
-        if (!im.hasCustomModelData()) return false;
+        if (im == null || !im.hasCustomModelData()) return false;
         return im.getCustomModelData() == getId() || im.getCustomModelData() == flyid;
     }
 
@@ -280,7 +284,7 @@ BambooDragonfly extends CustItem_CustModle implements Listener {
                 pi.setChestplate(null);
                 player.getWorld().dropItem(l,he);
             }
-            l.getWorld().playSound(l,"block.beacon.deactivate",0.4f,1.5f);
+            stopSound.playTo(l);
             activate = false;
             flag = 10;
         }
@@ -309,7 +313,7 @@ BambooDragonfly extends CustItem_CustModle implements Listener {
             player.setFlying(true);
             player.setFlySpeed(flyspeed);
             Location l = player.getLocation();
-            l.getWorld().playSound(l,"block.beacon.activate",0.4f,1.5f);
+            startSound.playTo(l);
             activate = true;
             setTimer();
         }

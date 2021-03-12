@@ -1,5 +1,6 @@
 package cn.whiteg.rpgArmour.custItems;
 
+import cn.whiteg.mmocore.sound.SingleSound;
 import cn.whiteg.rpgArmour.api.CustItem_CustModle;
 import cn.whiteg.rpgArmour.utils.ItemToolUtil;
 import cn.whiteg.rpgArmour.utils.RandomUtil;
@@ -7,7 +8,6 @@ import cn.whiteg.rpgArmour.utils.VectorUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.SoundCategory;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
@@ -23,9 +23,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 public class Fan extends CustItem_CustModle implements Listener {
-    private final float power = 5;
-    private final float range = 6;
-    private final float angle = 45;
+    private final float power = 5F;
+    private final float range = 6F;
+    private final float angle = 35F;
+    SingleSound sound = new SingleSound("minecraft:entity.player.attack.knockback",1F,0.1F);
     private Entity damager = null;
 
     public Fan() {
@@ -66,7 +67,7 @@ public class Fan extends CustItem_CustModle implements Listener {
         damager = user;
         Location loc = user.getEyeLocation();
         if (user instanceof Player) loc.setY(loc.getY() - (((Player) user).isSneaking() ? 0.4D : 0.2D));
-        loc.getWorld().playSound(loc,"minecraft:entity.player.attack.knockback",SoundCategory.AMBIENT,1F,0.1F);
+        sound.playTo(loc);
 
         //获取使用者载具
         Entity uv = user.getVehicle();
@@ -75,8 +76,9 @@ public class Fan extends CustItem_CustModle implements Listener {
             if (!e.isValid() || e.isInsideVehicle() || e.getType() == vt || e.getType() == EntityType.ITEM_FRAME)
                 continue;
             final Location loc2 = e.getLocation();
+            loc2.setY(loc2.getY() + e.getHeight() / 2);
             float yaw = VectorUtils.getLocYaw(loc,loc2);
-            float ag = VectorUtils.checkViewCone(loc,loc2,35F);
+            float ag = VectorUtils.checkViewCone(loc,loc2,angle);
             if (ag > 0){
                 EntityDamageByEntityEvent ev = new EntityDamageByEntityEvent(user,e,EntityDamageEvent.DamageCause.CUSTOM,0);
                 Bukkit.getPluginManager().callEvent(ev);
