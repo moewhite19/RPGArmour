@@ -33,11 +33,15 @@ public class CustItem_CustModle extends CustItem {
         if (item == null || item.getType() != getMaterial() || !item.hasItemMeta()) return false;
         ItemMeta im = item.getItemMeta();
         if (!im.hasCustomModelData()) return false;
-        return im.getCustomModelData() == id;
+        return hasId(im.getCustomModelData());
 
     }
 
     public int getId() {
         return id;
+    }
+
+    public boolean hasId(int id){
+        return id == getId();
     }
 }

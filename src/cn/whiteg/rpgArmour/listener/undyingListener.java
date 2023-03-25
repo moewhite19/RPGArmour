@@ -1,18 +1,22 @@
 package cn.whiteg.rpgArmour.listener;
 
+import cn.whiteg.mmocore.reflection.MethodInvoker;
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.event.PlayerDeathPreprocessEvent;
+import cn.whiteg.rpgArmour.utils.NMSUtils;
 import net.minecraft.advancements.CriterionTriggers;
 import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.server.level.WorldServer;
 import net.minecraft.stats.StatisticList;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityLiving;
 import net.minecraft.world.item.Items;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftLivingEntity;
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,7 +29,27 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.lang.reflect.Method;
+
 public class UndyingListener implements Listener {
+    static MethodInvoker<Void> worldServer_updateState;
+
+    static {
+        findMethod:
+        {
+            for (Method method : WorldServer.class.getMethods()) {
+                if (method.getReturnType() == void.class){
+                    final Class<?>[] types = method.getParameterTypes();
+                    if (types.length == 2 && types[0].equals(Entity.class) && types[1].equals(byte.class)){
+                        worldServer_updateState = new MethodInvoker<>(method);
+                        break findMethod;
+                    }
+                }
+            }
+            throw new RuntimeException("Cant Find Method: worldServer_updateState");
+        }
+
+    }
 
     @Deprecated
     public static void useOffHand(PlayerInventory inv,ItemStack item) {
@@ -57,7 +81,8 @@ public class UndyingListener implements Listener {
         entity.addEffect(new MobEffect(MobEffects.j,900,1),EntityPotionEffectEvent.Cause.TOTEM);
         entity.addEffect(new MobEffect(MobEffects.v,100,1),EntityPotionEffectEvent.Cause.TOTEM);
         entity.addEffect(new MobEffect(MobEffects.l,800,0),EntityPotionEffectEvent.Cause.TOTEM);
-        entity.s.a(entity,(byte) 35);
+        worldServer_updateState.invoke(entity,entity,32);
+//        NMSUtils.getNmsWorld(livingEntity.getWorld()).a(entity,(byte) 32);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

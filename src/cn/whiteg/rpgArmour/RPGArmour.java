@@ -23,7 +23,7 @@ public class RPGArmour extends PluginBase {
     private RecipeManage recipeManage;
     private ApiManager apiManager;
     //todo 待开发侧边栏GUI
-    private GUIManager guiManager;
+//    private GUIManager guiManager;
     private CanBreakEntityItem canBreakEntityItem;
 
     public RPGArmour() {
@@ -98,9 +98,10 @@ public class RPGArmour extends PluginBase {
         return recipeManage;
     }
 
-    public GUIManager getGuiManager() {
-        return guiManager;
-    }
+    //   todo 待开发
+//    public GUIManager getGuiManager() {
+//        return guiManager;
+//    }
 
     public ApiManager getApiManager() {
         return apiManager;

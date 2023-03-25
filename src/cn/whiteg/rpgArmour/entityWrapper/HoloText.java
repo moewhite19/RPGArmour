@@ -46,7 +46,6 @@ public class HoloText extends LivingEntityWrapper {
     public void initDataWatcher() {
         super.initDataWatcher();
         if (customName != null){
-//            IChatBaseComponent ibc = ChatComponentScore.ChatSerializer.a(JsonBuilder.parse(customName).toString());
             IChatBaseComponent ibc = IChatBaseComponent.a(customName);
             dataWatcher.b(displayName,Optional.of(ibc));
         }

@@ -1,5 +1,8 @@
 package cn.whiteg.rpgArmour.entityWrapper;
 
+import cn.whiteg.moepacketapi.utils.MethodInvoker;
+import cn.whiteg.rpgArmour.reflection.FieldAccessor;
+import cn.whiteg.rpgArmour.reflection.ReflectionFactory;
 import cn.whiteg.rpgArmour.utils.EntityUtils;
 import cn.whiteg.rpgArmour.utils.NMSUtils;
 import cn.whiteg.rpgArmour.utils.Utils;
@@ -15,16 +18,15 @@ import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.phys.Vec3D;
-import org.apache.commons.lang.ObjectUtils;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_19_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R1.util.CraftVector;
+import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_19_R3.util.CraftVector;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -32,8 +34,9 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("unchecked")
 public abstract class EntityWrapper {
-    static Field data_i;
-    static Method data_b;
+    static FieldAccessor<Boolean> data_b1;
+    static MethodInvoker<DataWatcher.Item<?>> dataWatcher_getItem;
+    static MethodInvoker<List<DataWatcher.b<?>>> dataWatcher_packAll;
     static DataWatcherObject<Byte> flags;
     static DataWatcherObject<Integer> air_tick;
     static DataWatcherObject<Boolean> name_visible;
@@ -45,11 +48,19 @@ public abstract class EntityWrapper {
 
     static {
         try{
-            data_i = DataWatcher.class.getDeclaredField("i"); //change???
-            data_i.setAccessible(true);
+            data_b1 = (FieldAccessor<Boolean>) ReflectionFactory.createFieldAccessor(NMSUtils.getFieldFormType(DataWatcher.class,boolean.class)); //change???
 
-            data_b = DataWatcher.class.getDeclaredMethod("b",DataWatcherObject.class); //set???
-            data_b.setAccessible(true);
+            try{
+                dataWatcher_getItem = new MethodInvoker<>(DataWatcher.class.getDeclaredMethod("b", DataWatcherObject.class));
+                dataWatcher_packAll = new MethodInvoker<>(DataWatcher.class.getDeclaredMethod("packAll"));
+            }catch (NoSuchMethodException e){
+                e.printStackTrace();
+            }
+
+//            for (Method method : DataWatcher.class.getMethods()) {
+//
+//            }
+            Objects.requireNonNull(dataWatcher_getItem);
             Field f;
             f = NMSUtils.getFieldFormType(Entity.class,"net.minecraft.network.syncher.DataWatcherObject<java.lang.Byte>"); // flags
             f.setAccessible(true);
@@ -92,13 +103,12 @@ public abstract class EntityWrapper {
             Field count_f = NMSUtils.getFieldFormType(Entity.class,AtomicInteger.class);
             count_f.setAccessible(true);
             ENTITY_COUNT = (AtomicInteger) count_f.get(null);
-        }catch (NoSuchFieldException | NoSuchMethodException | IllegalAccessException e){
+        }catch (NoSuchFieldException | IllegalAccessException e){
             throw new RuntimeException(e);
         }
     }
 
     final Random random = new Random();
-    final Class<?> packetPlayOutEntityTeleportClass = PacketPlayOutEntityTeleport.class;
     final UUID uuid;
     final int entityId;
     public DataWatcher dataWatcher;
@@ -137,7 +147,7 @@ public abstract class EntityWrapper {
             var np = EntityUtils.getNmsPlayer(player);
             var conn = EntityUtils.getPlayerConnection(np);
             conn.a(p1);
-            conn.a(p2);
+            if (p2 != null) conn.a(p2);
         }
         setVisble(players);
     }
@@ -176,7 +186,7 @@ public abstract class EntityWrapper {
         var p1 = createPacketSpawnEntity();
         var p2 = createPacketEntityMetadata();
         pc.a(p1);
-        pc.a(p2);
+        if (p2 != null) pc.a(p2);
     }
 
     public void remove(Player player) {
@@ -268,13 +278,18 @@ public abstract class EntityWrapper {
         return new PacketPlayOutEntityDestroy(entityId);
     }
 
+    @Nullable
     public Packet<PacketListenerPlayOut> createPacketEntityMetadata() {
-        return new PacketPlayOutEntityMetadata(entityId,getDataWatcher(),true);
+        final List<DataWatcher.b<?>> b = dataWatcher_packAll.invoke(getDataWatcher());
+        if (b != null) return new PacketPlayOutEntityMetadata(entityId,b);
+        return null;
     }
 
     public void sendUpdate() {
         if (canVisble != null){
-            final PacketPlayOutEntityMetadata p = new PacketPlayOutEntityMetadata(entityId,getDataWatcher(),true);
+            List<DataWatcher.b<?>> list = dataWatcher_packAll.invoke(getDataWatcher());
+            if (list == null) return;
+            final PacketPlayOutEntityMetadata p = new PacketPlayOutEntityMetadata(entityId,list);
             playersForEach(player -> {
                 Utils.sendPacket(p,player);
             });
@@ -331,18 +346,16 @@ public abstract class EntityWrapper {
      */
     public void initDataWatcher() {
         byte flags = (byte) (1 << 5);
+
+        //重写方法，不然会抛出null
         dataWatcher = new DataWatcher(null) {
             @Override
-            public <T> void b(DataWatcherObject<T> datawatcherobject,T t0) {
-                try{
-                    Item<T> datawatcher_item = (Item<T>) data_b.invoke(this,datawatcherobject);
-                    if (ObjectUtils.notEqual(t0,datawatcher_item.b())){
-                        datawatcher_item.a(t0);
-                        datawatcher_item.a(true);
-                        data_i.set(this,true);
-                    }
-                }catch (IllegalAccessException | InvocationTargetException e){
-                    e.printStackTrace();
+            public <T> void b(DataWatcherObject<T> datawatcherobject,T value) {
+                Item<T> datawatcher_item = (Item<T>) dataWatcher_getItem.invoke(this,datawatcherobject);
+                if (org.apache.commons.lang3.ObjectUtils.notEqual(value, datawatcher_item.b())) {
+                    datawatcher_item.a(value);
+                    datawatcher_item.a(true);
+                    data_b1.set(this,true);
                 }
             }
         };

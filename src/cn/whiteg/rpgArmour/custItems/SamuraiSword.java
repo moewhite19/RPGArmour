@@ -245,17 +245,9 @@ public class SamuraiSword extends CustItem_CustModle implements Listener {
         }
     }
 
-
-    @SuppressWarnings("all")
     @Override
-    public boolean is(ItemStack item) {
-        if (item == null || item.getType() != getMaterial() || !item.hasItemMeta()) return false;
-        ItemMeta im = item.getItemMeta();
-        if (im.hasCustomModelData()){
-            int i = im.getCustomModelData();
-            if (i == getId() || i == id2) return true;
-        }
-        return false;
+    public boolean hasId(int i) {
+        return i == getId() | i ==id2;
     }
 
     public int isItem(ItemStack item) {

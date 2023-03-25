@@ -1,29 +1,46 @@
 package cn.whiteg.rpgArmour.manager;
 
+import cn.whiteg.moepacketapi.utils.MethodInvoker;
 import cn.whiteg.rpgArmour.Setting;
+import cn.whiteg.rpgArmour.reflection.FieldAccessor;
 import cn.whiteg.rpgArmour.utils.NMSUtils;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
+import net.minecraft.server.dedicated.DedicatedServerProperties;
+import net.minecraft.server.dedicated.DedicatedServerSettings;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Optional;
 
 import static cn.whiteg.rpgArmour.RPGArmour.logger;
 
 public class ResourcePackManage {
-    static Method setPacketMethod;
+    static FieldAccessor<DedicatedServerSettings> server_setting;
+    static FieldAccessor<DedicatedServerProperties> serverSetting_serverProp;
+    static FieldAccessor<Optional<MinecraftServer.ServerResourcePackInfo>> serverProp_ServerPackInfo;
 
     static {
-        for (Method method : DedicatedServer.class.getMethods()) {
-            Class<?>[] parameterTypes = method.getParameterTypes();
-            if (parameterTypes.length == 2 && (parameterTypes[0] == String.class && parameterTypes[1] == String.class)){
-                setPacketMethod = method;
-                break;
+        try{
+            server_setting = new FieldAccessor<>(NMSUtils.getFieldFormType(DedicatedServer.class,DedicatedServerSettings.class));
+            serverSetting_serverProp = new FieldAccessor<>(NMSUtils.getFieldFormType(DedicatedServerSettings.class,DedicatedServerProperties.class));
+        }catch (NoSuchFieldException e){
+            throw new RuntimeException(e);
+        }
+
+        findField:
+        {
+            for (Field field : DedicatedServerProperties.class.getDeclaredFields()) {
+                if (field.getType().isAssignableFrom(Optional.class)){
+                    serverProp_ServerPackInfo = new FieldAccessor<>(field);
+                    break findField;
+                }
             }
+            throw new RuntimeException("Cant find field: serverProp_ServerPackInfo");
         }
     }
 
@@ -33,7 +50,8 @@ public class ResourcePackManage {
 
     public static void set(String url,String sha1,boolean require,String prompt) {
         DedicatedServer con = NMSUtils.getNmsServer();
-        con.u.a().S = Optional.of(new MinecraftServer.ServerResourcePackInfo(url,sha1,require,IChatBaseComponent.a(prompt)));
+//        con.u.a().S = Optional.of(new MinecraftServer.ServerResourcePackInfo(url,sha1,require,IChatBaseComponent.a(prompt)));
+        serverProp_ServerPackInfo.set(serverSetting_serverProp.get(server_setting.get(con)),Optional.of(new MinecraftServer.ServerResourcePackInfo(url,sha1,require,IChatBaseComponent.a(prompt))));
         logger.info("设置资源包 " + url + "  " + sha1);
     }
 

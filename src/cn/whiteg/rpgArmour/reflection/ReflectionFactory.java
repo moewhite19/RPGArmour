@@ -2,6 +2,7 @@ package cn.whiteg.rpgArmour.reflection;
 
 import sun.misc.Unsafe;
 
+import java.lang.reflect.Field;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
@@ -30,6 +31,12 @@ public class ReflectionFactory {
         }
 
     }
+
+    //
+    public static FieldAccessor<?> createFieldAccessor(Field field){
+        return new FieldAccessor<>(field);
+    }
+
 
     //构建一个对象但不调用构建方法
     @SuppressWarnings("unchecked")

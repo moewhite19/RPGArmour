@@ -61,11 +61,8 @@ BambooDragonfly extends CustItem_CustModle implements Listener {
     }
 
     @Override
-    public boolean is(ItemStack item) {
-        if (item == null || item.getType() != getMaterial() || !item.hasItemMeta()) return false;
-        final ItemMeta im = item.getItemMeta();
-        if (im == null || !im.hasCustomModelData()) return false;
-        return im.getCustomModelData() == getId() || im.getCustomModelData() == flyid;
+    public boolean hasId(int id) {
+        return id == getId() || id == flyid;
     }
 
     public Staus getUserSta(Player player) {
@@ -140,7 +137,7 @@ BambooDragonfly extends CustItem_CustModle implements Listener {
     public void onEnter(EntityMountEvent event) {
         if (event.getEntity() instanceof Player player){
             final Staus sta = staMap.get(player.getUniqueId());
-            if(sta != null && sta.activate){
+            if (sta != null && sta.activate){
                 sta.stopFly();
             }
         }
@@ -148,9 +145,9 @@ BambooDragonfly extends CustItem_CustModle implements Listener {
 
     //使用激流时关闭竹蜻蜓
     @EventHandler(ignoreCancelled = true)
-    public void onPush(PlayerRiptideEvent event){
+    public void onPush(PlayerRiptideEvent event) {
         final Staus sta = staMap.get(event.getPlayer().getUniqueId());
-        if(sta != null && sta.activate){
+        if (sta != null && sta.activate){
             sta.stopFly();
         }
     }
@@ -170,8 +167,8 @@ BambooDragonfly extends CustItem_CustModle implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true,priority = EventPriority.HIGHEST)
-    public void onTp(PlayerTeleportEvent event){
+    @EventHandler(ignoreCancelled = true, priority = EventPriority.HIGHEST)
+    public void onTp(PlayerTeleportEvent event) {
         final Staus sta = staMap.get(event.getPlayer().getUniqueId());
         if (sta != null){
             sta.lastLoc = event.getTo();

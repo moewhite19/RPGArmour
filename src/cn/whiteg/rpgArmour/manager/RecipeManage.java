@@ -84,7 +84,7 @@ public class RecipeManage {
 
                     }
                 };
-                pligin.getGuiManager().openGui(p,guiAbs);
+//                pligin.getGuiManager().openGui(p,guiAbs);
                 return guiAbs;
             }
         }

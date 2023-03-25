@@ -1,5 +1,7 @@
 package cn.whiteg.rpgArmour.utils;
 
+import cn.whiteg.moepacketapi.utils.EntityNetUtils;
+import cn.whiteg.moepacketapi.utils.MethodInvoker;
 import cn.whiteg.rpgArmour.reflection.FieldAccessor;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.level.EntityPlayer;
@@ -12,16 +14,13 @@ import net.minecraft.world.entity.projectile.EntityProjectileThrowable;
 import net.minecraft.world.entity.projectile.EntitySnowball;
 import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.phys.Vec3D;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_19_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_19_R3.inventory.CraftItemStack;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.BoundingBox;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -30,7 +29,7 @@ public class EntityUtils {
     public static Field sizeField;
     public static Field goalTargetField;
     public static Field fieldArmorStandDisabledSlots;
-    public static Method getItemMethod;
+    public static MethodInvoker<net.minecraft.world.item.ItemStack> getItemMethod;
     private static FieldAccessor<Boolean> jump;
     private static FieldAccessor<Float> inputX;
     private static FieldAccessor<Float> inputY;
@@ -38,8 +37,6 @@ public class EntityUtils {
     private static FieldAccessor<Integer> itemUseTimeLeftField;
     private static FieldAccessor<PlayerConnection> playerConnectionField;
     private static FieldAccessor<PlayerInteractManager> playerInteractManagerField;
-    private static FieldAccessor<NetworkManager> playerNetworkManagerField;
-    private static Field craftHandler;
     private static FieldAccessor<Integer> playerPrepTime;
 
     private static FieldAccessor<Object> entityYaw;
@@ -77,7 +74,6 @@ public class EntityUtils {
         try{
             playerConnectionField = new FieldAccessor<>(NMSUtils.getFieldFormType(EntityPlayer.class,PlayerConnection.class));
             playerInteractManagerField = new FieldAccessor<>(NMSUtils.getFieldFormType(EntityPlayer.class,PlayerInteractManager.class));
-            playerNetworkManagerField = new FieldAccessor<>(NMSUtils.getFieldFormType(EntityPlayer.class,NetworkManager.class));
         }catch (NoSuchFieldException e){
             e.printStackTrace();
         }
@@ -121,28 +117,16 @@ public Vector3f bodyPose;
         }
 
         //获取雪球的物品堆
-        Method m;
-        try{
-            m = EntityProjectileThrowable.class.getDeclaredMethod("h");
-            m.setAccessible(true);
-        }catch (NoSuchMethodException e){
-            e.printStackTrace();
-            m = null;
+        findMethod:
+        {
+            for (Method method : EntityProjectileThrowable.class.getDeclaredMethods()) {
+                if (method.getReturnType().isAssignableFrom(net.minecraft.world.item.ItemStack.class)){
+                    getItemMethod = new MethodInvoker<>(method);
+                    break findMethod;
+                }
+            }
+            throw new RuntimeException("Cant find method: getItemMethod");
         }
-        if (m != null){
-            getItemMethod = m;
-            m.setAccessible(true);
-        }
-
-        //从Bukkit实体获取Nms实体
-        try{
-            var clazz = EntityUtils.class.getClassLoader().loadClass(Bukkit.getServer().getClass().getPackage().getName() + ".entity.CraftEntity");
-            craftHandler = clazz.getDeclaredField("entity");
-            craftHandler.setAccessible(true);
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
 
         //获取实体在骑乘中的操作
         try{
@@ -172,17 +156,13 @@ public Vector3f bodyPose;
         }
 
 
+        //protected int aO;
         try{
             playerPrepTime = new FieldAccessor<>(NMSUtils.getFieldFormStructure(EntityLiving.class,
                     float.class,
-                    int.class,
-                    float.class,
                     float.class,
                     int.class,
-                    float.class,
-                    float.class,
-                    float.class,
-                    int.class)[4]);
+                    WalkAnimationState.class)[2]);
         }catch (NoSuchFieldException e){
             e.printStackTrace();
         }
@@ -194,7 +174,41 @@ public Vector3f bodyPose;
             EntitySize size = new EntitySize(width,height,true);
             Entity nmsEntity = getNmsEntity(entity);
             sizeField.set(nmsEntity,size);
-            if (update) nmsEntity.z_();
+            /*
+            @Deprecated
+            protected void cz() {
+                EntityPose entitypose = this.al();
+                EntitySize entitysize = this.a(entitypose);
+                this.be = entitysize;
+                this.bf = this.a(entitypose, entitysize);
+            }
+
+            public void c_() {
+                EntitySize entitysize = this.be;
+                EntityPose entitypose = this.al();
+                EntitySize entitysize1 = this.a(entitypose);
+                this.be = entitysize1;
+                this.bf = this.a(entitypose, entitysize1);
+                this.an();
+                boolean flag = (double)entitysize1.a <= 4.0 && (double)entitysize1.b <= 4.0;
+                if (!this.H.B && !this.al && !this.ae && flag && (entitysize1.a > entitysize.a || entitysize1.b > entitysize.b) && !(this instanceof EntityHuman)) {
+                    Vec3D vec3d = this.de().b(0.0, (double)entitysize.b / 2.0, 0.0);
+                    double d0 = (double)Math.max(0.0F, entitysize1.a - entitysize.a) + 1.0E-6;
+                    double d1 = (double)Math.max(0.0F, entitysize1.b - entitysize.b) + 1.0E-6;
+                    VoxelShape voxelshape = VoxelShapes.a(AxisAlignedBB.a(vec3d, d0, d1, d0));
+                    this.H.a(this, voxelshape, vec3d, (double)entitysize1.a, (double)entitysize1.b, (double)entitysize1.a).ifPresent((vec3d1) -> {
+                        this.a(vec3d1.b(0.0, (double)(-entitysize1.b) / 2.0, 0.0));
+                    });
+                }
+
+            }
+
+            public EnumDirection cA() {
+                return EnumDirection.a((double)this.dw());
+            }
+
+             */
+            if (update) nmsEntity.c_();
         }catch (IllegalAccessException e){
             e.printStackTrace();
         }
@@ -273,12 +287,7 @@ public Vector3f bodyPose;
     //获取雪球的Item对象
     public static ItemStack getSnowballItem(Snowball snowball) {
         EntitySnowball nms = (EntitySnowball) getNmsEntity(snowball);
-        try{
-            return CraftItemStack.asBukkitCopy((net.minecraft.world.item.ItemStack) getItemMethod.invoke(nms));
-        }catch (IllegalAccessException | InvocationTargetException e){
-            e.printStackTrace();
-            return new ItemStack(Material.AIR);
-        }
+        return CraftItemStack.asBukkitCopy(getItemMethod.invoke(nms));
     }
 
     //实体是否为刷怪笼刷出
@@ -346,7 +355,7 @@ public Vector3f bodyPose;
     }
 
     public static NetworkManager getNetworkManager(EntityPlayer player) {
-        return playerNetworkManagerField.get(player);
+        return EntityNetUtils.getNetWork(EntityNetUtils.getPlayerConnection(player));
     }
 
     public static int getEntityId(org.bukkit.entity.Entity entity) {
@@ -360,14 +369,14 @@ public Vector3f bodyPose;
 
     public static net.minecraft.world.entity.Entity getNmsEntity(org.bukkit.entity.Entity entity) {
         try{
-            return (net.minecraft.world.entity.Entity) craftHandler.get(entity);
+            return EntityNetUtils.getNmsEntity(entity);
         }catch (Throwable e){
             throw new RuntimeException(e);
         }
     }
 
 
-//    武器准备时间，相当于攻击CD， 如剑的准备时间是15tick
+    //    武器准备时间，相当于攻击CD， 如剑的准备时间是15tick
     public static float getPlayerPrepTime(org.bukkit.entity.Entity player) {
         if (player instanceof LivingEntity) return playerPrepTime.get(NMSUtils.getNmsEntity(player));
         return 0f;
