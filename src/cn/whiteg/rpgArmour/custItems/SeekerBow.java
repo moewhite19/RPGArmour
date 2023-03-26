@@ -1,6 +1,8 @@
 package cn.whiteg.rpgArmour.custItems;
 
 import cn.whiteg.chanlang.LangUtils;
+import cn.whiteg.mmocore.reflection.ReflectUtil;
+import cn.whiteg.mmocore.util.NMSUtils;
 import cn.whiteg.moeInfo.nms.ActionBar;
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.Setting;
@@ -299,7 +301,7 @@ public class SeekerBow extends CustItem_CustModle implements Listener {
             item.setItemMeta(meta);
             try{
 //                var itemField = EntityProjectileThrowable.class.getDeclaredField("b");
-                var itemField = NMSUtils.getFieldFormType(EntityProjectileThrowable.class,DataWatcherObject.class);
+                var itemField = ReflectUtil.getFieldFormType(EntityProjectileThrowable.class,DataWatcherObject.class);
                 itemField.setAccessible(true);
                 //noinspection unchecked
                 itemData = (DataWatcherObject<net.minecraft.world.item.ItemStack>) itemField.get(null);

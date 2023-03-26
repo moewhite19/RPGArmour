@@ -1,6 +1,6 @@
 package cn.whiteg.rpgArmour.utils;
 
-import cn.whiteg.rpgArmour.reflection.FieldAccessor;
+import cn.whiteg.mmocore.reflection.FieldAccessor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;

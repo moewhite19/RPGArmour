@@ -1,9 +1,9 @@
 package cn.whiteg.rpgArmour.manager;
 
-import cn.whiteg.moepacketapi.utils.MethodInvoker;
+import cn.whiteg.mmocore.reflection.FieldAccessor;
+import cn.whiteg.mmocore.reflection.ReflectUtil;
+import cn.whiteg.mmocore.util.NMSUtils;
 import cn.whiteg.rpgArmour.Setting;
-import cn.whiteg.rpgArmour.reflection.FieldAccessor;
-import cn.whiteg.rpgArmour.utils.NMSUtils;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
@@ -14,7 +14,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Optional;
 
 import static cn.whiteg.rpgArmour.RPGArmour.logger;
@@ -26,8 +25,8 @@ public class ResourcePackManage {
 
     static {
         try{
-            server_setting = new FieldAccessor<>(NMSUtils.getFieldFormType(DedicatedServer.class,DedicatedServerSettings.class));
-            serverSetting_serverProp = new FieldAccessor<>(NMSUtils.getFieldFormType(DedicatedServerSettings.class,DedicatedServerProperties.class));
+            server_setting = new FieldAccessor<>(ReflectUtil.getFieldFormType(DedicatedServer.class,DedicatedServerSettings.class));
+            serverSetting_serverProp = new FieldAccessor<>(ReflectUtil.getFieldFormType(DedicatedServerSettings.class,DedicatedServerProperties.class));
         }catch (NoSuchFieldException e){
             throw new RuntimeException(e);
         }

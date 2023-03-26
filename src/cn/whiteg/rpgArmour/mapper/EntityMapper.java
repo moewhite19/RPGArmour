@@ -1,6 +1,7 @@
 package cn.whiteg.rpgArmour.mapper;
 
-import cn.whiteg.rpgArmour.utils.NMSUtils;
+import cn.whiteg.mmocore.reflection.ReflectUtil;
+import cn.whiteg.mmocore.util.NMSUtils;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.World;
 
@@ -11,7 +12,7 @@ public class EntityMapper {
 
     static {
         try{
-            worldField = NMSUtils.getFieldFormType(Entity.class,World.class);
+            worldField = ReflectUtil.getFieldFormType(Entity.class,World.class);
         }catch (NoSuchFieldException e){
             throw new RuntimeException(e);
         }

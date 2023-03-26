@@ -1,8 +1,10 @@
 package cn.whiteg.rpgArmour.utils;
 
+import cn.whiteg.mmocore.reflection.FieldAccessor;
+import cn.whiteg.mmocore.reflection.ReflectUtil;
+import cn.whiteg.mmocore.util.NMSUtils;
 import cn.whiteg.moepacketapi.utils.EntityNetUtils;
 import cn.whiteg.moepacketapi.utils.MethodInvoker;
-import cn.whiteg.rpgArmour.reflection.FieldAccessor;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.PlayerInteractManager;
@@ -56,7 +58,7 @@ public class EntityUtils {
 
         //大小
         try{
-            sizeField = NMSUtils.getFieldFormType(Entity.class,EntitySize.class);
+            sizeField = ReflectUtil.getFieldFormType(Entity.class,EntitySize.class);
             sizeField.setAccessible(true);
         }catch (NoSuchFieldException e){
             e.printStackTrace();
@@ -64,7 +66,7 @@ public class EntityUtils {
 
         //仇恨目标
         try{
-            goalTargetField = NMSUtils.getFieldFormType(EntityInsentient.class,EntityLiving.class);
+            goalTargetField = ReflectUtil.getFieldFormType(EntityInsentient.class,EntityLiving.class);
             goalTargetField.setAccessible(true);
         }catch (NoSuchFieldException e){
             e.printStackTrace();
@@ -72,8 +74,8 @@ public class EntityUtils {
 
         //网络协议控制器
         try{
-            playerConnectionField = new FieldAccessor<>(NMSUtils.getFieldFormType(EntityPlayer.class,PlayerConnection.class));
-            playerInteractManagerField = new FieldAccessor<>(NMSUtils.getFieldFormType(EntityPlayer.class,PlayerInteractManager.class));
+            playerConnectionField = new FieldAccessor<>(ReflectUtil.getFieldFormType(EntityPlayer.class,PlayerConnection.class));
+            playerInteractManagerField = new FieldAccessor<>(ReflectUtil.getFieldFormType(EntityPlayer.class,PlayerInteractManager.class));
         }catch (NoSuchFieldException e){
             e.printStackTrace();
         }
@@ -130,7 +132,7 @@ public Vector3f bodyPose;
 
         //获取实体在骑乘中的操作
         try{
-            var result = NMSUtils.getFieldFormStructure(EntityLiving.class,boolean.class,float.class,float.class,float.class);
+            var result = ReflectUtil.getFieldFormStructure(EntityLiving.class,boolean.class,float.class,float.class,float.class);
             for (Field field : result) {
                 field.setAccessible(true);
             }
@@ -144,7 +146,7 @@ public Vector3f bodyPose;
         }
         //获取实体的Pitch和Yaw
         try{
-            var result = NMSUtils.getFieldFormStructure(Entity.class,Vec3D.class,float.class,float.class,float.class,float.class);
+            var result = ReflectUtil.getFieldFormStructure(Entity.class,Vec3D.class,float.class,float.class,float.class,float.class);
             for (Field field : result) {
                 field.setAccessible(true);
             }
@@ -158,7 +160,7 @@ public Vector3f bodyPose;
 
         //protected int aO;
         try{
-            playerPrepTime = new FieldAccessor<>(NMSUtils.getFieldFormStructure(EntityLiving.class,
+            playerPrepTime = new FieldAccessor<>(ReflectUtil.getFieldFormStructure(EntityLiving.class,
                     float.class,
                     float.class,
                     int.class,

@@ -3,7 +3,6 @@ package cn.whiteg.rpgArmour.listener;
 import cn.whiteg.mmocore.reflection.MethodInvoker;
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.event.PlayerDeathPreprocessEvent;
-import cn.whiteg.rpgArmour.utils.NMSUtils;
 import net.minecraft.advancements.CriterionTriggers;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.server.level.WorldServer;
