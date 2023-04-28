@@ -1,10 +1,10 @@
 package cn.whiteg.rpgArmour.entityWrapper;
 
+import cn.whiteg.mmocore.reflection.FieldAccessor;
+import cn.whiteg.mmocore.reflection.ReflectUtil;
+import cn.whiteg.mmocore.reflection.ReflectionFactory;
 import cn.whiteg.moepacketapi.utils.MethodInvoker;
-import cn.whiteg.rpgArmour.reflection.FieldAccessor;
-import cn.whiteg.rpgArmour.reflection.ReflectionFactory;
 import cn.whiteg.rpgArmour.utils.EntityUtils;
-import cn.whiteg.rpgArmour.utils.NMSUtils;
 import cn.whiteg.rpgArmour.utils.Utils;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketDataSerializer;
@@ -27,7 +27,6 @@ import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -48,7 +47,7 @@ public abstract class EntityWrapper {
 
     static {
         try{
-            data_b1 = (FieldAccessor<Boolean>) ReflectionFactory.createFieldAccessor(NMSUtils.getFieldFormType(DataWatcher.class,boolean.class)); //change???
+            data_b1 = (FieldAccessor<Boolean>) ReflectionFactory.createFieldAccessor(ReflectUtil.getFieldFormType(DataWatcher.class,boolean.class)); //change???
 
             try{
                 dataWatcher_getItem = new MethodInvoker<>(DataWatcher.class.getDeclaredMethod("b", DataWatcherObject.class));
@@ -62,15 +61,15 @@ public abstract class EntityWrapper {
 //            }
             Objects.requireNonNull(dataWatcher_getItem);
             Field f;
-            f = NMSUtils.getFieldFormType(Entity.class,"net.minecraft.network.syncher.DataWatcherObject<java.lang.Byte>"); // flags
+            f = ReflectUtil.getFieldFormType(Entity.class,"net.minecraft.network.syncher.DataWatcherObject<java.lang.Byte>"); // flags
             f.setAccessible(true);
             flags = (DataWatcherObject<Byte>) f.get(null);
 
-            f = NMSUtils.getFieldFormType(Entity.class,"net.minecraft.network.syncher.DataWatcherObject<java.lang.Integer>"); //Air Ticks???
+            f = ReflectUtil.getFieldFormType(Entity.class,"net.minecraft.network.syncher.DataWatcherObject<java.lang.Integer>"); //Air Ticks???
             f.setAccessible(true);
             air_tick = (DataWatcherObject<Integer>) f.get(null);
 
-            f = NMSUtils.getFieldFormType(Entity.class,"net.minecraft.network.syncher.DataWatcherObject<java.util.Optional<net.minecraft.network.chat.IChatBaseComponent>>"); // custom name
+            f = ReflectUtil.getFieldFormType(Entity.class,"net.minecraft.network.syncher.DataWatcherObject<java.util.Optional<net.minecraft.network.chat.IChatBaseComponent>>"); // custom name
 
             f.setAccessible(true);
             displayName = (DataWatcherObject<Optional<IChatBaseComponent>>) f.get(null);
@@ -100,7 +99,7 @@ public abstract class EntityWrapper {
             }
 
             //AtomicInteger
-            Field count_f = NMSUtils.getFieldFormType(Entity.class,AtomicInteger.class);
+            Field count_f = ReflectUtil.getFieldFormType(Entity.class,AtomicInteger.class);
             count_f.setAccessible(true);
             ENTITY_COUNT = (AtomicInteger) count_f.get(null);
         }catch (NoSuchFieldException | IllegalAccessException e){

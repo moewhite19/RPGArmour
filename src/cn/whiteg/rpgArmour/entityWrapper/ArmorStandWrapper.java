@@ -11,8 +11,7 @@ import org.bukkit.Location;
 
 import java.util.Optional;
 
-public class HoloText extends LivingEntityWrapper {
-
+public class ArmorStandWrapper extends LivingEntityWrapper {
     static DataWatcherObject<Byte> marker;
     private static EntityTypes<EntityItem> ITEM_TYPE;
 
@@ -26,7 +25,7 @@ public class HoloText extends LivingEntityWrapper {
         }
     }
 
-    public HoloText(Location location,String customName) {
+    public ArmorStandWrapper(Location location,String customName) {
         super(ITEM_TYPE);
         this.location = location;
         this.customName = customName;
@@ -36,7 +35,7 @@ public class HoloText extends LivingEntityWrapper {
     public void setMarker(boolean flag) {
         final byte by = (byte) (flag ? 16 : 0);
         dataWatcher.b(marker,by);
-        sendUpdate();
+//        sendUpdate();
     }
 
     /**
@@ -47,6 +46,7 @@ public class HoloText extends LivingEntityWrapper {
     public void initDataWatcher() {
         super.initDataWatcher();
         if (customName != null){
+//            IChatBaseComponent ibc = ChatComponentScore.ChatSerializer.a(JsonBuilder.parse(customName).toString());
             IChatBaseComponent ibc = IChatBaseComponent.a(customName);
             dataWatcher.b(displayName,Optional.of(ibc));
         }

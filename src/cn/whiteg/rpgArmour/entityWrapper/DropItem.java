@@ -1,7 +1,8 @@
 package cn.whiteg.rpgArmour.entityWrapper;
 
 
-import cn.whiteg.rpgArmour.utils.NMSUtils;
+import cn.whiteg.mmocore.reflection.ReflectUtil;
+import cn.whiteg.mmocore.util.NMSUtils;
 import net.minecraft.network.syncher.DataWatcherObject;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.item.EntityItem;
@@ -17,7 +18,7 @@ public class DropItem extends EntityWrapper {
 
     static {
         try{
-            Field f = NMSUtils.getFieldFormType(EntityItem.class,DataWatcherObject.class);
+            Field f = ReflectUtil.getFieldFormType(EntityItem.class,DataWatcherObject.class);
             f.setAccessible(true);
             //noinspection unchecked
             ITEM = (DataWatcherObject<ItemStack>) f.get(null);
