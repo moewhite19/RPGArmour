@@ -79,7 +79,7 @@ public class EnderHat extends CustItem_CustModle implements Listener {
                 entityliving.stopRiding(true);
             }
 
-            if (entityliving.a(d3,d4,d5,true)){
+            if (entityliving.b(d3,d4,d5,true)){
                 //item.chorus_fruit.teleport
                 em.getWorld().a(d0,
                         d1,

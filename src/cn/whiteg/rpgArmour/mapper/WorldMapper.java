@@ -1,7 +1,7 @@
 package cn.whiteg.rpgArmour.mapper;
 
 import net.minecraft.world.level.World;
-import org.bukkit.craftbukkit.v1_19_R3.CraftWorld;
+import org.bukkit.craftbukkit.v1_20_R1.CraftWorld;
 
 public class WorldMapper {
     final World world;

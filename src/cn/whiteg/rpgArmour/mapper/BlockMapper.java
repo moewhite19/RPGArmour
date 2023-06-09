@@ -3,7 +3,7 @@ package cn.whiteg.rpgArmour.mapper;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBase;
 import net.minecraft.world.level.block.state.IBlockData;
-import org.bukkit.craftbukkit.v1_19_R3.block.CraftBlock;
+import org.bukkit.craftbukkit.v1_20_R1.block.CraftBlock;
 
 import java.lang.reflect.Method;
 

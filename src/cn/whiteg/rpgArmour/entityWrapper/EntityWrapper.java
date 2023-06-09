@@ -19,14 +19,15 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.phys.Vec3D;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_19_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_19_R3.util.CraftVector;
+import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R1.util.CraftVector;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -47,10 +48,22 @@ public abstract class EntityWrapper {
 
     static {
         try{
-            data_b1 = (FieldAccessor<Boolean>) ReflectionFactory.createFieldAccessor(ReflectUtil.getFieldFormType(DataWatcher.class,boolean.class)); //change???
+            data_b1 = ReflectionFactory.createFieldAccessor(ReflectUtil.getFieldFormType(DataWatcher.class,boolean.class)); //change???
 
             try{
-                dataWatcher_getItem = new MethodInvoker<>(DataWatcher.class.getDeclaredMethod("b", DataWatcherObject.class));
+                dataWatcher_getItem = new MethodInvoker<>(DataWatcher.class.getDeclaredMethod("c",DataWatcherObject.class));
+                findMethod:
+                {
+                    for (Method method : DataWatcher.class.getDeclaredMethods()) {
+                        final Class<?>[] types = method.getParameterTypes();
+                        if (types.length == 1 && DataWatcherObject.class.isAssignableFrom(types[0]) && DataWatcher.Item.class.isAssignableFrom(method.getReturnType())){
+                            dataWatcher_getItem = new MethodInvoker<>(method);
+                            break findMethod;
+                        }
+                    }
+                    throw new NoSuchMethodException();
+                }
+
                 dataWatcher_packAll = new MethodInvoker<>(DataWatcher.class.getDeclaredMethod("packAll"));
             }catch (NoSuchMethodException e){
                 e.printStackTrace();
@@ -351,7 +364,7 @@ public abstract class EntityWrapper {
             @Override
             public <T> void b(DataWatcherObject<T> datawatcherobject,T value) {
                 Item<T> datawatcher_item = (Item<T>) dataWatcher_getItem.invoke(this,datawatcherobject);
-                if (org.apache.commons.lang3.ObjectUtils.notEqual(value, datawatcher_item.b())) {
+                if (org.apache.commons.lang3.ObjectUtils.notEqual(value,datawatcher_item.b())){
                     datawatcher_item.a(value);
                     datawatcher_item.a(true);
                     data_b1.set(this,true);

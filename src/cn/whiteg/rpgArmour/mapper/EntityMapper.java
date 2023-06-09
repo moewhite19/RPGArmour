@@ -13,6 +13,7 @@ public class EntityMapper {
     static {
         try{
             worldField = ReflectUtil.getFieldFormType(Entity.class,World.class);
+            worldField.setAccessible(true);
         }catch (NoSuchFieldException e){
             throw new RuntimeException(e);
         }
