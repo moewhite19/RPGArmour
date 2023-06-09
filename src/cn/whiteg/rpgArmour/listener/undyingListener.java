@@ -1,6 +1,7 @@
 package cn.whiteg.rpgArmour.listener;
 
 import cn.whiteg.mmocore.reflection.MethodInvoker;
+import cn.whiteg.mmocore.util.NMSUtils;
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.event.PlayerDeathPreprocessEvent;
 import net.minecraft.advancements.CriterionTriggers;
@@ -31,22 +32,23 @@ import org.bukkit.potion.PotionEffectType;
 import java.lang.reflect.Method;
 
 public class UndyingListener implements Listener {
-    static MethodInvoker<Void> worldServer_updateState;
+//    static MethodInvoker<Void> worldServer_updateState;
 
     static {
-        findMethod:
-        {
-            for (Method method : WorldServer.class.getMethods()) {
-                if (method.getReturnType() == void.class){
-                    final Class<?>[] types = method.getParameterTypes();
-                    if (types.length == 2 && types[0].equals(Entity.class) && types[1].equals(byte.class)){
-                        worldServer_updateState = new MethodInvoker<>(method);
-                        break findMethod;
-                    }
-                }
-            }
-            throw new RuntimeException("Cant Find Method: worldServer_updateState");
-        }
+        //这个暂时不用自适应
+//        findMethod:
+//        {
+//            for (Method method : WorldServer.class.getMethods()) {
+//                if (method.getReturnType().equals(void.class)){
+//                    final Class<?>[] types = method.getParameterTypes();
+//                    if (types.length == 2 && types[0].equals(Entity.class) && types[1].equals(byte.class)){
+//                        worldServer_updateState = new MethodInvoker<>(method);
+//                        break findMethod;
+//                    }
+//                }
+//            }
+//            throw new RuntimeException("Cant Find Method: worldServer_updateState");
+//        }
 
     }
 
@@ -60,7 +62,7 @@ public class UndyingListener implements Listener {
     }
 
     public static void EntityResurrect(LivingEntity livingEntity,ItemStack item) {
-        EntityLiving entity = ((CraftLivingEntity) livingEntity).getHandle();
+        EntityLiving entity = (EntityLiving) NMSUtils.getNmsEntity(livingEntity);
 //        if (item != null){
 //            if (entity instanceof EntityPlayer entityplayer){
 //                entityplayer.b(StatisticList.c.b(Items.TOTEM_OF_UNDYING));
@@ -71,17 +73,18 @@ public class UndyingListener implements Listener {
 //    EntityLiving.class;
 
         var nmsItem = CraftItemStack.asNMSCopy(item);
-        if (nmsItem != null && entity instanceof EntityPlayer entityplayer){
-            entityplayer.b(StatisticList.c.b(Items.sw));
-            CriterionTriggers.B.a(entityplayer,nmsItem);
+        if (nmsItem != null && entity instanceof EntityPlayer entityplayer) {
+            entityplayer.b(StatisticList.c.b(Items.uz));
+            CriterionTriggers.B.a(entityplayer, nmsItem);
         }
+
         livingEntity.setHealth(1.0f);
         entity.removeAllEffects(EntityPotionEffectEvent.Cause.TOTEM);
         entity.addEffect(new MobEffect(MobEffects.j,900,1),EntityPotionEffectEvent.Cause.TOTEM);
         entity.addEffect(new MobEffect(MobEffects.v,100,1),EntityPotionEffectEvent.Cause.TOTEM);
         entity.addEffect(new MobEffect(MobEffects.l,800,0),EntityPotionEffectEvent.Cause.TOTEM);
-        worldServer_updateState.invoke(entity,entity,32);
-//        NMSUtils.getNmsWorld(livingEntity.getWorld()).a(entity,(byte) 32);
+//        worldServer_updateState.invoke(NMSUtils.getNmsWorld(livingEntity.getWorld()),entity,(byte) 35);
+        NMSUtils.getNmsWorld(livingEntity.getWorld()).a(entity,(byte) 35); //这里不应该做成自适应，因为上面那个设置特效的还没完成自适应
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
