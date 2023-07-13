@@ -67,8 +67,6 @@ public abstract class Downloader extends Thread {
             //调用输入
             try (var input = conn.getInputStream()){
                 readInputStream(input);
-            }finally {
-                closed = true;
             }
             onDone();
         }catch (Exception e){

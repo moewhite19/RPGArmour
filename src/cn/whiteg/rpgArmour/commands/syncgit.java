@@ -18,6 +18,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -33,7 +34,7 @@ public class syncgit extends HasCommandInterface {
     Downloader downloader = null;
 
     @Override
-    public boolean executo(CommandSender sender,Command cmd,String label,String[] args) {
+    public boolean executo(@NotNull CommandSender sender,@NotNull Command cmd,@NotNull String label,String[] args) {
         final ConfigurationSection cs = Setting.getConfig().getConfigurationSection("SyncGit");
         if (cs == null) return false;
         String repo = cs.getString("repo");
@@ -82,6 +83,7 @@ public class syncgit extends HasCommandInterface {
                         if (file.exists()){
                             log("文件已存在,但仍然重新下载");
                         } else {
+                            //noinspection ResultOfMethodCallIgnored
                             file.createNewFile();
                         }
 
@@ -99,7 +101,7 @@ public class syncgit extends HasCommandInterface {
                         //输入重新打包
                         try (ZipInputStream zipInput = new ZipInputStream(inputStream);
                              OutputStream output = new FileOutputStream(file);
-                             ZipOutputStream zipOutput = new ZipOutputStream(output);
+                             ZipOutputStream zipOutput = new ZipOutputStream(output)
                         ){
                             //重新打包过程
                             ZipEntry entry;
@@ -188,7 +190,7 @@ public class syncgit extends HasCommandInterface {
     }
 
     @Override
-    public List<String> complete(CommandSender sender,Command cmd,String label,String[] args) {
+    public List<String> complete(@NotNull CommandSender sender,@NotNull Command cmd,@NotNull String label,String[] args) {
         if (args.length == 1){
             final ConfigurationSection sc = Setting.getStorage().getConfigurationSection("resourcepack");
             if (sc != null) return Collections.singletonList(sc.getString("url"));
