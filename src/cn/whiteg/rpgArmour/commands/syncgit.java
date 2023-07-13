@@ -9,6 +9,7 @@ import cn.whiteg.rpgArmour.utils.Downloader;
 import cn.whiteg.rpgArmour.utils.hashFile;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import net.md_5.bungee.api.chat.*;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -152,10 +153,16 @@ public class syncgit extends HasCommandInterface {
                         downloader = null;
                         super.close();
                     }
+
+                    @Override
+                    public void onDone() {
+                        sendpack.updateBoard();
+                    }
                 };
                 downloader.start();
             }
         };
+        downloader.start();
         if (sender instanceof Player p && p.isOnline()){
             try{
                 BossBar bar = Bukkit.createBossBar("下载进度",BarColor.WHITE,BarStyle.SOLID);

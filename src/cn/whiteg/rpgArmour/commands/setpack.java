@@ -94,6 +94,11 @@ public class setpack extends HasCommandInterface {
                     downloader = null;
                     super.close();
                 }
+
+                @Override
+                public void onDone() {
+                    sendpack.updateBoard();
+                }
             };
             downloader.start();
             if (sender instanceof Player){
