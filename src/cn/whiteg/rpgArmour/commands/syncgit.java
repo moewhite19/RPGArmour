@@ -45,16 +45,28 @@ public class syncgit extends HasCommandInterface {
             downloader.stop();
         }
 
-        //获取提交sha
+        //先获取提交sha值
         downloader = new Downloader(commitsUrl,sender) {
+            private String sha;
+
             @Override
             public void readInputStream(InputStream inputStream) throws IOException {
                 final byte[] bytes = inputStream.readAllBytes();
                 String raw = new String(bytes,StandardCharsets.UTF_8);
                 JsonElement jsonElement = JsonParser.parseString(raw);
                 jsonElement = jsonElement.getAsJsonArray().get(0);
-                final String sha = jsonElement.getAsJsonObject().get("sha").getAsString();
+                sha = jsonElement.getAsJsonObject().get("sha").getAsString();
                 log(sha);
+            }
+
+            @Override
+            public long getDownloaded() {
+                return 1;
+            }
+
+            //完成后再下载压缩包
+            @Override
+            public void onDone() {
                 File dir = new File(RPGArmour.plugin.slimeHttpServer.getRootDir(),"Resource");
                 if (!dir.exists()){
                     if (!dir.mkdirs()){
@@ -62,12 +74,8 @@ public class syncgit extends HasCommandInterface {
                         return;
                     }
                 }
-
-
                 //下载文件
                 downloader = new Downloader(downloadUrl,sender) {
-                    long downloaded = 0;
-
                     @Override
                     public void readInputStream(InputStream inputStream) throws IOException {
                         File file = new File(dir,sha.substring(0,7) + ".zip");
@@ -134,7 +142,7 @@ public class syncgit extends HasCommandInterface {
 
                     @Override
                     public long getDownloaded() {
-                        return downloaded;
+                        return 1;
                     }
 
                     @Override
@@ -143,16 +151,9 @@ public class syncgit extends HasCommandInterface {
                         super.close();
                     }
                 };
-                inputStream.close();
                 downloader.start();
             }
-
-            @Override
-            public long getDownloaded() {
-                return 1;
-            }
         };
-        downloader.start();
         if (sender instanceof Player p && p.isOnline()){
             try{
                 BossBar bar = Bukkit.createBossBar("下载进度",BarColor.WHITE,BarStyle.SOLID);
