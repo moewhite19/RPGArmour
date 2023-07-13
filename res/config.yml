@@ -80,3 +80,10 @@ HttpServer:
   serverUrl: 'http://0.0.0.0:1888'
   #http服务根目录
   serverDir: 'plugins/RPGArmour/http'
+
+#从github更新资源包
+SyncGit:
+  #仓库地址
+  repo: 'moewhite19/WhiteG-Resource'
+  #本地服务器地址
+  localhostURL: 'http://awsl.whiteg.cn:20203'

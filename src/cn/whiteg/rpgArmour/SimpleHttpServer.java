@@ -24,17 +24,17 @@ public class SimpleHttpServer implements HttpHandler {
     final private int maxCount;
     private final String dirAbsolutePath;
     AtomicInteger linkCount = new AtomicInteger(0);
-    File dir;
+    File root;
 
-    public SimpleHttpServer(File dir,URL url,long rateLimiting,int maxCount) throws IOException {
+    public SimpleHttpServer(File rootDir,URL url,long rateLimiting,int maxCount) throws IOException {
         this.rateLimiting = rateLimiting;
         this.maxCount = maxCount;
         server = HttpServer.create(new InetSocketAddress(url.getHost(),url.getPort()),0);
         server.createContext("/",this);
-        this.dir = dir;
-        if (!dir.exists()) //noinspection ResultOfMethodCallIgnored
-            dir.mkdirs();
-        dirAbsolutePath = dir.getAbsolutePath();
+        this.root = rootDir;
+        if (!rootDir.exists()) //noinspection ResultOfMethodCallIgnored
+            rootDir.mkdirs();
+        dirAbsolutePath = rootDir.getAbsolutePath();
         server.setExecutor(Executors.newCachedThreadPool()); //设置线程队列
         server.start();
         System.out.println("启动Http服务器: " + url + "#" + server.getExecutor());
@@ -60,7 +60,7 @@ public class SimpleHttpServer implements HttpHandler {
             linkCount.addAndGet(1);
             try (exchange){
                 final String path = exchange.getRequestURI().getPath();
-                File file = new File(dir,path);
+                File file = new File(root,path);
                 final String absolutePath = file.getAbsolutePath();
 //                System.out.println(Thread.currentThread() + "访问文件: " + absolutePath);
 //                System.out.println("请求头: ");
@@ -70,70 +70,74 @@ public class SimpleHttpServer implements HttpHandler {
 //                }
                 //防止下载目录外的文件
                 if (absolutePath.startsWith(dirAbsolutePath)){
-                    //文件存在
-                    BasicFileAttributes fileAttributes = Files.readAttributes(file.toPath(),BasicFileAttributes.class);
-                    if (file.exists() && fileAttributes.isRegularFile()){
-                        RateLimiter rateLimiter = this.rateLimiting > 0 ? RateLimiter.create(this.rateLimiting) : null;
-                        long length = fileAttributes.size();
-                        long start = 0;
-                        long end = length;
-
-                        final Headers responseHeaders = exchange.getResponseHeaders();
-
-                        //读取断点续传
-                        String range = requestHeaders.getFirst("Range");
-                        if (range != null && range.startsWith("bytes=")){
-//                            System.out.println("收到断点续传: " + range);
-                            range = range.substring(range.indexOf('=') + 1);
-                            final int index = range.indexOf('-');
-                            if (index > 0){
-                                String v = range.substring(0,index);
-                                if (!v.isBlank()) start = Long.parseLong(v);
-                                v = range.substring(index + 1);
-                                if (!v.isBlank()) end = Long.parseLong(v);
-                            } else {
-                                start = Long.parseLong(range);
-                            }
-                            length = Math.min(length,end - start);
-                        }
-
-
-                        responseHeaders.set("Content-length",String.valueOf(length));
-                        responseHeaders.set("Accept-Ranges","bytes");
-                        if (end != length){
-                            //断点续传
-                            range = "bytes " + start + "-" + end + "/" + length;
-//                            System.out.println("返回断点续传: " + range);
-                            responseHeaders.set("Content-Range",range);
-                            exchange.sendResponseHeaders(HttpURLConnection.HTTP_PARTIAL,length);
-                        } else {
-                            //完整下载
-                            exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK,length);
-                        }
-
-                        try (OutputStream output = exchange.getResponseBody(); InputStream input = new BufferedInputStream(new FileInputStream(file))){
-                            if (start > 0){
-                                long skip = input.skip(start);
-                                if (skip != start) System.out.println("想要跳过" + start + "只跳过了" + skip);
-                            }
-                            byte[] buff = new byte[2048];
-                            int len;
-                            while ((len = input.read(buff,0,Math.toIntExact(Math.min(length,buff.length)))) > 0) {
-                                //如果有限速处理限速
-                                if (rateLimiter != null && !rateLimiter.tryAcquire(len)){
-                                    while (!rateLimiter.tryAcquire(len)) {
-                                        sleep(1);
-                                    }
-                                }
-                                output.write(buff,0,len);
-                                length -= len;
-                            }
-
-                        }
-                    } else {
-                        exchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND,0);
-                    }
+                    exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST,0);
+                    return;
                 }
+                //文件存在
+                BasicFileAttributes fileAttributes = Files.readAttributes(file.toPath(),BasicFileAttributes.class);
+                if (file.exists() && fileAttributes.isRegularFile()){
+                    RateLimiter rateLimiter = this.rateLimiting > 0 ? RateLimiter.create(this.rateLimiting) : null;
+                    long length = fileAttributes.size();
+                    long start = 0;
+                    long end = length;
+
+                    final Headers responseHeaders = exchange.getResponseHeaders();
+
+                    //读取断点续传
+                    String range = requestHeaders.getFirst("Range");
+                    if (range != null && range.startsWith("bytes=")){
+//                            System.out.println("收到断点续传: " + range);
+                        range = range.substring(range.indexOf('=') + 1);
+                        final int index = range.indexOf('-');
+                        if (index > 0){
+                            String v = range.substring(0,index);
+                            if (!v.isBlank()) start = Long.parseLong(v);
+                            v = range.substring(index + 1);
+                            if (!v.isBlank()) end = Long.parseLong(v);
+                        } else {
+                            start = Long.parseLong(range);
+                        }
+                        length = Math.min(length,end - start);
+                    }
+
+
+                    responseHeaders.set("Content-length",String.valueOf(length));
+                    responseHeaders.set("Accept-Ranges","bytes");
+                    if (end != length){
+                        //断点续传
+                        range = "bytes " + start + "-" + end + "/" + length;
+//                            System.out.println("返回断点续传: " + range);
+                        responseHeaders.set("Content-Range",range);
+                        exchange.sendResponseHeaders(HttpURLConnection.HTTP_PARTIAL,length);
+                    } else {
+                        //完整下载
+                        exchange.sendResponseHeaders(HttpURLConnection.HTTP_OK,length);
+                    }
+
+                    try (OutputStream output = exchange.getResponseBody(); InputStream input = new BufferedInputStream(new FileInputStream(file))){
+                        //todo 这个断点续传好像没法工作捏
+                        if (start > 0){
+                            long skip = input.skip(start);
+                            if (skip != start) System.out.println("想要跳过" + start + "只跳过了" + skip);
+                        }
+                        byte[] buff = new byte[2048];
+                        int len;
+                        while ((len = input.read(buff,0,Math.toIntExact(Math.min(length,buff.length)))) > 0) {
+                            //如果有限速处理限速
+                            if (rateLimiter != null && !rateLimiter.tryAcquire(len)){
+                                while (!rateLimiter.tryAcquire(len)) {
+                                    sleep(1);
+                                }
+                            }
+                            output.write(buff,0,len);
+                            length -= len;
+                        }
+
+                    }
+                } else {
+                    exchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND,0);
+                }
+
             }catch (IOException e){
                 //客户端未下载完成
 //                    System.out.println(currentThread.getName() + "客户端下载未完成" + CommonUtils.tanSpace(schedule) + " : " + e.getMessage());
@@ -163,7 +167,20 @@ public class SimpleHttpServer implements HttpHandler {
         }
     }
 
+    public static void responseExchange(HttpExchange exchange,int code,String msg) throws IOException {
+        exchange.sendResponseHeaders(code,msg == null ? 0 : msg.length());
+        if (msg != null && !msg.isBlank()){
+            try (final OutputStream responseBody = exchange.getResponseBody(); final OutputStreamWriter writer = new OutputStreamWriter(responseBody)){
+                writer.write(msg);
+            }
+        }
+    }
+
     public HttpServer getServer() {
         return server;
+    }
+
+    public File getRootDir() {
+        return root;
     }
 }
