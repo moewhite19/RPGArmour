@@ -212,6 +212,6 @@ public class syncgit extends HasCommandInterface {
 
     @Override
     public String getDescription() {
-        return "设置资源包";
+        return "从github同步资源包";
     }
 }
