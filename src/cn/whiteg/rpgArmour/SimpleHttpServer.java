@@ -69,8 +69,8 @@ public class SimpleHttpServer implements HttpHandler {
 //                    System.out.println(entry.getKey() + ": " + entry.getValue().toString());
 //                }
                 //防止下载目录外的文件
-                if (absolutePath.startsWith(dirAbsolutePath)){
-                    exchange.sendResponseHeaders(HttpURLConnection.HTTP_BAD_REQUEST,0);
+                if (!absolutePath.startsWith(dirAbsolutePath)){
+                    responseExchange(exchange,HttpURLConnection.HTTP_BAD_REQUEST,"BAD_REQUEST");
                     return;
                 }
                 //文件存在
@@ -135,7 +135,7 @@ public class SimpleHttpServer implements HttpHandler {
 
                     }
                 } else {
-                    exchange.sendResponseHeaders(HttpURLConnection.HTTP_NOT_FOUND,0);
+                    responseExchange(exchange,HttpURLConnection.HTTP_NOT_FOUND,"not fond");
                 }
 
             }catch (IOException e){
