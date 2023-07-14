@@ -1,7 +1,7 @@
 name: RPGArmour
 description: RPGArmour
 main: cn.whiteg.rpgArmour.RPGArmour
-version: 1.0.1
+version: 1.0.2
 api-version: 1.16
 author: MoeWhite
 depend: [MMOCore, MoeInfo, ChanLang]
