@@ -184,9 +184,9 @@ public class syncgit extends HasCommandInterface {
                         long loaded = downloader.getDownloaded();
                         long speed = loaded - flag;
                         flag = loaded;
-                        float r = (float) ((double) loaded / (double) size);
                         bar.setTitle("下载进度" + CommonUtils.tanSpace(loaded) + "/" + CommonUtils.tanSpace(size) + "速度" + CommonUtils.tanSpace(speed));
-                        bar.setProgress(r);
+                        float r = (float) ((double) loaded / (double) size);
+                        bar.setProgress(r > 1 ? 1 : (r < 0 ? 0 : r));
                     }
                 }.runTaskTimerAsynchronously(RPGArmour.plugin,20,20);
             }catch (IllegalArgumentException | IllegalStateException e){

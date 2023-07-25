@@ -14,11 +14,9 @@ public class SpawnerReasonFix implements Listener {
         if (e instanceof Mob){
 //            RPGArmour.logger.info("刷怪笼生成" + e.getType());
             EntityEquipment ee = ((Mob) e).getEquipment();
-            if (ee != null){
-                ee.setHelmetDropChance(0F);
-                ee.setItemInMainHandDropChance(0f);
-                ee.setItemInOffHandDropChance(0F);
-            }
+            ee.setHelmetDropChance(0F);
+            ee.setItemInMainHandDropChance(0f);
+            ee.setItemInOffHandDropChance(0F);
         }
     }
 }
