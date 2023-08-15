@@ -6,7 +6,7 @@ import cn.whiteg.rpgArmour.Setting;
 import cn.whiteg.rpgArmour.manager.ResourcePackManage;
 import cn.whiteg.rpgArmour.utils.CommonUtils;
 import cn.whiteg.rpgArmour.utils.Downloader;
-import cn.whiteg.rpgArmour.utils.hashFile;
+import cn.whiteg.rpgArmour.utils.HashFile;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -76,8 +76,8 @@ public class setpack extends HasCommandInterface {
                         sha1Digest.update(buff,0,len);
                         md5Digest.update(buff,0,len);
                     }
-                    var sha1 = hashFile.bufferToHex(sha1Digest.digest());
-                    var md5 = hashFile.bufferToHex(md5Digest.digest());
+                    var sha1 = HashFile.bufferToHex(sha1Digest.digest());
+                    var md5 = HashFile.bufferToHex(md5Digest.digest());
                     log("Sha1为: " + sha1);
                     log("Md5为: " + md5);
                     ResourcePackManage.set(url,sha1);
