@@ -104,8 +104,9 @@ public class syncgit extends HasCommandInterface {
                              OutputStream output = new FileOutputStream(file){
                                  @Override
                                  public void write(int b) throws IOException {
-                                     sha1Digest.update((byte) b);
-                                     md5Digest.update((byte) b);
+                                     final byte h = (byte) b;
+                                     sha1Digest.update(h);
+                                     md5Digest.update(h);
                                      super.write(b);
                                  }
 
@@ -147,8 +148,18 @@ public class syncgit extends HasCommandInterface {
                         //打包完成后计算sha值
                         var sha1 = HashFile.bufferToHex(sha1Digest.digest());
                         var md5 = HashFile.bufferToHex(md5Digest.digest());
-//                        log("Sha1为: " + sha1);
-//                        log("Md5为: " + md5);
+//                        if(Setting.DEBUG){
+//                            log("Sha1为: " + sha1);
+//                            log("Md5为: " + md5);
+//                            try{
+//                                log("重新检测的结果为: ");
+                                  //偷个懒x,虽然会无意义的加载两次文件，但是这是现成的方法啊，这是测试代码啊
+//                                log("Sha1为: " + HashFile.getSha1(file));
+//                                log("Md5为: " + HashFile.getMD5(file));
+//                            }catch (NoSuchAlgorithmException e){
+//                                e.printStackTrace();
+//                            }
+//                        }
                         String realUrl = localHostURL + "/Resource/" + file.getName();
                         ResourcePackManage.set(realUrl,sha1);
                         ResourcePackManage.saveConfig(realUrl,sha1,md5);
