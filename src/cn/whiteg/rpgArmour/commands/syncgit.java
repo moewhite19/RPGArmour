@@ -6,10 +6,9 @@ import cn.whiteg.rpgArmour.Setting;
 import cn.whiteg.rpgArmour.manager.ResourcePackManage;
 import cn.whiteg.rpgArmour.utils.CommonUtils;
 import cn.whiteg.rpgArmour.utils.Downloader;
-import cn.whiteg.rpgArmour.utils.hashFile;
+import cn.whiteg.rpgArmour.utils.HashFile;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import net.md_5.bungee.api.chat.*;
 import org.bukkit.Bukkit;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
@@ -101,7 +100,29 @@ public class syncgit extends HasCommandInterface {
 
                         //输入重新打包
                         try (ZipInputStream zipInput = new ZipInputStream(inputStream);
-                             OutputStream output = new FileOutputStream(file);
+                             //重写OutputSteam流的写入方法，输出的过程插入md5和sha1效验检测
+                             OutputStream output = new FileOutputStream(file){
+                                 @Override
+                                 public void write(int b) throws IOException {
+                                     sha1Digest.update((byte) b);
+                                     md5Digest.update((byte) b);
+                                     super.write(b);
+                                 }
+
+                                 @Override
+                                 public void write(byte @NotNull [] b) throws IOException {
+                                     sha1Digest.update(b);
+                                     md5Digest.update(b);
+                                     super.write(b);
+                                 }
+
+                                 @Override
+                                 public void write(byte @NotNull [] b,int off,int len) throws IOException {
+                                     sha1Digest.update(b,off,len);
+                                     md5Digest.update(b,off,len);
+                                     super.write(b,off,len);
+                                 }
+                             };
                              ZipOutputStream zipOutput = new ZipOutputStream(output)
                         ){
                             //重新打包过程
@@ -123,21 +144,11 @@ public class syncgit extends HasCommandInterface {
                             }
                         }
 
-//
-
                         //打包完成后计算sha值
-                        try (InputStream in = new FileInputStream(file)){
-                            byte[] buff = new byte[2048];
-                            int read;
-                            while ((read = in.read(buff)) != -1) {
-                                sha1Digest.update(buff,0,read);
-                                md5Digest.update(buff,0,read);
-                            }
-                        }
-                        var sha1 = hashFile.bufferToHex(sha1Digest.digest());
-                        var md5 = hashFile.bufferToHex(md5Digest.digest());
-                        log("Sha1为: " + sha1);
-                        log("Md5为: " + md5);
+                        var sha1 = HashFile.bufferToHex(sha1Digest.digest());
+                        var md5 = HashFile.bufferToHex(md5Digest.digest());
+//                        log("Sha1为: " + sha1);
+//                        log("Md5为: " + md5);
                         String realUrl = localHostURL + "/Resource/" + file.getName();
                         ResourcePackManage.set(realUrl,sha1);
                         ResourcePackManage.saveConfig(realUrl,sha1,md5);
