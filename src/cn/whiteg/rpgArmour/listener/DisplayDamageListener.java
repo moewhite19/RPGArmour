@@ -48,8 +48,9 @@ public class DisplayDamageListener implements Listener {
         if (!(e instanceof Mob) && !(e instanceof HumanEntity)) return;
         final LivingEntity le = (LivingEntity) e;
         final String damagestr = damageToString(event);
-        if (event.getEntity() instanceof Player){
-            ActionBar.sendActionBar((Player) event.getEntity(),damagestr);
+        if (event.getEntity() instanceof Player player){
+//            ActionBar.sendActionBar((Player) event.getEntity(),damagestr);
+            player.sendActionBar(damagestr);
         }
 
         final List<Player> playerList = new ArrayList<>();

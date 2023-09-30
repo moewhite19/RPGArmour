@@ -1,22 +1,18 @@
 package cn.whiteg.rpgArmour.listener;
 
-import cn.whiteg.mmocore.reflection.MethodInvoker;
 import cn.whiteg.mmocore.util.NMSUtils;
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.event.PlayerDeathPreprocessEvent;
 import net.minecraft.advancements.CriterionTriggers;
 import net.minecraft.server.level.EntityPlayer;
-import net.minecraft.server.level.WorldServer;
 import net.minecraft.stats.StatisticList;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityLiving;
 import net.minecraft.world.item.Items;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftLivingEntity;
-import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,8 +24,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-
-import java.lang.reflect.Method;
 
 public class UndyingListener implements Listener {
 //    static MethodInvoker<Void> worldServer_updateState;

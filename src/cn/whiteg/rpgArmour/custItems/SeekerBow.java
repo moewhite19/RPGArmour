@@ -19,7 +19,7 @@ import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -234,7 +234,7 @@ public class SeekerBow extends CustItem_CustModle implements Listener {
                 loc.setY(loc.getY() + (target.getHeight() / 2));
                 selectorEntity.setLocation(loc);
                 if (lastTarget){
-                    selectorEntity.sendPacket(selectorEntity.cratePacketMount(target),player);
+                    PacketUnit.sendPacket(selectorEntity.cratePacketMount(target),player);
 //                    var p = selectorEntity.cratePacketEntityTeleport();
 //                    selectorEntity.sendPacket(p,player);
                 } else {

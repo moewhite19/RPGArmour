@@ -5,7 +5,7 @@ import cn.whiteg.mmocore.reflection.ReflectUtil;
 import cn.whiteg.mmocore.reflection.ReflectionFactory;
 import cn.whiteg.moepacketapi.utils.MethodInvoker;
 import cn.whiteg.rpgArmour.utils.EntityUtils;
-import cn.whiteg.rpgArmour.utils.Utils;
+import cn.whiteg.rpgArmour.utils.PacketUnit;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.PacketDataSerializer;
 import net.minecraft.network.chat.IChatBaseComponent;
@@ -19,11 +19,12 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.phys.Vec3D;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_20_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_20_R1.util.CraftVector;
+import org.bukkit.craftbukkit.v1_20_R2.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_20_R2.util.CraftVector;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
@@ -51,7 +52,7 @@ public abstract class EntityWrapper {
             data_b1 = ReflectionFactory.createFieldAccessor(ReflectUtil.getFieldFormType(DataWatcher.class,boolean.class)); //change???
 
             try{
-                dataWatcher_getItem = new MethodInvoker<>(DataWatcher.class.getDeclaredMethod("c",DataWatcherObject.class));
+//                dataWatcher_getItem = new MethodInvoker<>(DataWatcher.class.getDeclaredMethod("c",DataWatcherObject.class));
                 findMethod:
                 {
                     for (Method method : DataWatcher.class.getDeclaredMethods()) {
@@ -69,9 +70,6 @@ public abstract class EntityWrapper {
                 e.printStackTrace();
             }
 
-//            for (Method method : DataWatcher.class.getMethods()) {
-//
-//            }
             Objects.requireNonNull(dataWatcher_getItem);
             Field f;
             f = ReflectUtil.getFieldFormType(Entity.class,"net.minecraft.network.syncher.DataWatcherObject<java.lang.Byte>"); // flags
@@ -158,8 +156,8 @@ public abstract class EntityWrapper {
         for (Player player : players) {
             var np = EntityUtils.getNmsPlayer(player);
             var conn = EntityUtils.getPlayerConnection(np);
-            conn.a(p1);
-            if (p2 != null) conn.a(p2);
+            PacketUnit.sendPacket(p1,conn);
+            if (p2 != null) PacketUnit.sendPacket(p2,conn);
         }
         setVisble(players);
     }
@@ -197,12 +195,12 @@ public abstract class EntityWrapper {
     public void spawn(PlayerConnection pc) {
         var p1 = createPacketSpawnEntity();
         var p2 = createPacketEntityMetadata();
-        pc.a(p1);
-        if (p2 != null) pc.a(p2);
+        PacketUnit.sendPacket(p1,pc);
+        if (p2 != null) PacketUnit.sendPacket(p2,pc);
     }
 
     public void remove(Player player) {
-        Utils.sendPacket(createPacketEntityDestroy(),player);
+        PacketUnit.sendPacket(createPacketEntityDestroy(),player);
     }
 
     public DataWatcher getDataWatcher() {
@@ -216,7 +214,7 @@ public abstract class EntityWrapper {
         if (canVisble != null){
             var packet = createPacketEntityDestroy();
             playersForEach(player -> {
-                Utils.sendPacket(packet,player);
+                PacketUnit.sendPacket(packet,player);
             });
             canVisble = null;
         }
@@ -246,7 +244,7 @@ public abstract class EntityWrapper {
         this.location = location;
         if (canVisble != null){
             Packet<PacketListenerPlayOut> packet = cratePacketEntityTeleport();
-            playersForEach(player -> Utils.sendPacket(packet,player));
+            playersForEach(player -> PacketUnit.sendPacket(packet,player));
         }
     }
 
@@ -283,7 +281,7 @@ public abstract class EntityWrapper {
         }
         if (!list.contains(getEntityId())) list.add(getEntityId());
         int[] array = Arrays.stream(list.toArray(new Integer[0])).mapToInt(Integer::valueOf).toArray();
-        return new PacketPlayOutMount(new PacketDataSerializer(Unpooled.buffer()).d(entity.getEntityId()).a(array));
+        return new PacketPlayOutMount(new PacketDataSerializer(Unpooled.buffer()).c(entity.getEntityId()).a(array));
     }
 
     public Packet<PacketListenerPlayOut> createPacketEntityDestroy() {
@@ -303,7 +301,7 @@ public abstract class EntityWrapper {
             if (list == null) return;
             final PacketPlayOutEntityMetadata p = new PacketPlayOutEntityMetadata(entityId,list);
             playersForEach(player -> {
-                Utils.sendPacket(p,player);
+                PacketUnit.sendPacket(p,player);
             });
         }
     }
@@ -321,7 +319,7 @@ public abstract class EntityWrapper {
 
     public void setVector(Player player,Vector v) {
         final PacketPlayOutEntityVelocity p = new PacketPlayOutEntityVelocity(entityId,CraftVector.toNMS(v));
-        Utils.sendPacket(p,player);
+        PacketUnit.sendPacket(p,player);
     }
 
     public Vector getVector() {
@@ -330,7 +328,7 @@ public abstract class EntityWrapper {
 
     public void setVector(Player player) {
         final PacketPlayOutEntityVelocity p = new PacketPlayOutEntityVelocity(entityId,CraftVector.toNMS(vector));
-        Utils.sendPacket(p,player);
+        PacketUnit.sendPacket(p,player);
     }
 
     public void setVector(Vector v) {
@@ -338,7 +336,7 @@ public abstract class EntityWrapper {
         if (canVisble != null){
             final PacketPlayOutEntityVelocity p = new PacketPlayOutEntityVelocity(entityId,CraftVector.toNMS(v));
             playersForEach(player -> {
-                Utils.sendPacket(p,player);
+                PacketUnit.sendPacket(p,player);
             });
         }
     }
@@ -360,11 +358,12 @@ public abstract class EntityWrapper {
         byte flags = (byte) (1 << 5);
 
         //重写方法，不然会抛出null
+        //noinspection DataFlowIssue
         dataWatcher = new DataWatcher(null) {
             @Override
-            public <T> void b(DataWatcherObject<T> datawatcherobject,T value) {
+            public <T> void a(@NotNull DataWatcherObject<T> datawatcherobject,@NotNull T value,boolean force) {
                 Item<T> datawatcher_item = (Item<T>) dataWatcher_getItem.invoke(this,datawatcherobject);
-                if (org.apache.commons.lang3.ObjectUtils.notEqual(value,datawatcher_item.b())){
+                if (force || org.apache.commons.lang3.ObjectUtils.notEqual(value,datawatcher_item.b())){
                     datawatcher_item.a(value);
                     datawatcher_item.a(true);
                     data_b1.set(this,true);
@@ -379,9 +378,8 @@ public abstract class EntityWrapper {
         dataWatcher.a(displayName,Optional.empty());
     }
 
+    @Deprecated
     public void sendPacket(Packet<?> packet,Player player) {
-        EntityPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
-        var playerConnection = EntityUtils.getPlayerConnection(nmsPlayer);
-        playerConnection.a(packet);
+        PacketUnit.sendPacket(packet,player);
     }
 }

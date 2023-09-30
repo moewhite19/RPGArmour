@@ -16,7 +16,7 @@ import net.minecraft.world.entity.projectile.EntityProjectileThrowable;
 import net.minecraft.world.entity.projectile.EntitySnowball;
 import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.phys.Vec3D;
-import org.bukkit.craftbukkit.v1_20_R1.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack;
 import org.bukkit.entity.*;
 import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.bukkit.inventory.ItemStack;
@@ -177,15 +177,7 @@ public Vector3f bodyPose;
             Entity nmsEntity = getNmsEntity(entity);
             sizeField.set(nmsEntity,size);
             /*
-            @Deprecated
-            protected void cz() {
-                EntityPose entitypose = this.al();
-                EntitySize entitysize = this.a(entitypose);
-                this.be = entitysize;
-                this.bf = this.a(entitypose, entitysize);
-            }
-
-            public void c_() {
+            public void i_() {
                 EntitySize entitysize = this.be;
                 EntityPose entitypose = this.al();
                 EntitySize entitysize1 = this.a(entitypose);
@@ -204,13 +196,9 @@ public Vector3f bodyPose;
                 }
 
             }
-
-            public EnumDirection cA() {
-                return EnumDirection.a((double)this.dw());
-            }
-
              */
-            if (update) nmsEntity.c_();
+            //这个方法还是直接去Entity.class里搜索EntitySize关键词吧
+            if (update) nmsEntity.i_();
         }catch (IllegalAccessException e){
             e.printStackTrace();
         }
