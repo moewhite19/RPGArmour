@@ -8,7 +8,7 @@ import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.item.EntityItem;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 
 import java.lang.reflect.Field;
 

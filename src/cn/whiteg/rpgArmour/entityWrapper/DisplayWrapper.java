@@ -5,7 +5,7 @@ import net.minecraft.network.syncher.DataWatcherObject;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.ItemStack;
-import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 
 public abstract class DisplayWrapper extends EntityWrapper {
     static DataWatcherObject<ItemStack> ITEM;

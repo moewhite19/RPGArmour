@@ -14,7 +14,9 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import java.util.UUID;
 
 import static cn.whiteg.rpgArmour.RPGArmour.logger;
 
@@ -49,8 +51,11 @@ public class ResourcePackManage {
 
     public static void set(String url,String sha1,boolean require,String prompt) {
         DedicatedServer con = NMSUtils.getNmsServer();
+        final Optional<MinecraftServer.ServerResourcePackInfo> packInfo = Optional.of(new MinecraftServer.ServerResourcePackInfo(UUID.nameUUIDFromBytes(sha1.getBytes(StandardCharsets.UTF_8)),url,sha1,require,IChatBaseComponent.a(prompt)));
+        final DedicatedServerSettings serverSettings = server_setting.get(con);
+        final DedicatedServerProperties serverProperties = serverSetting_serverProp.get(serverSettings);
+        serverProp_ServerPackInfo.set(serverProperties,packInfo);
 //        con.u.a().S = Optional.of(new MinecraftServer.ServerResourcePackInfo(url,sha1,require,IChatBaseComponent.a(prompt)));
-        serverProp_ServerPackInfo.set(serverSetting_serverProp.get(server_setting.get(con)),Optional.of(new MinecraftServer.ServerResourcePackInfo(url,sha1,require,IChatBaseComponent.a(prompt))));
         logger.info("设置资源包 " + url + "  " + sha1);
     }
 

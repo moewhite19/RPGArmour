@@ -1,9 +1,13 @@
 package cn.whiteg.rpgArmour.listener;
 
+import cn.whiteg.mmocore.reflection.FieldAccessor;
+import cn.whiteg.mmocore.reflection.ReflectUtil;
+import cn.whiteg.mmocore.reflection.ReflectionFactory;
 import cn.whiteg.mmocore.util.NMSUtils;
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.event.PlayerDeathPreprocessEvent;
 import net.minecraft.advancements.CriterionTriggers;
+import net.minecraft.advancements.critereon.CriterionTriggerUsedTotem;
 import net.minecraft.server.level.EntityPlayer;
 import net.minecraft.stats.StatisticList;
 import net.minecraft.world.effect.MobEffect;
@@ -12,7 +16,7 @@ import net.minecraft.world.entity.EntityLiving;
 import net.minecraft.world.item.Items;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_20_R2.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -26,9 +30,16 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class UndyingListener implements Listener {
+    static CriterionTriggerUsedTotem triggerUsedTotem;
 //    static MethodInvoker<Void> worldServer_updateState;
 
     static {
+        try{
+            triggerUsedTotem = (CriterionTriggerUsedTotem) ReflectionFactory.createFieldAccessor(ReflectUtil.getFieldFormType(CriterionTriggers.class,CriterionTriggerUsedTotem.class)).get(null);
+        }catch (NoSuchFieldException e){
+            throw new RuntimeException(e);
+        }
+
         //这个暂时不用自适应
 //        findMethod:
 //        {
@@ -67,9 +78,9 @@ public class UndyingListener implements Listener {
 //    EntityLiving.class;
 
         var nmsItem = CraftItemStack.asNMSCopy(item);
-        if (nmsItem != null && entity instanceof EntityPlayer entityplayer) {
+        if (nmsItem != null && entity instanceof EntityPlayer entityplayer){
             entityplayer.b(StatisticList.c.b(Items.uz));
-            CriterionTriggers.B.a(entityplayer, nmsItem);
+            triggerUsedTotem.a(entityplayer,nmsItem);
         }
 
         livingEntity.setHealth(1.0f);
