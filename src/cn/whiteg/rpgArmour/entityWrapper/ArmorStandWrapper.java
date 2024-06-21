@@ -2,54 +2,83 @@ package cn.whiteg.rpgArmour.entityWrapper;
 
 import cn.whiteg.mmocore.reflection.ReflectUtil;
 import cn.whiteg.mmocore.util.NMSUtils;
-import net.minecraft.network.chat.IChatBaseComponent;
-import net.minecraft.network.syncher.DataWatcherObject;
-import net.minecraft.world.entity.EntityTypes;
-import net.minecraft.world.entity.decoration.EntityArmorStand;
-import net.minecraft.world.entity.item.EntityItem;
+import net.minecraft.core.Rotations;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.world.entity.decoration.ArmorStand;
 import org.bukkit.Location;
 
-import java.util.Optional;
-
+@SuppressWarnings("unchecked")
 public class ArmorStandWrapper extends LivingEntityWrapper {
-    static DataWatcherObject<Byte> marker;
-    private static EntityTypes<EntityItem> ITEM_TYPE;
+    static EntityDataAccessor<Byte> DATA_CLIENT_FLAGS;
+    static EntityDataAccessor<Rotations> DATA_HEAD_POSE;
+    static EntityDataAccessor<Rotations> DATA_BODY_POSE;
+    static EntityDataAccessor<Rotations> DATA_LEFT_ARM_POSE;
+    static EntityDataAccessor<Rotations> DATA_RIGHT_ARM_POSE;
+    static EntityDataAccessor<Rotations> DATA_LEFT_LEG_POSE;
+    static EntityDataAccessor<Rotations> DATA_RIGHT_LEG_POSE;
+    static final Rotations DEFAULT_HEAD_POSE;
+    static final Rotations DEFAULT_BODY_POSE;
+    static final Rotations DEFAULT_LEFT_ARM_POSE;
+    static final Rotations DEFAULT_RIGHT_ARM_POSE;
+    static final Rotations DEFAULT_LEFT_LEG_POSE;
+    static final Rotations DEFAULT_RIGHT_LEG_POSE;
 
     static {
+
+
         try{
-            //noinspection unchecked
-            marker = (DataWatcherObject<Byte>) ReflectUtil.getFieldFormType(EntityArmorStand.class,"net.minecraft.network.syncher.DataWatcherObject<java.lang.Byte>").get(null);
-            ITEM_TYPE = NMSUtils.getEntityType(EntityArmorStand.class);
+            DATA_CLIENT_FLAGS = (EntityDataAccessor<Byte>) ReflectUtil.getFieldAndAccessible(ArmorStand.class,"DATA_CLIENT_FLAGS").get(null);
+            DATA_HEAD_POSE = (EntityDataAccessor<Rotations>) ReflectUtil.getFieldAndAccessible(ArmorStand.class,"DATA_HEAD_POSE").get(null);
+            DATA_BODY_POSE = (EntityDataAccessor<Rotations>) ReflectUtil.getFieldAndAccessible(ArmorStand.class,"DATA_BODY_POSE").get(null);
+            DATA_LEFT_ARM_POSE = (EntityDataAccessor<Rotations>) ReflectUtil.getFieldAndAccessible(ArmorStand.class,"DATA_LEFT_ARM_POSE").get(null);
+            DATA_RIGHT_ARM_POSE = (EntityDataAccessor<Rotations>) ReflectUtil.getFieldAndAccessible(ArmorStand.class,"DATA_RIGHT_ARM_POSE").get(null);
+            DATA_LEFT_LEG_POSE = (EntityDataAccessor<Rotations>) ReflectUtil.getFieldAndAccessible(ArmorStand.class,"DATA_LEFT_LEG_POSE").get(null);
+            DATA_RIGHT_LEG_POSE = (EntityDataAccessor<Rotations>) ReflectUtil.getFieldAndAccessible(ArmorStand.class,"DATA_RIGHT_LEG_POSE").get(null);
+            DEFAULT_HEAD_POSE = (Rotations) ReflectUtil.getFieldAndAccessible(ArmorStand.class,"DEFAULT_HEAD_POSE").get(null);
+            DEFAULT_BODY_POSE = (Rotations) ReflectUtil.getFieldAndAccessible(ArmorStand.class,"DEFAULT_BODY_POSE").get(null);
+            DEFAULT_LEFT_ARM_POSE = (Rotations) ReflectUtil.getFieldAndAccessible(ArmorStand.class,"DEFAULT_LEFT_ARM_POSE").get(null);
+            DEFAULT_RIGHT_ARM_POSE = (Rotations) ReflectUtil.getFieldAndAccessible(ArmorStand.class,"DEFAULT_RIGHT_ARM_POSE").get(null);
+            DEFAULT_LEFT_LEG_POSE = (Rotations) ReflectUtil.getFieldAndAccessible(ArmorStand.class,"DEFAULT_LEFT_LEG_POSE").get(null);
+            DEFAULT_RIGHT_LEG_POSE = (Rotations) ReflectUtil.getFieldAndAccessible(ArmorStand.class,"DEFAULT_RIGHT_LEG_POSE").get(null);
         }catch (IllegalAccessException | NoSuchFieldException e){
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
+
     }
 
     public ArmorStandWrapper(Location location,String customName) {
-        super(ITEM_TYPE);
+        super(NMSUtils.getEntityType(ArmorStand.class));
         this.location = location;
         this.customName = customName;
+        getDataWatcherBuilder()
+                .define(DATA_CLIENT_FLAGS,(byte) 0)
+                .define(DATA_HEAD_POSE,DEFAULT_HEAD_POSE)
+                .define(DATA_BODY_POSE,DEFAULT_BODY_POSE)
+                .define(DATA_LEFT_ARM_POSE,DEFAULT_LEFT_ARM_POSE)
+                .define(DATA_RIGHT_ARM_POSE,DEFAULT_RIGHT_ARM_POSE)
+                .define(DATA_LEFT_LEG_POSE,DEFAULT_LEFT_LEG_POSE)
+                .define(DATA_RIGHT_LEG_POSE,DEFAULT_RIGHT_LEG_POSE);
         initDataWatcher();
     }
 
-    public void setMarker(boolean flag) {
-        final byte by = (byte) (flag ? 16 : 0);
-        dataWatcher.b(marker,by);
-//        sendUpdate();
+
+    public void setMarker(boolean marker) {
+        super.getDataWatcher().set(DATA_CLIENT_FLAGS,this.setBit(super.getDataWatcher().get(DATA_CLIENT_FLAGS),16,marker));
     }
 
-    /**
-     * Create a NMS data watcher object to send via a {@code PacketPlayOutEntityMetadata} packet.
-     * Gravity will be disabled and the custom name will be displayed if available.
-     */
+    public byte setBit(byte value,int bitField,boolean set) {
+        if (set){
+            value = (byte) (value | bitField);
+        } else {
+            value = (byte) (value & ~bitField);
+        }
+
+        return value;
+    }
+
+
     @Override
     public void initDataWatcher() {
         super.initDataWatcher();
-        if (customName != null){
-//            IChatBaseComponent ibc = ChatComponentScore.ChatSerializer.a(JsonBuilder.parse(customName).toString());
-            IChatBaseComponent ibc = IChatBaseComponent.a(customName);
-            dataWatcher.b(displayName,Optional.of(ibc));
-        }
-        dataWatcher.a(marker,(byte) 16); // marker
     }
 }

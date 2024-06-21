@@ -4,7 +4,7 @@ import cn.whiteg.mmocore.reflection.FieldAccessor;
 import cn.whiteg.mmocore.reflection.ReflectUtil;
 import cn.whiteg.mmocore.util.NMSUtils;
 import cn.whiteg.rpgArmour.Setting;
-import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.dedicated.DedicatedServer;
 import net.minecraft.server.dedicated.DedicatedServerProperties;
@@ -51,11 +51,11 @@ public class ResourcePackManage {
 
     public static void set(String url,String sha1,boolean require,String prompt) {
         DedicatedServer con = NMSUtils.getNmsServer();
-        final Optional<MinecraftServer.ServerResourcePackInfo> packInfo = Optional.of(new MinecraftServer.ServerResourcePackInfo(UUID.nameUUIDFromBytes(sha1.getBytes(StandardCharsets.UTF_8)),url,sha1,require,IChatBaseComponent.a(prompt)));
+        final Optional<MinecraftServer.ServerResourcePackInfo> packInfo = Optional.of(new MinecraftServer.ServerResourcePackInfo(UUID.nameUUIDFromBytes(sha1.getBytes(StandardCharsets.UTF_8)),url,sha1,require,Component.literal(prompt)));
         final DedicatedServerSettings serverSettings = server_setting.get(con);
         final DedicatedServerProperties serverProperties = serverSetting_serverProp.get(serverSettings);
         serverProp_ServerPackInfo.set(serverProperties,packInfo);
-//        con.u.a().S = Optional.of(new MinecraftServer.ServerResourcePackInfo(url,sha1,require,IChatBaseComponent.a(prompt)));
+//        con.u.a().S = Optional.of(new MinecraftServer.ServerResourcePackInfo(url,sha1,require,Component.a(prompt)));
         logger.info("设置资源包 " + url + "  " + sha1);
     }
 

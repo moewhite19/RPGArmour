@@ -1,22 +1,22 @@
 package cn.whiteg.rpgArmour.listener;
 
-import cn.whiteg.mmocore.reflection.FieldAccessor;
 import cn.whiteg.mmocore.reflection.ReflectUtil;
 import cn.whiteg.mmocore.reflection.ReflectionFactory;
 import cn.whiteg.mmocore.util.NMSUtils;
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.event.PlayerDeathPreprocessEvent;
-import net.minecraft.advancements.CriterionTriggers;
-import net.minecraft.advancements.critereon.CriterionTriggerUsedTotem;
-import net.minecraft.server.level.EntityPlayer;
-import net.minecraft.stats.StatisticList;
+import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.advancements.critereon.UsedTotemTrigger;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stats;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
-import net.minecraft.world.entity.EntityLiving;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.gameevent.GameEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,12 +30,12 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 public class UndyingListener implements Listener {
-    static CriterionTriggerUsedTotem triggerUsedTotem;
+    static UsedTotemTrigger triggerUsedTotem;
 //    static MethodInvoker<Void> worldServer_updateState;
 
     static {
         try{
-            triggerUsedTotem = (CriterionTriggerUsedTotem) ReflectionFactory.createFieldAccessor(ReflectUtil.getFieldFormType(CriterionTriggers.class,CriterionTriggerUsedTotem.class)).get(null);
+            triggerUsedTotem = (UsedTotemTrigger) ReflectionFactory.createFieldAccessor(ReflectUtil.getFieldFormType(CriteriaTriggers.class,UsedTotemTrigger.class)).get(null);
         }catch (NoSuchFieldException e){
             throw new RuntimeException(e);
         }
@@ -67,29 +67,28 @@ public class UndyingListener implements Listener {
     }
 
     public static void EntityResurrect(LivingEntity livingEntity,ItemStack item) {
-        EntityLiving entity = (EntityLiving) NMSUtils.getNmsEntity(livingEntity);
+        net.minecraft.world.entity.LivingEntity entity = (net.minecraft.world.entity.LivingEntity) NMSUtils.getNmsEntity(livingEntity);
 //        if (item != null){
-//            if (entity instanceof EntityPlayer entityplayer){
+//            if (entity instanceof ServerPlayer entityplayer){
 //                entityplayer.b(StatisticList.c.b(Items.TOTEM_OF_UNDYING));
 //                CriterionTriggers.B.a(entityplayer,nmsItem);
 //            }
 //        }
         //    抄自
 //    EntityLiving.class;
-
         var nmsItem = CraftItemStack.asNMSCopy(item);
-        if (nmsItem != null && entity instanceof EntityPlayer entityplayer){
-            entityplayer.b(StatisticList.c.b(Items.uz));
-            triggerUsedTotem.a(entityplayer,nmsItem);
+        if (nmsItem != null && entity instanceof ServerPlayer entityplayer){
+            entityplayer.awardStat(Stats.ITEM_USED.get(Items.TOTEM_OF_UNDYING));
+            CriteriaTriggers.USED_TOTEM.trigger(entityplayer,nmsItem);
+            entity.gameEvent(GameEvent.ITEM_INTERACT_FINISH);
         }
 
-        livingEntity.setHealth(1.0f);
-        entity.removeAllEffects(EntityPotionEffectEvent.Cause.TOTEM);
-        entity.addEffect(new MobEffect(MobEffects.j,900,1),EntityPotionEffectEvent.Cause.TOTEM);
-        entity.addEffect(new MobEffect(MobEffects.v,100,1),EntityPotionEffectEvent.Cause.TOTEM);
-        entity.addEffect(new MobEffect(MobEffects.l,800,0),EntityPotionEffectEvent.Cause.TOTEM);
-//        worldServer_updateState.invoke(NMSUtils.getNmsWorld(livingEntity.getWorld()),entity,(byte) 35);
-        NMSUtils.getNmsWorld(livingEntity.getWorld()).a(entity,(byte) 35); //这里不应该做成自适应，因为上面那个设置特效的还没完成自适应
+        entity.setHealth(1.0F);
+        entity.removeAllEffects(org.bukkit.event.entity.EntityPotionEffectEvent.Cause.TOTEM);
+        entity.addEffect(new MobEffectInstance(MobEffects.REGENERATION,900,1),org.bukkit.event.entity.EntityPotionEffectEvent.Cause.TOTEM);
+        entity.addEffect(new MobEffectInstance(MobEffects.ABSORPTION,100,1),org.bukkit.event.entity.EntityPotionEffectEvent.Cause.TOTEM);
+        entity.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE,800,0),org.bukkit.event.entity.EntityPotionEffectEvent.Cause.TOTEM);
+        entity.level().broadcastEntityEvent(entity,(byte) 35);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

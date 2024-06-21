@@ -20,9 +20,12 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityMountEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.MainHand;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -30,7 +33,7 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.bukkit.util.NumberConversions;
-import org.spigotmc.event.entity.EntityMountEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 
@@ -73,6 +76,17 @@ BambooDragonfly extends CustItem_CustModle implements Listener {
     public void onBreakBlock(BlockBreakEvent event) {
         final PlayerInventory pi = event.getPlayer().getInventory();
         if (is(pi.getItemInMainHand()) || is(pi.getItemInOffHand())) event.setCancelled(true);
+    }
+
+    //限制使用竹蜻蜓时使用重锤
+    @EventHandler(ignoreCancelled = true)
+    public void onDamage(EntityDamageByEntityEvent event) {
+        if (event.getDamager() instanceof Player player){
+            ItemStack hand = player.getInventory().getItemInMainHand();
+            if (hand.getType() == Material.MACE && player.hasCooldown(Material.MACE)){
+                event.setCancelled(true);
+            }
+        }
     }
 
     @EventHandler
@@ -262,7 +276,8 @@ BambooDragonfly extends CustItem_CustModle implements Listener {
 
         if (player.hasPotionEffect(PotionEffectType.DARKNESS)) return false;
 
-        return player.getWorld().getBiome(player.getLocation()) != Biome.DEEP_DARK;
+        final Biome biome = player.getWorld().getBiome(player.getLocation());
+        return biome != Biome.DEEP_DARK;
     }
 
 
@@ -350,8 +365,8 @@ BambooDragonfly extends CustItem_CustModle implements Listener {
 //                pi.setChestplate(null);
 //                player.getWorld().dropItem(l,he);
 //            }
-
             stopSound.playTo(l);
+            player.setCooldown(Material.MACE,200);
             activate = false;
             flag = 10;
         }
@@ -360,10 +375,11 @@ BambooDragonfly extends CustItem_CustModle implements Listener {
             if (player.getAllowFlight()) return;
             if (!canFlyin(player)) return;
 
-            ItemStack chestplate = player.getInventory().getChestplate();
-            if (chestplate != null && chestplate.getType() == Material.ELYTRA){
-                return;
-            }
+//限制这个没有用
+//            ItemStack chestplate = player.getInventory().getChestplate();
+//            if (chestplate != null && chestplate.getType() == Material.ELYTRA){
+//                return;
+//            }
 
             if (!hasItem()) return;
             ItemMeta im = item.getItemMeta();

@@ -3,26 +3,26 @@ package cn.whiteg.rpgArmour.entityWrapper;
 
 import cn.whiteg.mmocore.reflection.ReflectUtil;
 import cn.whiteg.mmocore.util.NMSUtils;
-import net.minecraft.network.syncher.DataWatcherObject;
-import net.minecraft.world.entity.EntityTypes;
-import net.minecraft.world.entity.item.EntityItem;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 
 import java.lang.reflect.Field;
 
 public class DropItem extends EntityWrapper {
-    static DataWatcherObject<ItemStack> ITEM;
-    static EntityTypes<EntityItem> ITEM_TYPE;
+    static EntityDataAccessor<ItemStack> DATA_ITEM;
+    static EntityType<ItemEntity> ITEM_TYPE;
 
     static {
         try{
-            Field f = ReflectUtil.getFieldFormType(EntityItem.class,DataWatcherObject.class);
+            Field f = ReflectUtil.getFieldFormType(ItemEntity.class,EntityDataAccessor.class);
             f.setAccessible(true);
             //noinspection unchecked
-            ITEM = (DataWatcherObject<ItemStack>) f.get(null);
-            ITEM_TYPE = NMSUtils.getEntityType(EntityItem.class);
+            DATA_ITEM = (EntityDataAccessor<ItemStack>) f.get(null);
+            ITEM_TYPE = NMSUtils.getEntityType(ItemEntity.class);
         }catch (IllegalAccessException | NoSuchFieldException e){
             e.printStackTrace();
         }
@@ -34,6 +34,7 @@ public class DropItem extends EntityWrapper {
         super(ITEM_TYPE);
         this.location = location;
         nmsItem = CraftItemStack.asNMSCopy(item);
+        getDataWatcherBuilder().define(DATA_ITEM,ItemStack.EMPTY);
         initDataWatcher();
 //        setItemStack(item);
     }
@@ -41,7 +42,7 @@ public class DropItem extends EntityWrapper {
     @Override
     public void initDataWatcher() {
         super.initDataWatcher();
-        dataWatcher.a(ITEM,nmsItem);
+        dataWatcher.set(DATA_ITEM,nmsItem);
     }
 
     public org.bukkit.inventory.ItemStack getItemStack() {
@@ -50,6 +51,6 @@ public class DropItem extends EntityWrapper {
 
     public void setItemStack(org.bukkit.inventory.ItemStack item) {
         nmsItem = CraftItemStack.asNMSCopy(item);
-        dataWatcher.b(ITEM,nmsItem);
+        dataWatcher.set(DATA_ITEM,nmsItem);
     }
 }

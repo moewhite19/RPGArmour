@@ -23,7 +23,7 @@ public class setsize extends HasCommandInterface {
                     sender.sendMessage("找不到实体");
                     return false;
                 }
-                EntityUtils.setEntitySize(entity,r,r,true);
+                EntityUtils.setEntityDimensions(entity,r,r,true);
             } else if (args.length == 2){
                 float w = Float.parseFloat(args[0]);
                 float h = Float.parseFloat(args[1]);
@@ -33,7 +33,7 @@ public class setsize extends HasCommandInterface {
                     sender.sendMessage("找不到实体");
                     return false;
                 }
-                EntityUtils.setEntitySize(entity,w,h,true);
+                EntityUtils.setEntityDimensions(entity,w,h,true);
             }
         }catch (NumberFormatException e){
             sender.sendMessage("参数有误");

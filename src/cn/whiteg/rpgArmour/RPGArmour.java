@@ -49,11 +49,10 @@ public class RPGArmour extends PluginBase {
 
     public void onEnable() {
 //        guiManager = new GUIManager(this); 待开发
+        mmoCore = MMOCore.plugin;
         recipeManage = new RecipeManage(this);
         itemManager = new CustItemManager();
         entityManager = new CustEntityManager();
-        if (Bukkit.getPluginManager().getPlugin("MMOCore") != null)
-            mmoCore = MMOCore.plugin;
         regListener(new PlayerItemEatListener());
         regListener(new RideListenetr());
         regListener(new UndyingListener());

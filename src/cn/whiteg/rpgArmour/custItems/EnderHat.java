@@ -1,17 +1,14 @@
 package cn.whiteg.rpgArmour.custItems;
 
+import cn.whiteg.mmocore.util.NMSUtils;
 import cn.whiteg.rpgArmour.Setting;
 import cn.whiteg.rpgArmour.api.CustItem_CustModle;
-import cn.whiteg.rpgArmour.mapper.EntityMapper;
 import cn.whiteg.rpgArmour.utils.EntityUtils;
 import cn.whiteg.rpgArmour.utils.ItemToolUtil;
 import cn.whiteg.rpgArmour.utils.RandomUtil;
-import net.minecraft.sounds.SoundCategory;
-import net.minecraft.sounds.SoundEffects;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityLiving;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
@@ -66,29 +63,31 @@ public class EnderHat extends CustItem_CustModle implements Listener {
         double d0 = loc.getX();
         double d1 = loc.getY();
         double d2 = loc.getZ();
-        EntityMapper em = new EntityMapper(entity);
-        EntityLiving entityliving = (EntityLiving) em.getEntity();
+
+        net.minecraft.world.entity.LivingEntity entityliving = (net.minecraft.world.entity.LivingEntity) NMSUtils.getNmsEntity(entity);
+
+
         for (int i = 0; i < 16; ++i) {
             var random = getEntityRandom(entityliving);
-            double d3 = d0 + (random.j() - 0.5D) * 16.0D;
+            double d3 = d0 + (random.nextDouble() - 0.5D) * 16.0D;
             Location l = entity.getLocation();
-            double d4 = MathHelper.a(l.getY() + (double) (random.a(16) - 8),0.0D,entity.getWorld().getMaxHeight() - 1);
-            double d5 = l.getZ() + (random.j() - 0.5D) * 16.0D;
+            double d4 = Mth.length(l.getY() + (double) (random.nextInt(16) - 8),0.0D,entity.getWorld().getMaxHeight() - 1);
+            double d5 = l.getZ() + (random.nextDouble() - 0.5D) * 16.0D;
             if (entity.getVehicle() != null){
 //                entity.getVehicle().removePassenger(entityliving.getBukkitEntity());
                 entityliving.stopRiding(true);
             }
 
-            if (entityliving.b(d3,d4,d5,true)){
+            if (entityliving.randomTeleport(d3,d4,d5,true)){
                 //item.chorus_fruit.teleport
-                em.getWorld().a(d0,
-                        d1,
-                        d2,
-                        SoundEffects.cV,
-                        SoundCategory.h,
-                        1.0F,
-                        1.0F,
-                        false);
+//                entityliving.level().addParticle(d0,
+//                        d1,
+//                        d2,
+//                        SoundEffects.cV,
+//                        SoundCategory.h,
+//                        1.0F,
+//                        1.0F,
+//                        false);
 //                entityliving.a(SoundEffects.cV,1.0F,1.0F);
                 if (hat != null && ItemToolUtil.damage(hat,2)){
                     le.setHelmet(null);

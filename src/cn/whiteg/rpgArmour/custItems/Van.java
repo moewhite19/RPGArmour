@@ -1,11 +1,11 @@
 package cn.whiteg.rpgArmour.custItems;
 
 import cn.whiteg.rpgArmour.api.CustItem_CustModle;
-import net.minecraft.world.entity.EntityCreature;
-import net.minecraft.world.entity.EntityInsentient;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.PathfinderMob;
 import org.bukkit.Material;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftCreature;
-import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.entity.CraftCreature;
+import org.bukkit.craftbukkit.entity.CraftPlayer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -48,56 +48,6 @@ public class Van extends CustItem_CustModle implements Listener {
         }
 //        RPGArmour.logger.info(p.getName());
     }
-
-    //测试实体AI操作
-    //@EventHandler(ignoreCancelled = true)
-    public void onReClickEntity(EntityDamageByEntityEvent event) {
-        if (!(event.getEntity() instanceof LivingEntity) || !(event.getDamager() instanceof Player p)) return;
-        if (event.getCause() != EntityDamageEvent.DamageCause.ENTITY_ATTACK) return;
-        PlayerInventory pi = p.getInventory();
-        if (!is(pi.getItemInMainHand())) return;
-        Entity entity = event.getEntity();
-        if (entity instanceof CraftCreature){
-            LivingEntity e = (LivingEntity) entity;
-            EntityCreature nmsEntity = ((CraftCreature) e).getHandle();
-            //PathfinderGoalSelector
-//            nmsEntity.bQ.a(1,new PathfinderGoalMeleeAttack(nmsEntity,1.0D,true));
-
-            event.setCancelled(true);
-            try{
-                Field f = EntityInsentient.class.getDeclaredField("bO");//ControllerJump
-                f.setAccessible(true);
-                f.set(nmsEntity,((CraftPlayer) p).getHandle());
-                event.setCancelled(true);
-            }catch (NoSuchFieldException | IllegalAccessException ex){
-                ex.printStackTrace();
-            }
-                /*
-                //实体跳跃
-                try{
-                    Field f = EntityInsentient.class.getDeclaredField("bq");
-                    f.setAccessible(true);
-                    ControllerJump jump = (ControllerJump) f.get(fe);
-                    jump.jump();
-                    event.setCancelled(true);
-                }catch (NoSuchFieldException | IllegalAccessException ex){
-                    ex.printStackTrace();
-                }*/
-
-                /*
-                //设置实体目标
-                try{
-                    Field f = EntityInsentient.class.getDeclaredField("goalTarget");
-                    f.setAccessible(true);
-                    f.set(fe,((CraftPlayer) p).getHandle());
-                    event.setCancelled(true);
-                }catch (NoSuchFieldException | IllegalAccessException ex){
-                    ex.printStackTrace();
-                }
-                */
-        }
-    }
-
 //    @EventHandler(ignoreCancelled = true)
 //    public void onReClickEntity(EntityDamageByEntityEvent event) {
 //        if (!(event.getEntity() instanceof LivingEntity) || !(event.getDamager() instanceof Player)) return;
@@ -108,7 +58,7 @@ public class Van extends CustItem_CustModle implements Listener {
 //        LivingEntity livent = (LivingEntity) event.getEntity();
 ////            livent.setLeashHolder(player);
 //        ActionBar.sendActionBar(player,"拴上实体");
-//        final EntityPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
+//        final ServerPlayer nmsPlayer = ((CraftPlayer) player).getHandle();
 //        final EntityFishingHook fishingHook = new EntityFishingHook(nmsPlayer,nmsPlayer.getWorld(),0,0);
 //        final Location loc = player.getLocation();
 ////        fishingHook.locX = loc.getX();

@@ -3,26 +3,29 @@ package cn.whiteg.rpgArmour.entityWrapper;
 import cn.whiteg.mmocore.reflection.FieldAccessor;
 import cn.whiteg.mmocore.reflection.ReflectUtil;
 import cn.whiteg.mmocore.reflection.ReflectionFactory;
+import cn.whiteg.mmocore.util.NMSUtils;
 import cn.whiteg.moepacketapi.utils.MethodInvoker;
+import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.utils.EntityUtils;
 import cn.whiteg.rpgArmour.utils.PacketUnit;
 import io.netty.buffer.Unpooled;
-import net.minecraft.network.PacketDataSerializer;
-import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.*;
-import net.minecraft.network.syncher.DataWatcher;
-import net.minecraft.network.syncher.DataWatcherObject;
-import net.minecraft.server.network.PlayerConnection;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.SyncedDataHolder;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.util.ClassTreeIdRegistry;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityTypes;
-import net.minecraft.world.phys.Vec3D;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Pose;
+import net.minecraft.world.phys.Vec3;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_20_R3.util.CraftVector;
-import org.bukkit.entity.EntityType;
+import org.bukkit.craftbukkit.util.CraftVector;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
@@ -32,30 +35,41 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 @SuppressWarnings("unchecked")
-public abstract class EntityWrapper {
+public abstract class EntityWrapper implements SyncedDataHolder {
     static FieldAccessor<Boolean> data_b1;
-    static MethodInvoker<DataWatcher.Item<?>> dataWatcher_getItem;
-    static MethodInvoker<List<DataWatcher.b<?>>> dataWatcher_packAll;
-    static DataWatcherObject<Byte> flags;
-    static DataWatcherObject<Integer> air_tick;
-    static DataWatcherObject<Boolean> name_visible;
-    static DataWatcherObject<Boolean> silent;
-    static DataWatcherObject<Boolean> noGravity;
-    static DataWatcherObject<Optional<IChatBaseComponent>> displayName;
+//    static FieldAccessor<Integer> PacketPassengersVehicleId;
+//    static FieldAccessor<int[]> PacketPassengersArrays;
+
+
+    static MethodInvoker<SynchedEntityData.DataItem<?>> dataWatcher_getItem;
+
+    static EntityDataAccessor<Byte> DATA_SHARED_FLAGS_ID;
+    static EntityDataAccessor<Boolean> DATA_CUSTOM_NAME_VISIBLE;
+    static EntityDataAccessor<Boolean> DATA_NO_GRAVITY;
+    static EntityDataAccessor<Integer> DATA_AIR_SUPPLY_ID;
+    static EntityDataAccessor<Optional<Component>> DATA_CUSTOM_NAME;
+    static EntityDataAccessor<Boolean> DATA_SILENT;
+    static EntityDataAccessor<Pose> DATA_POSE;
+    static EntityDataAccessor<Integer> DATA_TICKS_FROZEN;
+    SynchedEntityData.Builder dataWatcherBuilder;
     public final static AtomicInteger ENTITY_COUNT;
+
+
+    static FieldAccessor<SynchedEntityData.DataItem<?>[]> dataWatchBuilerById;
+    static ClassTreeIdRegistry ID_REGISTRY;
 
 
     static {
         try{
-            data_b1 = ReflectionFactory.createFieldAccessor(ReflectUtil.getFieldFormType(DataWatcher.class,boolean.class)); //change???
+            data_b1 = (FieldAccessor<Boolean>) ReflectionFactory.createFieldAccessor(ReflectUtil.getFieldFormType(SynchedEntityData.DataItem.class,boolean.class)); //change???
 
             try{
-//                dataWatcher_getItem = new MethodInvoker<>(DataWatcher.class.getDeclaredMethod("c",DataWatcherObject.class));
+//                dataWatcher_getItem = new MethodInvoker<>(DataWatcher.class.getDeclaredMethod("c",EntityDataAccessor.class));
                 findMethod:
                 {
-                    for (Method method : DataWatcher.class.getDeclaredMethods()) {
+                    for (Method method : SynchedEntityData.class.getDeclaredMethods()) {
                         final Class<?>[] types = method.getParameterTypes();
-                        if (types.length == 1 && DataWatcherObject.class.isAssignableFrom(types[0]) && DataWatcher.Item.class.isAssignableFrom(method.getReturnType())){
+                        if (types.length == 1 && EntityDataAccessor.class.isAssignableFrom(types[0]) && SynchedEntityData.DataItem.class.isAssignableFrom(method.getReturnType())){
                             dataWatcher_getItem = new MethodInvoker<>(method);
                             break findMethod;
                         }
@@ -63,49 +77,28 @@ public abstract class EntityWrapper {
                     throw new NoSuchMethodException();
                 }
 
-                dataWatcher_packAll = new MethodInvoker<>(DataWatcher.class.getDeclaredMethod("packAll"));
+                dataWatchBuilerById = new FieldAccessor<>(SynchedEntityData.Builder.class.getDeclaredField("itemsById"));
+                final Field field = SynchedEntityData.class.getDeclaredField("ID_REGISTRY");
+                field.setAccessible(true);
+                ID_REGISTRY = (ClassTreeIdRegistry) field.get(null);
+
+//                PacketPassengersVehicleId = new FieldAccessor<>(ClientboundSetPassengersPacket.class.getDeclaredField("vehicle"));
+//                PacketPassengersArrays = new FieldAccessor<>(ClientboundSetPassengersPacket.class.getDeclaredField("passengers"));
             }catch (NoSuchMethodException e){
                 e.printStackTrace();
             }
 
             Objects.requireNonNull(dataWatcher_getItem);
-            Field f;
-            f = ReflectUtil.getFieldFormType(Entity.class,"net.minecraft.network.syncher.DataWatcherObject<java.lang.Byte>"); // flags
-            f.setAccessible(true);
-            flags = (DataWatcherObject<Byte>) f.get(null);
 
-            f = ReflectUtil.getFieldFormType(Entity.class,"net.minecraft.network.syncher.DataWatcherObject<java.lang.Integer>"); //Air Ticks???
-            f.setAccessible(true);
-            air_tick = (DataWatcherObject<Integer>) f.get(null);
+            DATA_SHARED_FLAGS_ID = (EntityDataAccessor<Byte>) ReflectUtil.getFieldAndAccessible(Entity.class,"DATA_SHARED_FLAGS_ID").get(null);
+            DATA_AIR_SUPPLY_ID = (EntityDataAccessor<Integer>) ReflectUtil.getFieldAndAccessible(Entity.class,"DATA_AIR_SUPPLY_ID").get(null);
+            DATA_CUSTOM_NAME_VISIBLE = (EntityDataAccessor<Boolean>) ReflectUtil.getFieldAndAccessible(Entity.class,"DATA_CUSTOM_NAME_VISIBLE").get(null);
+            DATA_SILENT = (EntityDataAccessor<Boolean>) ReflectUtil.getFieldAndAccessible(Entity.class,"DATA_SILENT").get(null);
+            DATA_NO_GRAVITY = (EntityDataAccessor<Boolean>) ReflectUtil.getFieldAndAccessible(Entity.class,"DATA_NO_GRAVITY").get(null);
+            DATA_CUSTOM_NAME = (EntityDataAccessor<Optional<Component>>) ReflectUtil.getFieldAndAccessible(Entity.class,"DATA_CUSTOM_NAME").get(null);
+            DATA_POSE = (EntityDataAccessor<Pose>) ReflectUtil.getFieldAndAccessible(Entity.class,"DATA_POSE").get(null);
+            DATA_TICKS_FROZEN = (EntityDataAccessor<Integer>) ReflectUtil.getFieldAndAccessible(Entity.class,"DATA_TICKS_FROZEN").get(null);
 
-            f = ReflectUtil.getFieldFormType(Entity.class,"net.minecraft.network.syncher.DataWatcherObject<java.util.Optional<net.minecraft.network.chat.IChatBaseComponent>>"); // custom name
-
-            f.setAccessible(true);
-            displayName = (DataWatcherObject<Optional<IChatBaseComponent>>) f.get(null);
-
-            var fields = Entity.class.getDeclaredFields();
-            int end = fields.length - 3;
-            loom:
-            for (int i = 0; i < end; i++) {
-                for (int j = 0; j < 3; j++) {
-                    f = fields[i + j];
-                    if (!f.getAnnotatedType().getType().getTypeName().equals("net.minecraft.network.syncher.DataWatcherObject<java.lang.Boolean>")){
-                        continue loom;
-                    }
-                }
-                f = fields[i]; // custom name visible
-                f.setAccessible(true);
-                name_visible = (DataWatcherObject<Boolean>) f.get(null);
-
-                f = fields[i + 1]; // silent
-                f.setAccessible(true);
-                silent = (DataWatcherObject<Boolean>) f.get(null);
-                f.setAccessible(true);
-
-                f = fields[i + 2];// no gravitysilent
-                f.setAccessible(true);
-                noGravity = (DataWatcherObject<Boolean>) f.get(null);
-            }
 
             //AtomicInteger
             Field count_f = ReflectUtil.getFieldFormType(Entity.class,AtomicInteger.class);
@@ -119,21 +112,34 @@ public abstract class EntityWrapper {
     final Random random = new Random();
     final UUID uuid;
     final int entityId;
-    public DataWatcher dataWatcher;
-    EntityTypes<? extends Entity> entityType;
+    public SynchedEntityData dataWatcher;
+    net.minecraft.world.entity.EntityType<? extends Entity> entityType;
     Collection<Player> canVisble = null;
     Location location;
     String customName;
     Vector vector;
 
-    public EntityWrapper(EntityTypes<? extends Entity> entityType) {
+
+    public EntityWrapper(net.minecraft.world.entity.EntityType<? extends Entity> entityType) {
         this.entityType = entityType;
         this.entityId = ENTITY_COUNT.incrementAndGet();
         uuid = new UUID(random.nextLong(),System.currentTimeMillis());
+        dataWatcherBuilder = new SynchedEntityData.Builder(this);
+        dataWatchBuilerById.set(dataWatcherBuilder,new SynchedEntityData.DataItem[ID_REGISTRY.getCount(NMSUtils.getEntityClass(entityType))]);
+        dataWatcherBuilder
+                .define(DATA_SHARED_FLAGS_ID,(byte) 0)
+                .define(DATA_AIR_SUPPLY_ID,300)
+                .define(DATA_CUSTOM_NAME_VISIBLE,false)
+                .define(DATA_CUSTOM_NAME,Optional.empty())
+                .define(DATA_SILENT,false)
+                .define(DATA_NO_GRAVITY,false)
+                .define(DATA_POSE,Pose.STANDING)
+                .define(DATA_TICKS_FROZEN,0);
+
     }
 
-    public static PacketDataSerializer createDataSerializer() {
-        return new PacketDataSerializer(Unpooled.buffer());
+    public static FriendlyByteBuf createDataSerializer() {
+        return new FriendlyByteBuf(Unpooled.buffer());
     }
 
     public void setVisible(Player player,boolean visible) {
@@ -150,10 +156,10 @@ public abstract class EntityWrapper {
 
     public void playerShow(Collection<Player> players) {
         var p1 = createPacketSpawnEntity();
-        Packet<PacketListenerPlayOut> p2 = createPacketEntityMetadata();
+        Packet<ClientGamePacketListener> p2 = createPacketEntityMetadata();
         for (Player player : players) {
             var np = EntityUtils.getNmsPlayer(player);
-            var conn = EntityUtils.getPlayerConnection(np);
+            var conn = EntityUtils.getServerGamePacketListenerImpl(np);
             PacketUnit.sendPacket(p1,conn);
             if (p2 != null) PacketUnit.sendPacket(p2,conn);
         }
@@ -178,19 +184,19 @@ public abstract class EntityWrapper {
         return canVisble.contains(p);
     }
 
-    public EntityTypes<? extends Entity> getEntityType() {
+    public EntityType<? extends Entity> getEntityType() {
         return entityType;
     }
 
-    public void setEntityType(EntityTypes<? extends Entity> entityType) {
+    public void setEntityType(EntityType<? extends Entity> entityType) {
         this.entityType = entityType;
     }
 
     public void spawn(Player player) {
-        spawn(EntityUtils.getPlayerConnection(EntityUtils.getNmsPlayer(player)));
+        spawn(EntityUtils.getServerGamePacketListenerImpl(EntityUtils.getNmsPlayer(player)));
     }
 
-    public void spawn(PlayerConnection pc) {
+    public void spawn(ServerGamePacketListenerImpl pc) {
         var p1 = createPacketSpawnEntity();
         var p2 = createPacketEntityMetadata();
         PacketUnit.sendPacket(p1,pc);
@@ -201,7 +207,7 @@ public abstract class EntityWrapper {
         PacketUnit.sendPacket(createPacketEntityDestroy(),player);
     }
 
-    public DataWatcher getDataWatcher() {
+    public SynchedEntityData getDataWatcher() {
         if (dataWatcher == null){
             initDataWatcher();
         }
@@ -241,36 +247,36 @@ public abstract class EntityWrapper {
     public void setLocation(Location location) {
         this.location = location;
         if (canVisble != null){
-            Packet<PacketListenerPlayOut> packet = cratePacketEntityTeleport();
+            Packet<ClientGamePacketListener> packet = cratePacketEntityTeleport();
             playersForEach(player -> PacketUnit.sendPacket(packet,player));
         }
     }
 
     /**
      * Create a {@code PacketPlayOutSpawnEntity} object.
-     * Only {@link EntityType#ARMOR_STAND} and {@link EntityType#DROPPED_ITEM} are supported!
+     * Only {@link EntityType#ARMOR_STAND} and {@link EntityType#ITEM} are supported!
      */
-    public Packet<PacketListenerPlayOut> createPacketSpawnEntity() {
+    public Packet<ClientGamePacketListener> createPacketSpawnEntity() {
         var v = getVector();
-        var mot = v == null ? new Vec3D(0,0,0) : new Vec3D(v.getX(),v.getY(),v.getZ());
-        return new PacketPlayOutSpawnEntity(entityId,uuid,location.getX(),location.getY(),location.getZ(),location.getPitch(),location.getYaw(),entityType,0,mot,0);
+        var mot = v == null ? new Vec3(0,0,0) : new Vec3(v.getX(),v.getY(),v.getZ());
+        return new ClientboundAddEntityPacket(entityId,uuid,location.getX(),location.getY(),location.getZ(),location.getPitch(),location.getYaw(),entityType,0,mot,0);
     }
 
     //创建实体传送包
-    public Packet<PacketListenerPlayOut> cratePacketEntityTeleport() {
-        var var0 = createDataSerializer();
-        var0.d(this.entityId);
-        var0.writeDouble(location.getX());
-        var0.writeDouble(location.getY());
-        var0.writeDouble(location.getZ());
-        var0.writeByte((byte) ((int) (location.getYaw() * 256.0F / 360.0F)));
-        var0.writeByte((byte) ((int) (location.getPitch() * 256.0F / 360.0F)));
-        var0.writeBoolean(true);
-        return new PacketPlayOutEntityTeleport(var0);
+    public Packet<ClientGamePacketListener> cratePacketEntityTeleport() {
+        var buff = createDataSerializer();
+        buff.writeInt(this.entityId);
+        buff.writeDouble(location.getX());
+        buff.writeDouble(location.getY());
+        buff.writeDouble(location.getZ());
+        buff.writeByte((byte) ((int) (location.getYaw() * 256.0F / 360.0F)));
+        buff.writeByte((byte) ((int) (location.getPitch() * 256.0F / 360.0F)));
+        buff.writeBoolean(true);
+        return ClientboundTeleportEntityPacket.STREAM_CODEC.decode(buff);
     }
 
     //创建实体骑乘包
-    public Packet<PacketListenerPlayOut> cratePacketMount(org.bukkit.entity.Entity entity) {
+    public Packet<ClientGamePacketListener> cratePacketMount(org.bukkit.entity.Entity entity) {
         var passengers = entity.getPassengers();
         ArrayList<Integer> list = new ArrayList<>(passengers.size() + 1);
         for (org.bukkit.entity.Entity passenger : passengers) {
@@ -279,25 +285,27 @@ public abstract class EntityWrapper {
         }
         if (!list.contains(getEntityId())) list.add(getEntityId());
         int[] array = Arrays.stream(list.toArray(new Integer[0])).mapToInt(Integer::valueOf).toArray();
-        return new PacketPlayOutMount(new PacketDataSerializer(Unpooled.buffer()).c(entity.getEntityId()).a(array));
+
+        final FriendlyByteBuf buff = new FriendlyByteBuf(Unpooled.buffer()).writeInt(entity.getEntityId()).writeVarIntArray(array);
+        return ClientboundSetPassengersPacket.STREAM_CODEC.decode(buff);
     }
 
-    public Packet<PacketListenerPlayOut> createPacketEntityDestroy() {
-        return new PacketPlayOutEntityDestroy(entityId);
+    public Packet<ClientGamePacketListener> createPacketEntityDestroy() {
+        return new ClientboundRemoveEntitiesPacket(entityId);
     }
 
     @Nullable
-    public Packet<PacketListenerPlayOut> createPacketEntityMetadata() {
-        final List<DataWatcher.b<?>> b = dataWatcher_packAll.invoke(getDataWatcher());
-        if (b != null) return new PacketPlayOutEntityMetadata(entityId,b);
+    public Packet<ClientGamePacketListener> createPacketEntityMetadata() {
+        final List<SynchedEntityData.DataValue<?>> b = getDataWatcher().packAll();
+        if (b != null) return new ClientboundSetEntityDataPacket(entityId,b);
         return null;
     }
 
     public void sendUpdate() {
         if (canVisble != null){
-            List<DataWatcher.b<?>> list = dataWatcher_packAll.invoke(getDataWatcher());
+            List<SynchedEntityData.DataValue<?>> list = getDataWatcher().packAll();
             if (list == null) return;
-            final PacketPlayOutEntityMetadata p = new PacketPlayOutEntityMetadata(entityId,list);
+            final ClientboundSetEntityDataPacket p = new ClientboundSetEntityDataPacket(entityId,list);
             playersForEach(player -> {
                 PacketUnit.sendPacket(p,player);
             });
@@ -310,13 +318,12 @@ public abstract class EntityWrapper {
 
     public void setCustomName(String customName) {
         this.customName = customName;
-        final IChatBaseComponent ibc = IChatBaseComponent.a(customName);
-        dataWatcher.b(displayName,Optional.of(ibc));
-        sendUpdate();
+        final Component ibc = Component.literal(customName);
+        dataWatcher.set(DATA_CUSTOM_NAME,Optional.of(ibc));
     }
 
     public void setVector(Player player,Vector v) {
-        final PacketPlayOutEntityVelocity p = new PacketPlayOutEntityVelocity(entityId,CraftVector.toNMS(v));
+        final ClientboundSetEntityMotionPacket p = new ClientboundSetEntityMotionPacket(entityId,CraftVector.toNMS(v));
         PacketUnit.sendPacket(p,player);
     }
 
@@ -325,14 +332,14 @@ public abstract class EntityWrapper {
     }
 
     public void setVector(Player player) {
-        final PacketPlayOutEntityVelocity p = new PacketPlayOutEntityVelocity(entityId,CraftVector.toNMS(vector));
+        final ClientboundSetEntityMotionPacket p = new ClientboundSetEntityMotionPacket(entityId,CraftVector.toNMS(vector));
         PacketUnit.sendPacket(p,player);
     }
 
     public void setVector(Vector v) {
         vector = v;
         if (canVisble != null){
-            final PacketPlayOutEntityVelocity p = new PacketPlayOutEntityVelocity(entityId,CraftVector.toNMS(v));
+            final ClientboundSetEntityMotionPacket p = new ClientboundSetEntityMotionPacket(entityId,CraftVector.toNMS(v));
             playersForEach(player -> {
                 PacketUnit.sendPacket(p,player);
             });
@@ -340,44 +347,90 @@ public abstract class EntityWrapper {
     }
 
     public void setNoGravity(boolean b) {
-        getDataWatcher().b(noGravity,b);
-        sendUpdate();
+        dataWatcher.set(DATA_NO_GRAVITY,b);
     }
 
-    public void setCustomNameVisible(boolean b) {
-        dataWatcher.b(name_visible,b);
+    public boolean isNoGravity() {
+        return dataWatcher.get(DATA_NO_GRAVITY);
+    }
+
+    public void setInvisible(boolean invisible) {
+        this.setSharedFlag(5,invisible);
+    }
+
+    public boolean getInvisible() {
+        return getSharedFlag(5);
+    }
+
+    public boolean hasCustomName() {
+        return ((Optional) this.dataWatcher.get(DATA_CUSTOM_NAME)).isPresent();
+    }
+
+    public void setCustomNameVisible(boolean visible) {
+        this.dataWatcher.set(DATA_CUSTOM_NAME_VISIBLE,visible);
+    }
+
+    public boolean isCustomNameVisible() {
+        return this.dataWatcher.get(DATA_CUSTOM_NAME_VISIBLE);
+    }
+
+
+    public boolean getSharedFlag(int index) {
+        return (this.dataWatcher.get(DATA_SHARED_FLAGS_ID) & 1 << index) != 0;
+    }
+
+    public void setSharedFlag(int index,boolean value) {
+        byte b0 = dataWatcher.get(DATA_SHARED_FLAGS_ID);
+        if (value){
+            this.dataWatcher.set(DATA_SHARED_FLAGS_ID,(byte) (b0 | 1 << index));
+        } else {
+            this.dataWatcher.set(DATA_SHARED_FLAGS_ID,(byte) (b0 & ~(1 << index)));
+        }
     }
 
     /**
-     * Create a NMS data watcher object to send via a {@code PacketPlayOutEntityMetadata} packet.
+     * Create a NMS data watcher object to send via a {@code ClientboundSetEntityDataPacket} packet.
      * Gravity will be disabled and the custom name will be displayed if available.
      */
     public void initDataWatcher() {
-        byte flags = (byte) (1 << 5);
-
-        //重写方法，不然会抛出null
-        //noinspection DataFlowIssue
-        dataWatcher = new DataWatcher(null) {
-            @Override
-            public <T> void a(@NotNull DataWatcherObject<T> datawatcherobject,@NotNull T value,boolean force) {
-                Item<T> datawatcher_item = (Item<T>) dataWatcher_getItem.invoke(this,datawatcherobject);
-                if (force || org.apache.commons.lang3.ObjectUtils.notEqual(value,datawatcher_item.b())){
-                    datawatcher_item.a(value);
-                    datawatcher_item.a(true);
-                    data_b1.set(this,true);
-                }
+        if (dataWatcherBuilder != null){
+            // 尝试初始化数据观察者
+            try{
+                dataWatcher = dataWatcherBuilder.build();
+                // 清理
+                dataWatcherBuilder = null;
+            }catch (IllegalStateException e){
+                // 如果初始化失败，获取ById的数据观察者数组
+                SynchedEntityData.DataItem<?>[] arrays = dataWatchBuilerById.get(dataWatcherBuilder);
+                // 打印日志
+                RPGArmour.logger.warning("当前参数: " + Arrays.toString(arrays));
+                // 获取当前实体类型对应的EntityDataAccessor数组
+                final EntityDataAccessor<?>[] helper = EntityUtils.getEntityDataWatchesHelper(NMSUtils.getEntityClass(entityType));
+                // 打印日志
+                RPGArmour.logger.warning("可用参数: " + Arrays.toString(helper));
+                throw e;
             }
-        };
-        dataWatcher.a(EntityWrapper.flags,flags);  //flags
-        dataWatcher.a(air_tick,300);
-        dataWatcher.a(name_visible,customName != null); // custname
-        dataWatcher.a(silent,true); // silent
-        dataWatcher.a(noGravity,false);
-        dataWatcher.a(displayName,Optional.empty());
+        }
     }
 
     @Deprecated
     public void sendPacket(Packet<?> packet,Player player) {
         PacketUnit.sendPacket(packet,player);
+    }
+
+
+    @Override
+    public void onSyncedDataUpdated(List<SynchedEntityData.DataValue<?>> entries) {
+
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> data) {
+
+    }
+
+    public SynchedEntityData.Builder getDataWatcherBuilder() {
+        if (dataWatcherBuilder == null) throw new IllegalArgumentException("This method can only be used at build");
+        return dataWatcherBuilder;
     }
 }

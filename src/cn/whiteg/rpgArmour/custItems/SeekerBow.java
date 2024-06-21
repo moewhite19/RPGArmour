@@ -10,16 +10,17 @@ import cn.whiteg.rpgArmour.api.CustItem_CustModle;
 import cn.whiteg.rpgArmour.entityWrapper.EntityWrapper;
 import cn.whiteg.rpgArmour.event.ReadyThrowEvent;
 import cn.whiteg.rpgArmour.utils.*;
-import net.minecraft.network.syncher.DataWatcherObject;
-import net.minecraft.world.entity.projectile.EntityProjectileThrowable;
-import net.minecraft.world.entity.projectile.EntitySnowball;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import org.bukkit.*;
 import org.bukkit.boss.BarColor;
 import org.bukkit.boss.BarStyle;
 import org.bukkit.boss.BossBar;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
+import org.bukkit.craftbukkit.entity.CraftThrowableProjectile;
+import org.bukkit.craftbukkit.inventory.CraftItemStack;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -293,18 +294,20 @@ public class SeekerBow extends CustItem_CustModle implements Listener {
     //选择指示
     public static class SelectorEntity extends EntityWrapper {
         private static final ItemStack item = new ItemStack(Material.SNOWBALL);
-        static DataWatcherObject<net.minecraft.world.item.ItemStack> itemData;
+        static EntityDataAccessor<net.minecraft.world.item.ItemStack> itemData;
 
         static {
             ItemMeta meta = item.getItemMeta();
             meta.setCustomModelData(10);
             item.setItemMeta(meta);
             try{
+
+
 //                var itemField = EntityProjectileThrowable.class.getDeclaredField("b");
-                var itemField = ReflectUtil.getFieldFormType(EntityProjectileThrowable.class,DataWatcherObject.class);
+                var itemField = ReflectUtil.getFieldFormType(ThrowableItemProjectile.class,EntityDataAccessor.class);
                 itemField.setAccessible(true);
                 //noinspection unchecked
-                itemData = (DataWatcherObject<net.minecraft.world.item.ItemStack>) itemField.get(null);
+                itemData = (EntityDataAccessor<net.minecraft.world.item.ItemStack>) itemField.get(null);
             }catch (NoSuchFieldException | IllegalAccessException e){
                 e.printStackTrace();
             }
@@ -312,19 +315,19 @@ public class SeekerBow extends CustItem_CustModle implements Listener {
 
 
         public SelectorEntity() {
-            super(NMSUtils.getEntityType(EntitySnowball.class));
+            super(NMSUtils.getEntityType(net.minecraft.world.entity.projectile.Snowball.class));
             initDataWatcher();
             setNoGravity(true);
         }
 
         /**
-         * Create a NMS data watcher object to send via a {@code PacketPlayOutEntityMetadata} packet.
+         * Create a NMS data watcher object to send via a {@code ClientboundSetEntityDataPacket} packet.
          * Gravity will be disabled and the custom name will be displayed if available.
          */
         @Override
         public void initDataWatcher() {
             super.initDataWatcher();
-            dataWatcher.a(itemData,CraftItemStack.asNMSCopy(item));
+            dataWatcher.set(itemData,CraftItemStack.asNMSCopy(item));
         }
     }
 

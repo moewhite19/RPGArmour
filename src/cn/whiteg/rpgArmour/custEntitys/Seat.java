@@ -6,8 +6,8 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityDismountEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
-import org.spigotmc.event.entity.EntityDismountEvent;
 
 import java.util.Set;
 
