@@ -8,7 +8,9 @@ import cn.whiteg.moepacketapi.utils.MethodInvoker;
 import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.utils.EntityUtils;
 import cn.whiteg.rpgArmour.utils.PacketUnit;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -54,6 +56,9 @@ public abstract class EntityWrapper implements SyncedDataHolder {
     SynchedEntityData.Builder dataWatcherBuilder;
     public final static AtomicInteger ENTITY_COUNT;
 
+    static FieldAccessor<Integer> setPassengersVehicleId;
+    static FieldAccessor<int[]> setPassengersArrays;
+
 
     static FieldAccessor<SynchedEntityData.DataItem<?>[]> dataWatchBuilerById;
     static ClassTreeIdRegistry ID_REGISTRY;
@@ -98,6 +103,9 @@ public abstract class EntityWrapper implements SyncedDataHolder {
             DATA_CUSTOM_NAME = (EntityDataAccessor<Optional<Component>>) ReflectUtil.getFieldAndAccessible(Entity.class,"DATA_CUSTOM_NAME").get(null);
             DATA_POSE = (EntityDataAccessor<Pose>) ReflectUtil.getFieldAndAccessible(Entity.class,"DATA_POSE").get(null);
             DATA_TICKS_FROZEN = (EntityDataAccessor<Integer>) ReflectUtil.getFieldAndAccessible(Entity.class,"DATA_TICKS_FROZEN").get(null);
+
+            setPassengersVehicleId = (FieldAccessor<Integer>) ReflectionFactory.createFieldAccessor(ReflectUtil.getFieldFormType(ClientboundSetPassengersPacket.class,int.class));
+            setPassengersArrays = (FieldAccessor<int[]>) ReflectionFactory.createFieldAccessor(ReflectUtil.getFieldFormType(ClientboundSetPassengersPacket.class,int[].class));
 
 
             //AtomicInteger
@@ -275,19 +283,26 @@ public abstract class EntityWrapper implements SyncedDataHolder {
         return ClientboundTeleportEntityPacket.STREAM_CODEC.decode(buff);
     }
 
-    //创建实体骑乘包
-    public Packet<ClientGamePacketListener> cratePacketMount(org.bukkit.entity.Entity entity) {
-        var passengers = entity.getPassengers();
-        ArrayList<Integer> list = new ArrayList<>(passengers.size() + 1);
-        for (org.bukkit.entity.Entity passenger : passengers) {
-            int id = passenger.getEntityId();
-            if (!list.contains(id)) list.add(id);
-        }
-        if (!list.contains(getEntityId())) list.add(getEntityId());
-        int[] array = Arrays.stream(list.toArray(new Integer[0])).mapToInt(Integer::valueOf).toArray();
+    //创建实体骑乘包(骑上实体)
+    //todo 暂时无效果
+    public Packet<ClientGamePacketListener> cratePacketMount(org.bukkit.entity.Entity vehicle) {
+        List<org.bukkit.entity.Entity> passengers = vehicle.getPassengers();
+        int[] array = new int[passengers.size() + 1];
 
-        final FriendlyByteBuf buff = new FriendlyByteBuf(Unpooled.buffer()).writeInt(entity.getEntityId()).writeVarIntArray(array);
-        return ClientboundSetPassengersPacket.STREAM_CODEC.decode(buff);
+        for (int i = 0; i < passengers.size(); i++) {
+            array[i] = passengers.get(i).getEntityId();
+        }
+        array[passengers.size()] = getEntityId();
+
+        final ClientboundSetPassengersPacket packet;
+        try{
+            packet = ReflectionFactory.allocateInstance(ClientboundSetPassengersPacket.class);
+        }catch (InstantiationException e){
+            throw new RuntimeException(e);
+        }
+        setPassengersVehicleId.set(packet,vehicle.getEntityId());
+        setPassengersArrays.set(packet,array);
+        return packet;
     }
 
     public Packet<ClientGamePacketListener> createPacketEntityDestroy() {

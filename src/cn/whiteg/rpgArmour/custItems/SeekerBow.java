@@ -8,6 +8,7 @@ import cn.whiteg.rpgArmour.RPGArmour;
 import cn.whiteg.rpgArmour.Setting;
 import cn.whiteg.rpgArmour.api.CustItem_CustModle;
 import cn.whiteg.rpgArmour.entityWrapper.EntityWrapper;
+import cn.whiteg.rpgArmour.entityWrapper.ThrowableItemWrapper;
 import cn.whiteg.rpgArmour.event.ReadyThrowEvent;
 import cn.whiteg.rpgArmour.utils.*;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -65,6 +66,7 @@ public class SeekerBow extends CustItem_CustModle implements Listener {
             saveTarget = c.getBoolean("saveTarget",saveTarget);
         }
     }
+
 
     @EventHandler
     public void takeAim(ReadyThrowEvent event) {
@@ -292,25 +294,14 @@ public class SeekerBow extends CustItem_CustModle implements Listener {
     }
 
     //选择指示
-    public static class SelectorEntity extends EntityWrapper {
-        private static final ItemStack item = new ItemStack(Material.SNOWBALL);
-        static EntityDataAccessor<net.minecraft.world.item.ItemStack> itemData;
+    public static class SelectorEntity extends ThrowableItemWrapper {
+        private static final ItemStack item;
 
         static {
+            item = new ItemStack(Material.SNOWBALL);
             ItemMeta meta = item.getItemMeta();
             meta.setCustomModelData(10);
             item.setItemMeta(meta);
-            try{
-
-
-//                var itemField = EntityProjectileThrowable.class.getDeclaredField("b");
-                var itemField = ReflectUtil.getFieldFormType(ThrowableItemProjectile.class,EntityDataAccessor.class);
-                itemField.setAccessible(true);
-                //noinspection unchecked
-                itemData = (EntityDataAccessor<net.minecraft.world.item.ItemStack>) itemField.get(null);
-            }catch (NoSuchFieldException | IllegalAccessException e){
-                e.printStackTrace();
-            }
         }
 
 
@@ -327,7 +318,7 @@ public class SeekerBow extends CustItem_CustModle implements Listener {
         @Override
         public void initDataWatcher() {
             super.initDataWatcher();
-            dataWatcher.set(itemData,CraftItemStack.asNMSCopy(item));
+            setItemStack(item);
         }
     }
 

@@ -103,7 +103,7 @@ public Vector3f bodyPose;
            protected int bd; <--
            protected int be;
      */
-            itemUseTimeLeftField = new FieldAccessor<>(LivingEntity.class.getDeclaredField("swingTime"));
+            itemUseTimeLeftField = new FieldAccessor<>(LivingEntity.class.getDeclaredField("useItemRemaining"));
         }catch (NoSuchFieldException e){
             e.printStackTrace();
         }
