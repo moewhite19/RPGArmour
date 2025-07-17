@@ -48,7 +48,7 @@ public class Muramasa extends CustItem_CustModle implements Listener {
         final double damage = event.getDamage() + 14;
         event.setDamage(damage);
         double ph = damager.getHealth();
-        AttributeInstance att = damager.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+        AttributeInstance att = damager.getAttribute(Attribute.MAX_HEALTH);
         final double max = att.getBaseValue() / 2;
         if (ph < max){
             ph += (event.getFinalDamage() / 2);

@@ -1,6 +1,8 @@
 package cn.whiteg.rpgArmour.entityWrapper;
 
+import cn.whiteg.mmocore.reflection.FieldAccessor;
 import cn.whiteg.mmocore.reflection.ReflectUtil;
+import cn.whiteg.mmocore.reflection.ReflectionFactory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Rotations;
 import net.minecraft.core.particles.ParticleOptions;
@@ -29,6 +31,10 @@ public abstract class LivingEntityWrapper extends EntityWrapper {
     static final EntityDataAccessor<Integer> DATA_STINGER_COUNT_ID;
     static final EntityDataAccessor<Optional<BlockPos>> SLEEPING_POS_ID;
 
+    //栓绳包节点
+    static FieldAccessor<Integer> setLeashSourceId;
+    static FieldAccessor<Integer> setLeashDestId;
+
 
     static {
         try{
@@ -40,6 +46,10 @@ public abstract class LivingEntityWrapper extends EntityWrapper {
             DATA_STINGER_COUNT_ID = (EntityDataAccessor<Integer>) ReflectUtil.getFieldAndAccessible(LivingEntity.class,"DATA_STINGER_COUNT_ID").get(null);
             SLEEPING_POS_ID = (EntityDataAccessor<Optional<BlockPos>>) ReflectUtil.getFieldAndAccessible(LivingEntity.class,"SLEEPING_POS_ID").get(null);
             DATA_LIVING_ENTITY_FLAGS = (EntityDataAccessor<Byte>) ReflectUtil.getFieldAndAccessible(LivingEntity.class,"DATA_LIVING_ENTITY_FLAGS").get(null);
+
+
+            setLeashSourceId = (FieldAccessor<Integer>) ReflectionFactory.createFieldAccessor(ClientboundSetEntityLinkPacket.class.getDeclaredField("sourceId"));
+            setLeashDestId = (FieldAccessor<Integer>) ReflectionFactory.createFieldAccessor(ClientboundSetEntityLinkPacket.class.getDeclaredField("destId"));
         }catch (IllegalAccessException | NoSuchFieldException e){
             throw new RuntimeException(e);
         }
@@ -58,9 +68,18 @@ public abstract class LivingEntityWrapper extends EntityWrapper {
     }
 
     public Packet<ClientGamePacketListener> createPacketLeashHolder(int targetId) {
-        FriendlyByteBuf buff = createDataSerializer();
-        buff.writeInt(this.getEntityId()).writeInt(targetId);
-        return ClientboundSetEntityLinkPacket.STREAM_CODEC.decode(buff);
+        final ClientboundSetEntityLinkPacket linkPacket;
+        try{
+            linkPacket = ReflectionFactory.allocateInstance(ClientboundSetEntityLinkPacket.class);
+        }catch (InstantiationException e){
+            throw new RuntimeException(e);
+        }
+        setLeashSourceId.set(linkPacket,getEntityId());
+        setLeashDestId.set(linkPacket,targetId);
+        return linkPacket;
+//        FriendlyByteBuf buff = createDataSerializer();
+//        buff.writeInt(this.getEntityId()).writeInt(targetId);
+//        return ClientboundSetEntityLinkPacket.STREAM_CODEC.decode(buff);
 
     }
 

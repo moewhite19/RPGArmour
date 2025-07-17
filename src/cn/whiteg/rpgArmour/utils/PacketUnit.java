@@ -10,11 +10,11 @@ public class PacketUnit {
         if (player.isOnline()){
             ServerPlayer nmsPlayer = EntityUtils.getNmsPlayer(player);
             var pc = EntityUtils.getServerGamePacketListenerImpl(nmsPlayer);
-            pc.sendPacket(packet);
+            pc.send(packet);
         }
     }
 
     public static void sendPacket(Packet<?> packet,ServerGamePacketListenerImpl connection) {
-        connection.sendPacket(packet);
+        connection.send(packet);
     }
 }

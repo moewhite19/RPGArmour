@@ -117,13 +117,13 @@ public class ZombieWarrior extends CustEntityName implements Listener, CommandEx
         EntityEquipment ej = ((LivingEntity) entity).getEquipment();
         ej.setHelmet(hat);
         ej.setHelmetDropChance(0);
-        AttributeInstance ab = livent.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+        AttributeInstance ab = livent.getAttribute(Attribute.MAX_HEALTH);
         ab.setBaseValue(80);
-        ab = livent.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+        ab = livent.getAttribute(Attribute.MOVEMENT_SPEED);
         ab.setBaseValue(0.3);
-        ab = livent.getAttribute(Attribute.GENERIC_ARMOR);
+        ab = livent.getAttribute(Attribute.ARMOR);
         ab.setBaseValue(10);
-        ab = livent.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+        ab = livent.getAttribute(Attribute.KNOCKBACK_RESISTANCE);
         ab.setBaseValue(0.5D);
         livent.setHealth(80);
         if (RandomUtil.getRandom().nextDouble() < 0.25){

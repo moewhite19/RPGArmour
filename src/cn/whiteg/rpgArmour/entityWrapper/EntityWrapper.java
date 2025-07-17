@@ -56,8 +56,10 @@ public abstract class EntityWrapper implements SyncedDataHolder {
     SynchedEntityData.Builder dataWatcherBuilder;
     public final static AtomicInteger ENTITY_COUNT;
 
+    //骑乘包节点
     static FieldAccessor<Integer> setPassengersVehicleId;
     static FieldAccessor<int[]> setPassengersArrays;
+
 
 
     static FieldAccessor<SynchedEntityData.DataItem<?>[]> dataWatchBuilerById;
@@ -104,6 +106,7 @@ public abstract class EntityWrapper implements SyncedDataHolder {
             DATA_POSE = (EntityDataAccessor<Pose>) ReflectUtil.getFieldAndAccessible(Entity.class,"DATA_POSE").get(null);
             DATA_TICKS_FROZEN = (EntityDataAccessor<Integer>) ReflectUtil.getFieldAndAccessible(Entity.class,"DATA_TICKS_FROZEN").get(null);
 
+            //骑乘包节点
             setPassengersVehicleId = (FieldAccessor<Integer>) ReflectionFactory.createFieldAccessor(ReflectUtil.getFieldFormType(ClientboundSetPassengersPacket.class,int.class));
             setPassengersArrays = (FieldAccessor<int[]>) ReflectionFactory.createFieldAccessor(ReflectUtil.getFieldFormType(ClientboundSetPassengersPacket.class,int[].class));
 
@@ -144,10 +147,6 @@ public abstract class EntityWrapper implements SyncedDataHolder {
                 .define(DATA_POSE,Pose.STANDING)
                 .define(DATA_TICKS_FROZEN,0);
 
-    }
-
-    public static FriendlyByteBuf createDataSerializer() {
-        return new FriendlyByteBuf(Unpooled.buffer());
     }
 
     public void setVisible(Player player,boolean visible) {
@@ -338,7 +337,7 @@ public abstract class EntityWrapper implements SyncedDataHolder {
     }
 
     public void setVector(Player player,Vector v) {
-        final ClientboundSetEntityMotionPacket p = new ClientboundSetEntityMotionPacket(entityId,CraftVector.toNMS(v));
+        final ClientboundSetEntityMotionPacket p = new ClientboundSetEntityMotionPacket(entityId,CraftVector.toVec3(v));
         PacketUnit.sendPacket(p,player);
     }
 
@@ -347,14 +346,14 @@ public abstract class EntityWrapper implements SyncedDataHolder {
     }
 
     public void setVector(Player player) {
-        final ClientboundSetEntityMotionPacket p = new ClientboundSetEntityMotionPacket(entityId,CraftVector.toNMS(vector));
+        final ClientboundSetEntityMotionPacket p = new ClientboundSetEntityMotionPacket(entityId,CraftVector.toVec3(vector));
         PacketUnit.sendPacket(p,player);
     }
 
     public void setVector(Vector v) {
         vector = v;
         if (canVisble != null){
-            final ClientboundSetEntityMotionPacket p = new ClientboundSetEntityMotionPacket(entityId,CraftVector.toNMS(v));
+            final ClientboundSetEntityMotionPacket p = new ClientboundSetEntityMotionPacket(entityId,CraftVector.toVec3(v));
             playersForEach(player -> {
                 PacketUnit.sendPacket(p,player);
             });
@@ -426,6 +425,10 @@ public abstract class EntityWrapper implements SyncedDataHolder {
                 throw e;
             }
         }
+    }
+
+    public static FriendlyByteBuf createDataSerializer() {
+        return new FriendlyByteBuf(Unpooled.buffer());
     }
 
     @Deprecated

@@ -123,7 +123,7 @@ public class SamuraiSword extends CustItem_CustModle implements Listener {
                 Item dropItem = loc.getWorld().dropItem(loc,main);
                 if (dropItem.isDead()) return;
                 dropItem.setVelocity(VectorUtils.viewVector(loc));
-                main.setData(null);
+                main.setAmount(0);
             }
             if (ItemToolUtil.damage(off,3)){
                 loc.getWorld().playSound(loc,sound_damagebad,1,1);
@@ -247,7 +247,7 @@ public class SamuraiSword extends CustItem_CustModle implements Listener {
 
     @Override
     public boolean hasId(int i) {
-        return i == getId() | i ==id2;
+        return i == getId() | i == id2;
     }
 
     public int isItem(ItemStack item) {

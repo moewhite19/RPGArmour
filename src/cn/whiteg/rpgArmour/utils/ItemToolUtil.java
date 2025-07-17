@@ -46,13 +46,21 @@ public class ItemToolUtil {
 
     //消耗物品耐久度
     public static int damageRest(ItemStack item,int dam) {
-        Damageable im = (Damageable) item.getItemMeta();
-        if (!((ItemMeta) im).isUnbreakable()){
-            int nd = im.getDamage() + dam;
-            im.setDamage(nd);
-            item.setItemMeta((ItemMeta) im);
+        if (item.getItemMeta() instanceof Damageable im){
+            if (!im.isUnbreakable()){
+                int nd = im.getDamage() + dam;
+                im.setDamage(nd);
+                item.setItemMeta(im);
+            }
+            final int maxDamage;
+            if (im.hasMaxDamage()){
+                maxDamage = im.getMaxDamage();
+            } else {
+                maxDamage = item.getType().getMaxDurability();
+            }
+            return maxDamage - im.getDamage();
         }
-        return item.getType().getMaxDurability() - im.getDamage();
+        return 0;
     }
 
     //复制附魔

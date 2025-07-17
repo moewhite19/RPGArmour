@@ -151,11 +151,11 @@ public class SkeletonWin extends CustEntityName implements Listener, CommandExec
 //        ah = new AttributeModifier(UUID.randomUUID(),"hed",20,AttributeModifier.Operation.ADD_NUMBER,EquipmentSlot.HEAD);
 //        im.addAttributeModifier(Attribute.GENERIC_ARMOR,ah);
 //        hat.setItemMeta(im);
-        AttributeInstance ab = livent.getAttribute(Attribute.GENERIC_MAX_HEALTH);
+        AttributeInstance ab = livent.getAttribute(Attribute.MAX_HEALTH);
         ab.setBaseValue(500);
-        ab = livent.getAttribute(Attribute.GENERIC_MOVEMENT_SPEED);
+        ab = livent.getAttribute(Attribute.MOVEMENT_SPEED);
         ab.setBaseValue(0.3);
-        ab = livent.getAttribute(Attribute.GENERIC_FOLLOW_RANGE);
+        ab = livent.getAttribute(Attribute.FOLLOW_RANGE);
         ab.setBaseValue(128);
         livent.setHealth(150);
         ej.setHelmet(hat);

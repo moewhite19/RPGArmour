@@ -32,10 +32,6 @@ public class EntityUtils {
     public static Field sizeField;
     public static Field goalTargetField;
     public static FieldAccessor<Integer> fieldArmorStandDisabledSlots;
-    private static FieldAccessor<Boolean> jump;
-    private static FieldAccessor<Float> inputX;
-    private static FieldAccessor<Float> inputY;
-    private static FieldAccessor<Float> inputZ;
     private static FieldAccessor<Integer> itemUseTimeLeftField;
     private static FieldAccessor<ServerGamePacketListenerImpl> playerConnectionField;
     private static FieldAccessor<ServerPlayerGameMode> playerInteractManagerField;
@@ -118,20 +114,6 @@ public Vector3f bodyPose;
         }
 
 
-        //获取实体在骑乘中的操作
-        try{
-            var result = ReflectUtil.getFieldFormStructure(LivingEntity.class,boolean.class,float.class,float.class,float.class);
-            for (Field field : result) {
-                field.setAccessible(true);
-            }
-            jump = new FieldAccessor<>(result[0]);
-            inputX = new FieldAccessor<>(result[1]);
-            inputY = new FieldAccessor<>(result[2]);
-            inputZ = new FieldAccessor<>(result[3]);
-        }catch (NoSuchFieldException e){
-            e.printStackTrace();
-//            throw new IllegalArgumentException("搜索不到方法" + Arrays.toString(fields));
-        }
         //获取实体的Pitch和Yaw
         try{
             var result = ReflectUtil.getFieldFormStructure(Entity.class,Vec3.class,float.class,float.class,float.class,float.class);
@@ -202,28 +184,36 @@ public Vector3f bodyPose;
         ent.setBoundingBox(bb);
     }
 
-    //设置实体是否要跳跃
-    public static void setJumping(org.bukkit.entity.LivingEntity entity,boolean jumpin) {
-        jump.set(getNmsEntity(entity),jumpin);
-    }
 
     public static boolean getJumping(org.bukkit.entity.LivingEntity entity) {
-        return jump.get(getNmsEntity(entity));
+        if (getNmsEntity(entity) instanceof ServerPlayer player){
+            return player.getLastClientInput().jump();
+        }
+        return false;
     }
 
     //获取玩家控制坐骑的平行X轴(左右
     public static float getInputX(org.bukkit.entity.LivingEntity entity) {
-        return inputX.get(getNmsEntity(entity));
+        if (getNmsEntity(entity) instanceof ServerPlayer player){
+            return (float) player.getLastClientMoveIntent().x;
+        }
+        return 0f;
     }
 
     //获取玩家控制坐骑的前后Z轴(前后
     public static float getInputZ(org.bukkit.entity.LivingEntity entity) {
-        return inputZ.get(getNmsEntity(entity));
+        if (getNmsEntity(entity) instanceof ServerPlayer player){
+            return (float) player.getLastClientMoveIntent().z;
+        }
+        return 0f;
     }
 
     //获取玩家控制坐骑的前后Y轴(意味不明
     public static float getInputY(org.bukkit.entity.LivingEntity entity) {
-        return inputY.get(getNmsEntity(entity));
+        if (getNmsEntity(entity) instanceof ServerPlayer player){
+            return (float) player.getLastClientMoveIntent().y;
+        }
+        return 0f;
     }
 
     /*

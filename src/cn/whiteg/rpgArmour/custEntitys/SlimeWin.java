@@ -115,9 +115,9 @@ public class SlimeWin extends CustEntityName implements Listener, CommandExecuto
     public boolean init(final Entity entity) {
         if (entity instanceof Slime slim && super.init(entity)){
             slim.getEquipment().setHelmet(new ItemStack(Material.SLIME_BLOCK));
-            AttributeInstance ab = slim.getAttribute(Attribute.GENERIC_KNOCKBACK_RESISTANCE);
+            AttributeInstance ab = slim.getAttribute(Attribute.KNOCKBACK_RESISTANCE);
             ab.setBaseValue(1);
-            ab = slim.getAttribute(Attribute.GENERIC_ARMOR);
+            ab = slim.getAttribute(Attribute.ARMOR);
             ab.setBaseValue(10);
         }
         return false;
